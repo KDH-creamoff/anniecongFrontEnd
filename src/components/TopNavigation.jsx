@@ -18,17 +18,17 @@ export function TopNavigation({ currentPage, onNavigate }) {
       label: "기초정보",
       icon: <Settings className="w-4 h-4" />,
       sidebarKey: "basicInfo",
-      sidebarChildKey: "nav1",
+      sidebarChildKey: "basic_nav1",
     },
     {
       key: "manufacturing",
       label: "제조",
       icon: <Factory className="w-4 h-4" />,
       sidebarKey: "manufacturing",
-      sidebarChildKey: "nav1",
+      sidebarChildKey: "manufacturing_nav1",
     },
     {
-      key: "quality",
+      key: "inventory",
       label: "품질",
       icon: <BarChart3 className="w-4 h-4" />,
       sidebarKey: "inventory",
@@ -46,14 +46,14 @@ export function TopNavigation({ currentPage, onNavigate }) {
       label: "주문",
       icon: <ShoppingCart className="w-4 h-4" />,
       sidebarKey: "receiving",
-      sidebarChildKey: "nav1",
+      sidebarChildKey: "receiving_nav1",
     },
     {
       key: "shipping",
       label: "출고",
       icon: <Truck className="w-4 h-4" />,
       sidebarKey: "shipping",
-      sidebarChildKey: "nav1",
+      sidebarChildKey: "shipping_nav1",
     },
   ];
 
