@@ -35,20 +35,6 @@ export function Sidebar({
     "approval",
   ]);
 
-  // TopNavigation tab-to-sidebar mapping
-  const topNavToSidebarMap = {
-    기초정보: { page: "basicInfo", parent: "basic" },
-    제조: { page: "plant1Processing", parent: "manufacturing" },
-    품질: { page: "inventoryHistory", parent: "inventory" },
-    라벨: {
-      page: "labelManagement",
-      parent: "basic",
-      child: "barcodeTemplate",
-    },
-    주문: { page: "receiving", parent: "receiving" },
-    출고: { page: "shipping", parent: "shipping" },
-  };
-
   const menuItems = [
     {
       id: "dashboard",
