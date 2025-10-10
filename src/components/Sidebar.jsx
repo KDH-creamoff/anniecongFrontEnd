@@ -79,8 +79,8 @@ export function Sidebar({
           page: "receiving_nav1",
         },
         {
-          id: "nav2",
-          label: "receiving_nav2",
+          id: "receiving_nav2",
+          label: "nav2",
           icon: <BarChart3 className="w-3 h-3" />,
           page: "receiving_nav2",
         },
