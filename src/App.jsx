@@ -13,7 +13,7 @@ import { Label } from "./components/pages/label/Label";
 import { UserManagement } from "./components/pages/user-management/UserManagement";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("basicInfo-nav1");
+  const [currentPage, setCurrentPage] = useState("basic_nav1");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const renderPage = () => {

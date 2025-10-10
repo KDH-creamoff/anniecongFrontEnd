@@ -221,7 +221,7 @@ export function Sidebar({
     const isActive = item.page === currentPage;
 
     return (
-      <div key={item.id}>
+      <div key={item.id} class="overflow-x-hidden">
         <Button
           variant="ghost"
           className={`w-full justify-start px-2 py-1.5 h-auto ${
@@ -314,13 +314,13 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="p-2 border-t border-[#F5E9D5]">
+      {/* <div className="p-2 border-t border-[#F5E9D5]">
         {!collapsed && (
           <div className="text-xs text-[#333333] text-center">
             <p className="text-[#A3C478]">● 연결됨</p>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
