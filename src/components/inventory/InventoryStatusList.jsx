@@ -14,7 +14,7 @@ const InventoryStatusList = ({ filters }) => {
       lotNumber: 'LOT20250909001',
       expiryDate: '2025-09-16',
       daysLeft: '-27일',
-      status: '정상'
+      status: '정상',
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ const InventoryStatusList = ({ filters }) => {
       lotNumber: 'LOT20250910002',
       expiryDate: '2025-09-13',
       daysLeft: '-30일',
-      status: '유통기한임박'
+      status: '유통기한임박',
     },
     {
       id: 3,
@@ -40,7 +40,7 @@ const InventoryStatusList = ({ filters }) => {
       lotNumber: 'LOT20250908003',
       expiryDate: '2025-10-08',
       daysLeft: '-5일',
-      status: '정상'
+      status: '정상',
     },
     {
       id: 4,
@@ -53,68 +53,101 @@ const InventoryStatusList = ({ filters }) => {
       lotNumber: 'LOT20250907004',
       expiryDate: '2025-09-21',
       daysLeft: '-22일',
-      status: '부족'
-    }
+      status: '부족',
+    },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className='overflow-hidden rounded-xl bg-white shadow-sm'>
       {/* 헤더 */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <Package className="w-5 h-5 text-[#674529]" />
-          <h3 className="text-base font-semibold text-[#674529]">재고 현황 (4건)</h3>
+      <div className='border-b border-gray-200 px-6 py-4'>
+        <div className='flex items-center space-x-2'>
+          <Package className='h-5 w-5 text-[#674529]' />
+          <h3 className='text-base text-[#674529]'>재고 현황 (4건)</h3>
         </div>
       </div>
 
       {/* 테이블 */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-[#F9F6F2] border-b border-gray-200">
+      <div className='overflow-x-auto'>
+        <table className='w-full'>
+          <thead className='border-b border-gray-200'>
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">품목코드</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">품목명</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">카테고리</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">재고량</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">창고/위치</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">로트번호</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">유통기한</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">상태</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-[#674529]">이력</th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                품목코드
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                품목명
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                카테고리
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                재고량
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                창고/위치
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                바코드번호
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>
+                유통기한
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>상태</th>
+              <th className='px-4 py-3 text-left text-sm font-medium'>이력</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className='divide-y divide-gray-100'>
             {mockData.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.code}</td>
-                <td className="px-4 py-4 text-sm text-gray-900">{item.name}</td>
-                <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
-                <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.quantity}</td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center space-x-1 text-sm text-gray-700">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    <span>{item.warehouse} {item.warehouseCode}</span>
+              <tr
+                key={item.id}
+                className='transition-colors hover:bg-gray-50/50'
+              >
+                <td className='px-4 py-4 text-sm font-medium text-gray-900'>
+                  {item.code}
+                </td>
+                <td className='px-4 py-4 text-sm text-gray-900'>{item.name}</td>
+                <td className='px-4 py-4 text-sm text-gray-700'>
+                  {item.category}
+                </td>
+                <td className='px-4 py-4 text-sm font-medium text-gray-900'>
+                  {item.quantity}
+                </td>
+                <td className='px-4 py-4'>
+                  <div className='flex items-center space-x-1 text-sm text-gray-700'>
+                    <MapPin className='h-4 w-4 text-gray-500' />
+                    <span>
+                      {item.warehouse} {item.warehouseCode}
+                    </span>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-700">{item.lotNumber}</td>
-                <td className="px-4 py-4">
-                  <div className="flex items-center space-x-1 text-sm text-gray-700">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span>{item.expiryDate} {item.daysLeft}</span>
+                <td className='px-4 py-4 text-sm text-gray-700'>
+                  {item.lotNumber}
+                </td>
+                <td className='px-4 py-4'>
+                  <div className='flex items-center space-x-1 text-sm text-gray-700'>
+                    <Clock className='h-4 w-4 text-gray-500' />
+                    <span>
+                      {item.expiryDate} {item.daysLeft}
+                    </span>
                   </div>
                 </td>
-                <td className="px-4 py-4">
-                  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded ${
-                    item.status === '정상' ? 'bg-green-100 text-green-700' :
-                    item.status === '부족' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-orange-100 text-orange-700'
-                  }`}>
+                <td className='px-4 py-4'>
+                  <span
+                    className={`inline-flex rounded px-3 py-1 text-xs font-medium ${
+                      item.status === '정상'
+                        ? 'bg-green-100 text-green-700'
+                        : item.status === '부족'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-orange-100 text-orange-700'
+                    }`}
+                  >
                     {item.status}
                   </span>
                 </td>
-                <td className="px-4 py-4">
-                  <button className="text-gray-500 hover:text-[#674529] transition-colors">
-                    <Search className="w-5 h-5" />
+                <td className='px-4 py-4'>
+                  <button className='text-gray-500 transition-colors hover:text-[#674529]'>
+                    <Search className='h-5 w-5' />
                   </button>
                 </td>
               </tr>
