@@ -4,6 +4,9 @@ import InventoryTabSelector from '../components/inventory/InventoryTabSelector';
 import InventoryStatusFilter from '../components/inventory/InventoryStatusFilter';
 import InventoryStatusSummary from '../components/inventory/InventoryStatusSummary';
 import InventoryStatusList from '../components/inventory/InventoryStatusList';
+import InventoryMovementList from '../components/inventory/InventoryMovementList';
+import InventoryAlertsSummary from '../components/inventory/InventoryAlertsSummary';
+import WarehouseUtilization from '../components/inventory/WarehouseUtilization';
 
 const Inventory = () => {
   const [activeTab, setActiveTab] = useState('status');
@@ -11,7 +14,7 @@ const Inventory = () => {
     category: '전체',
     warehouse: '전체',
     status: '전체',
-    searchTerm: ''
+    searchTerm: '',
   });
 
   const handleFilterChange = (newFilters) => {
@@ -38,15 +41,16 @@ const Inventory = () => {
         );
       case 'tracking':
         return (
-          <div className="bg-white rounded-xl p-8 shadow-sm text-center">
-            <p className="text-gray-600">이력 추적 기능은 준비 중입니다.</p>
-          </div>
+          <>
+            <InventoryMovementList />
+          </>
         );
       case 'dashboard':
         return (
-          <div className="bg-white rounded-xl p-8 shadow-sm text-center">
-            <p className="text-gray-600">분석 대시보드는 준비 중입니다.</p>
-          </div>
+          <>
+            <InventoryAlertsSummary />
+            <WarehouseUtilization />
+          </>
         );
       default:
         return null;
@@ -56,19 +60,22 @@ const Inventory = () => {
   return (
     <div>
       {/* 페이지 헤더 */}
-      <div className="flex items-center justify-between mb-6">
+      <div className='mb-6 flex items-center justify-between'>
         <div>
-          <div className="flex items-center space-x-2 mb-1">
-            <BarChart3 className="w-5 h-5 text-[#674529]" />
-            <h1 className="text-lg font-semibold text-[#674529]">재고/이력 조회</h1>
+          <div className='mb-1 flex items-center space-x-2'>
+            <BarChart3 className='h-5 w-5 text-[#674529]' />
+            <h1 className='text-lg font-semibold text-[#674529]'>
+              재고/이력 조회
+            </h1>
           </div>
-          <p className="text-sm text-gray-600">공장, 창고, 로트, 유통기한 필터 및 바코드 히스토리</p>
+          <p className='text-sm text-gray-600'>
+            공장, 창고, 로트, 유통기한 필터 및 바코드 히스토리
+          </p>
         </div>
         <button
           onClick={handleExport}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-[#674529] rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          className='flex items-center space-x-2 rounded-xl border border-[#674529] bg-white px-4 py-2.5 font-medium text-[#674529] transition-colors hover:bg-gray-50'
         >
-          <Download size={16} />
           <span>데이터 내보내기</span>
         </button>
       </div>
