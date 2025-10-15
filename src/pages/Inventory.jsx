@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Download } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import InventoryTabSelector from '../components/inventory/InventoryTabSelector';
 import InventoryStatusFilter from '../components/inventory/InventoryStatusFilter';
 import InventoryStatusSummary from '../components/inventory/InventoryStatusSummary';

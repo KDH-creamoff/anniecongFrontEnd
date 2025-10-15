@@ -19,7 +19,7 @@ const Dash = () => {
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
       라벨관리: '/label',
-      사용자관리: '/user-management',
+      사용자관리: '/user',
     };
 
     navigate(navMap[nav] || '/dash');
