@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import ManufacturingManagement from '../components/dashboard/ManufacturingManagement';
 import MainModule from '../components/dashboard/MainModule';
-import UrgentMatters from '../components/dashboard/UrgentMatters';
-import ProductionStatus from '../components/dashboard/ProductionStatus';
 
 const Dash = () => {
   const navigate = useNavigate();
@@ -11,13 +9,21 @@ const Dash = () => {
     const navMap = {
       대시보드: '/dash',
       기초정보: '/basic',
-      입고관리: '/receiving',
+      '기초정보-품목등록': '/basic',
+      '기초정보-공정정보': '/basic',
+      '기초정보-BOM관리': '/basic',
+      입출고관리: '/receiving',
       '제조관리-nav1': '/manufacturing/nav1',
       '제조관리-nav2': '/manufacturing/nav2',
       '제조관리-nav3': '/manufacturing/nav3',
       재고관리: '/inventory',
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
+      '배송관리-nav3': '/shipping/nav3',
+      '생산관리-nav1': '/production/nav1',
+      '생산관리-nav2': '/production/nav2',
+      '전자결재-nav1': '/approval/nav1',
+      '전자결재-nav2': '/approval/nav2',
       라벨관리: '/label',
       사용자관리: '/user',
     };
@@ -44,11 +50,6 @@ const Dash = () => {
       {/* 나머지 대시보드 컴포넌트들 */}
       <div className='mb-6'>
         <MainModule onNavigate={handleNavigate} />
-      </div>
-
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-        <UrgentMatters />
-        <ProductionStatus />
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ const AccessLogList = () => {
       time: '2025-09-11 09:15',
       user: '김검수',
       action: '입고 검수',
-      module: '입고관리',
+      module: '입출고관리',
       ipAddress: '192.168.1.120',
       result: '성공',
       resultBg: 'bg-green-100',
