@@ -8,7 +8,6 @@ const FactoryInfo = () => {
       name: '애니콩 의성 공장',
       address: '경북 의성군 안계면 용기5길 12 애니콩 본사',
       processes: ['원재료 입고', '절단', '세척', '전처리', '농산물 가공'],
-      warehouses: ['P1-US1', 'P1-US2'],
     },
     {
       id: 2,
@@ -16,7 +15,6 @@ const FactoryInfo = () => {
       name: '애니콩 상주 공장',
       address: '경북 상주시 냉림1길 66 애니콩 건물 상주지사',
       processes: ['혼합/배합', '조리/제이킹', '포장', '냉동보관'],
-      warehouses: [' P2-SJ1', 'P2-SJ2'],
     },
   ];
 
@@ -73,23 +71,6 @@ const FactoryInfo = () => {
                   >
                     {process}
                   </span>
-                ))}
-              </div>
-            </div>
-
-            {/* 창고코드 */}
-            <div>
-              <label className='mb-2 block text-sm font-medium text-gray-700'>
-                창고코드
-              </label>
-              <div className='grid grid-cols-2 gap-2 md:grid-cols-2'>
-                {factory.warehouses.map((warehouse, index) => (
-                  <div
-                    key={index}
-                    className='rounded-xl bg-gray-100 px-4 py-2.5 text-sm text-gray-900'
-                  >
-                    {warehouse}
-                  </div>
                 ))}
               </div>
             </div>

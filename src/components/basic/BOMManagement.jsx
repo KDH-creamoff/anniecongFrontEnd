@@ -1,12 +1,6 @@
 import { useState } from 'react';
-import {
-  Package,
-  ChevronLeft,
-  ChevronRight,
-  Trash2,
-  Plus,
-  X,
-} from 'lucide-react';
+import { Package, Trash2, Plus, X } from 'lucide-react';
+import Pagination from '../common/Pagination';
 
 const BOMManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -536,23 +530,6 @@ const BOMManagement = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentData = bomData.slice(startIndex, endIndex);
 
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 5;
-
-    const currentBlock = Math.floor((currentPage - 1) / maxVisible);
-
-    const startPage = currentBlock * maxVisible + 1;
-
-    const endPage = Math.min(startPage + maxVisible - 1, totalPages);
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return pages;
-  };
-
   const handleDelete = (id) => {
     setBomData(bomData.filter((item) => item.id !== id));
   };
@@ -726,39 +703,11 @@ const BOMManagement = () => {
         </button>
       </div>
 
-      <div className='mt-6 flex items-center justify-center gap-2'>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className='flex h-8 w-8 items-center justify-center rounded bg-[#e1d6c3] text-[#674529] hover:bg-[#d6c7b3] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#e9dfd3]'
-        >
-          <ChevronLeft className='h-4 w-4' />
-        </button>
-
-        {getPageNumbers().map((pageNum) => (
-          <button
-            key={pageNum}
-            onClick={() => setCurrentPage(pageNum)}
-            className={`h-8 w-8 rounded border ${
-              currentPage === pageNum
-                ? 'border-[#674529] bg-[#674529] text-white'
-                : 'border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            {pageNum}
-          </button>
-        ))}
-
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className='flex h-8 w-8 items-center justify-center rounded bg-[#e1d6c3] text-[#674529] hover:bg-[#d6c7b3] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#e9dfd3]'
-        >
-          <ChevronRight className='h-4 w-4' />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
