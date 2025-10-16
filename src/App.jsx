@@ -21,7 +21,7 @@ export default function App() {
       <Route path='/signup' element={<Signup />} />
 
       {/* 메인 애플리케이션 라우트 */}
-      <Route path='/' element={<Navigate to='/login' replace />} />
+      <Route path='/' element={<Navigate to='/dash' replace />} />
       <Route path='/' element={<Home />}>
         <Route path='dash' element={<Dash />} />
         <Route path='basic' element={<Basic />} />
