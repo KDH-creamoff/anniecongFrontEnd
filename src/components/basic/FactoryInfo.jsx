@@ -1,4 +1,4 @@
-import { Factory } from 'lucide-react';
+import { Factory, X, Plus } from 'lucide-react';
 
 const FactoryInfo = () => {
   const factories = [
@@ -59,19 +59,26 @@ const FactoryInfo = () => {
               <label className='mb-2 block text-sm font-medium text-gray-700'>
                 담당 공정
               </label>
-              <div className='flex flex-wrap gap-2'>
+              <div className='flex flex-wrap items-center gap-2'>
                 {factory.processes.map((process, index) => (
                   <span
                     key={index}
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
                       factory.id === 1
                         ? 'bg-[#a3c478] text-[#fff]'
                         : 'bg-[#f9b679] text-[#fff]'
                     }`}
                   >
                     {process}
+                    <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
                   </span>
                 ))}
+                <button
+                  className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
+                  aria-label='공정 추가'
+                >
+                  <Plus className='h-4 w-4 text-gray-600' />
+                </button>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { Thermometer } from 'lucide-react';
+import { Thermometer, X, Plus } from 'lucide-react';
 
 const StorageTemperature = () => {
   return (
@@ -36,13 +36,21 @@ const StorageTemperature = () => {
             <label className='mb-2 block text-sm font-medium text-gray-700'>
               적용 품목
             </label>
-            <div className='flex flex-wrap gap-2'>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+            <div className='flex flex-wrap items-center gap-2'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 건조 식료
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 포장재
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
+              <button
+                className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
+                aria-label='품목 추가'
+              >
+                <Plus className='h-4 w-4 text-gray-600' />
+              </button>
             </div>
           </div>
         </div>
@@ -81,16 +89,25 @@ const StorageTemperature = () => {
             <label className='mb-2 block text-sm font-medium text-gray-700'>
               적용 품목
             </label>
-            <div className='flex flex-wrap gap-2'>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+            <div className='flex flex-wrap items-center gap-2'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 신선 육류
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 야채류
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 반제품
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
+              <button
+                className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
+                aria-label='품목 추가'
+              >
+                <Plus className='h-4 w-4 text-gray-600' />
+              </button>
             </div>
           </div>
         </div>
@@ -129,13 +146,21 @@ const StorageTemperature = () => {
             <label className='mb-2 block text-sm font-medium text-gray-700'>
               적용 품목
             </label>
-            <div className='flex flex-wrap gap-2'>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+            <div className='flex flex-wrap items-center gap-2'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 완제품
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
-              <span className='rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700'>
+              <span className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'>
                 냉동 육류
+                <X className='h-3 w-3 cursor-pointer hover:opacity-80' />
               </span>
+              <button
+                className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
+                aria-label='품목 추가'
+              >
+                <Plus className='h-4 w-4 text-gray-600' />
+              </button>
             </div>
           </div>
         </div>

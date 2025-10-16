@@ -36,7 +36,7 @@ const TopNavigation = () => {
       id: 'quality',
       label: '품질',
       icon: <BarChart3 className='h-4 w-4' />,
-      page: 'manufacturing/nav1',
+      page: 'inventory',
     },
     {
       id: 'label',
