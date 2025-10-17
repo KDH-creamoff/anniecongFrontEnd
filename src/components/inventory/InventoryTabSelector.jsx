@@ -3,6 +3,7 @@ const InventoryTabSelector = ({ activeTab, onTabChange }) => {
     { id: 'status', name: '재고 현황' },
     { id: 'tracking', name: '이력 추적' },
     { id: 'dashboard', name: '분석 대시보드' },
+    { id: 'temperature', name: '온도 관리'},
   ];
 
   return (

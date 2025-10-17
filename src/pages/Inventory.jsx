@@ -7,6 +7,8 @@ import InventoryStatusList from '../components/inventory/InventoryStatusList';
 import InventoryMovementList from '../components/inventory/InventoryMovementList';
 import InventoryAlertsSummary from '../components/inventory/InventoryAlertsSummary';
 import WarehouseUtilization from '../components/inventory/WarehouseUtilization';
+import TemperatureInput from '../components/inventory/TemperatureInput';
+import TemperatureList from '../components/inventory/TemperatureList';
 
 const Inventory = () => {
   const [activeTab, setActiveTab] = useState('status');
@@ -52,6 +54,13 @@ const Inventory = () => {
             <WarehouseUtilization />
           </>
         );
+        case 'temperature':
+          return (
+            <>
+              <TemperatureInput />
+              <TemperatureList />
+            </>
+          )
       default:
         return null;
     }
