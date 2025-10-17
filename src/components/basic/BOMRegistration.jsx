@@ -199,7 +199,6 @@ const BOMRegistration = ({ onSave }) => {
                     value={newMaterial.code}
                     readOnly
                     className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-gray-500 focus:outline-none'
-                    placeholder='원재료 선택 시 자동추가'
                   />
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>

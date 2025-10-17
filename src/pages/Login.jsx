@@ -125,11 +125,6 @@ const Login = () => {
             </p>
           </div>
         </div>
-
-        {/* 푸터 */}
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2025 애니콩 펫베이커리. All rights reserved.</p>
-        </div>
       </div>
     </div>
   );
