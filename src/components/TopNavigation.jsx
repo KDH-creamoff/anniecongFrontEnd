@@ -98,6 +98,15 @@ const TopNavigation = () => {
     navigate('/login');
   };
 
+  const handleMyPage = () => {
+    // if (isLoggedIn) {
+    //   navigate('/mypage');
+    // } else {
+    //   navigate('/login');
+    // }
+    navigate('/mypage');
+  };
+
   const [activeTab, setActiveTab] = useState('basicInfo');
 
   const handleTabClick = (tabId, page) => {
@@ -138,38 +147,16 @@ const TopNavigation = () => {
           {/* 사용자 메뉴 */}
           <div className='relative' ref={userMenuRef}>
             <button
-              onClick={handleUserIconClick}
+              onClick={handleMyPage}
               className='rounded-full p-1.5 transition-colors hover:bg-gray-100'
             >
               <User size={14} className='text-gray-600' />
               {isLoggedIn && (
-                <span className='text-xs text-white'>{userName}</span>
+                <span className='text-xs text-gray-900'>{userName}</span>
               )}
             </button>
 
             {/* 드롭다운 메뉴 */}
-            {isLoggedIn && showUserMenu && (
-              <div className='absolute right-0 z-50 mt-2 w-56 rounded-lg border border-gray-200 bg-white py-2 shadow-lg'>
-                {/* 사용자 정보 */}
-                <div className='border-b border-gray-200 px-4 py-3'>
-                  <p className='text-sm font-semibold text-[#674529]'>
-                    {userName}
-                  </p>
-                  <p className='text-xs text-gray-500'>애니콩 펫베이커리</p>
-                </div>
-
-                {/* 로그아웃 */}
-                <div className='border-t border-gray-200 py-1'>
-                  <button
-                    onClick={handleLogout}
-                    className='flex w-full items-center space-x-2 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50'
-                  >
-                    <LogOut size={16} />
-                    <span>로그아웃</span>
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
