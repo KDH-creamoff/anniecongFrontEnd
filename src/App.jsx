@@ -12,6 +12,7 @@ import Label from './pages/Label';
 import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Mypage from './pages/Mypage';
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
         />
         <Route path='label' element={<Label />} />
         <Route path='user' element={<UserManagement />} />
+        <Route path='mypage' element={<Mypage />} />
       </Route>
     </Routes>
   );

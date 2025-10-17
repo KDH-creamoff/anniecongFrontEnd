@@ -9,6 +9,7 @@ const BasicNewItem = () => {
     factory: '',
     storage: '',
     shelfLife: '',
+    shortage: '',
     unit: '',
   });
 
@@ -55,6 +56,10 @@ const BasicNewItem = () => {
       newErrors.shelfLife = '유통기한을 입력해주세요';
     }
 
+    if (!formData.shortage) {
+      newErrors.shortage = '부족 개수 기준을 입력해주세요'
+    }
+
     // 단위 검증
     if (!formData.unit) {
       newErrors.unit = '단위를 선택해주세요';
@@ -75,6 +80,7 @@ const BasicNewItem = () => {
         factory: '',
         storage: '',
         shelfLife: '',
+        shortage: '',
         unit: '',
       });
       alert('품목이 성공적으로 등록되었습니다!');
@@ -111,8 +117,8 @@ const BasicNewItem = () => {
           </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-                    {/* 품목코드 */}
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
+          {/* 품목코드 */}
           <div>
             <label className='mb-2 block text-sm font-medium text-gray-700'>
               품목코드
@@ -174,9 +180,6 @@ const BasicNewItem = () => {
               <p className='mt-1 text-xs text-red-500'>{errors.factory}</p>
             )}
           </div>
-        </div>
-
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
           {/* 보관조건 */}
           <div>
             <label className='mb-2 block text-sm font-medium text-gray-700'>
@@ -196,6 +199,10 @@ const BasicNewItem = () => {
               <p className='mt-1 text-xs text-red-500'>{errors.storage}</p>
             )}
           </div>
+        </div>
+
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
+          
 
           {/* 유통기한 (일) */}
           <div>
@@ -214,6 +221,26 @@ const BasicNewItem = () => {
             />
             {errors.shelfLife && (
               <p className='mt-1 text-xs text-red-500'>{errors.shelfLife}</p>
+            )}
+          </div>
+
+          {/* 최소 보유 개수 */}
+          <div>
+            <label className='mb-2 block text-sm font-medium text-gray-700'>
+              최소 보유 개수
+            </label>
+            <input
+              type='number'
+              value={formData.shortage}
+              onChange={(e) => handleInputChange('shortage', e.target.value)}
+              maxLength={3}
+              placeholder='100'
+              className={`w-full rounded-xl border ${
+                errors.shortage ? 'border-red-300' : 'border-gray-100'
+              } bg-gray-100 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20`}
+            />
+            {errors.shortage && (
+              <p className='mt-1 text-xs text-red-500'>{errors.shortage}</p>
             )}
           </div>
 

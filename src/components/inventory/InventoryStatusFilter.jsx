@@ -14,10 +14,10 @@ const InventoryStatusFilter = ({ onFilterChange }) => {
     '전체',
     '의성자재창고',
     '상주자재창고',
-    '상주생산 창고',
-    '의성 생산 창고',
+    '상주생산창고',
+    '의성생산창고',
   ];
-  const statuses = ['전체', '정상', '부족', '유통기한 임박'];
+  const statuses = ['전체', '정상', '재고부족', '유통기한 임박', '유통기한 만료'];
 
   const handleFilterChange = (key, value) => {
     const newFilters = { ...filters, [key]: value };
