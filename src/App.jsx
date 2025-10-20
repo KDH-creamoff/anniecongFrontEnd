@@ -26,7 +26,18 @@ export default function App() {
       <Route path='/' element={<Home />}>
         <Route path='dash' element={<Dash />} />
         <Route path='basic' element={<Basic />} />
-        <Route path='receiving' element={<Receiving />} />
+        <Route
+          path='receiving/nav1'
+          element={<Receiving subPage='nav1' />}
+        />
+        <Route
+          path='receiving/nav2'
+          element={<Receiving subPage='nav2' />}
+        />
+        <Route
+          path='receiving/nav3'
+          element={<Receiving subPage='nav3' />}
+        />
         <Route
           path='manufacturing/nav1'
           element={<Manufacturing subPage='nav1' />}

@@ -52,6 +52,7 @@ const BOMRegistration = ({ onSave }) => {
       code: '',
       name: '',
       amount: '',
+      unit: 'g',
     });
   };
 
@@ -76,6 +77,14 @@ const BOMRegistration = ({ onSave }) => {
     });
   };
 
+  // 단위 선택 시
+  const handleUnitChange = (unit) => {
+    setNewMaterial({
+      ...newMaterial,
+      unit: unit,
+    });
+  };
+
   // 원재료 추가 취소
   const handleCancelMaterial = () => {
     setNewMaterial(null);
@@ -88,7 +97,7 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료 확인 (목록에 추가)
   const handleConfirmMaterial = () => {
-    if (newMaterial.code && newMaterial.name && newMaterial.amount) {
+    if (newMaterial.code && newMaterial.name && newMaterial.amount && newMaterial.unit) {
       setCurrentMaterials([...currentMaterials, newMaterial]);
       setNewMaterial(null);
     }
@@ -157,16 +166,19 @@ const BOMRegistration = ({ onSave }) => {
         <table className='w-full'>
           <thead className='border-b border-gray-200'>
             <tr>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className='w-[12%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
                 원재료 코드
               </th>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className='w-[40%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
                 원재료명
               </th>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className='w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
                 필요량
               </th>
-              <th className='px-4 py-3 text-center text-sm font-medium text-gray-900'>
+              <th className='w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                단위
+              </th>
+              <th className='w-[18%] px-4 py-3 text-center text-sm font-medium text-gray-900'>
                 작업
               </th>
             </tr>
@@ -176,9 +188,8 @@ const BOMRegistration = ({ onSave }) => {
               <tr key={item.id} className='border-b border-gray-100'>
                 <td className='px-4 py-3 text-sm text-gray-700'>{item.code}</td>
                 <td className='px-4 py-3 text-sm text-gray-700'>{item.name}</td>
-                <td className='px-4 py-3 text-sm text-gray-700'>
-                  {item.amount}g
-                </td>
+                <td className='px-4 py-3 text-sm text-gray-700'>{item.amount}</td>
+                <td className='px-4 py-3 text-sm text-gray-700'>{item.unit}</td>
                 <td className='px-4 py-3 text-center'>
                   <button
                     onClick={() => handleDeleteMaterial(item.id)}
@@ -198,14 +209,14 @@ const BOMRegistration = ({ onSave }) => {
                     type='text'
                     value={newMaterial.code}
                     readOnly
-                    className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-gray-500 focus:outline-none'
+                    className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none'
                   />
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>
                   <select
                     value={newMaterial.name}
                     onChange={(e) => handleMaterialChange(e.target.value)}
-                    className='w-full rounded border border-gray-300 px-2 py-1'
+                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
                   >
                     <option value=''>원재료 선택</option>
                     {rawMaterialMaster.map((material) => (
@@ -225,9 +236,22 @@ const BOMRegistration = ({ onSave }) => {
                         handleConfirmMaterial();
                       }
                     }}
-                    className='w-full rounded border border-gray-300 px-2 py-1'
-                    placeholder='필요량 입력 (g)'
+                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    placeholder='필요량'
                   />
+                </td>
+                <td className='px-4 py-3 text-sm text-gray-700'>
+                  <select
+                    value={newMaterial.unit}
+                    onChange={(e) => handleUnitChange(e.target.value)}
+                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                  >
+                    <option value='g'>g</option>
+                    <option value='kg'>kg</option>
+                    <option value='ea'>ea</option>
+                    <option value='box'>box</option>
+                    <option value='pallet'>pallet</option>
+                  </select>
                 </td>
                 <td className='px-4 py-3 text-center'>
                   <div className='flex items-center justify-center gap-2'>
