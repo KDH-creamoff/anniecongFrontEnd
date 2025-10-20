@@ -14,7 +14,8 @@ const Home = () => {
     const pathMap = {
       '/dash': '대시보드',
       '/basic': '기초정보',
-      '/receiving': '입출고관리',
+      '/receiving/nav1': '입출고관리-nav1',
+      '/receiving/nav2': '입출고관리-nav2',
       '/manufacturing/nav1': '제조관리-nav1',
       '/manufacturing/nav2': '제조관리-nav2',
       '/manufacturing/nav3': '제조관리-nav3',
@@ -39,7 +40,8 @@ const Home = () => {
     const navMap = {
       대시보드: '/dash',
       기초정보: '/basic',
-      입출고관리: '/receiving',
+      '입출고관리-nav1': '/receiving/nav1',
+      '입출고관리-nav2': '/receiving/nav2',
       '제조관리-nav1': '/manufacturing/nav1',
       '제조관리-nav2': '/manufacturing/nav2',
       '제조관리-nav3': '/manufacturing/nav3',

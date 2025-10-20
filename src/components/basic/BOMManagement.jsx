@@ -10,9 +10,9 @@ const BOMManagement = () => {
       bomName: '애니콩 펫베이커리 A',
       updatedDate: '2025-10-15',
       materials: [
-        { id: 1, code: 'RAW001', name: '닭고기(가슴살)', amount: 150 },
-        { id: 2, code: 'RAW002', name: '당근', amount: 50 },
-        { id: 3, code: 'RAW004', name: '감자', amount: 100 },
+        { id: 1, code: 'RAW001', name: '닭고기(가슴살)', amount: 150, unit: 'g' },
+        { id: 2, code: 'RAW002', name: '당근', amount: 50, unit: 'g' },
+        { id: 3, code: 'RAW004', name: '감자', amount: 100, unit: 'g' },
       ],
     },
     {
@@ -20,10 +20,10 @@ const BOMManagement = () => {
       bomName: '애니콩 펫디너 치킨',
       updatedDate: '2025-10-14',
       materials: [
-        { id: 1, code: 'RAW001', name: '닭고기(가슴살)', amount: 200 },
-        { id: 2, code: 'RAW003', name: '양파', amount: 80 },
-        { id: 3, code: 'RAW005', name: '대파', amount: 30 },
-        { id: 4, code: 'RAW008', name: '간장', amount: 40 },
+        { id: 1, code: 'RAW001', name: '닭고기(가슴살)', amount: 200, unit: 'g' },
+        { id: 2, code: 'RAW003', name: '양파', amount: 80, unit: 'g' },
+        { id: 3, code: 'RAW005', name: '대파', amount: 30, unit: 'g' },
+        { id: 4, code: 'RAW008', name: '간장', amount: 40, unit: 'g' },
       ],
     },
     {
@@ -31,9 +31,9 @@ const BOMManagement = () => {
       bomName: '애니콩 펫디너 비프',
       updatedDate: '2025-10-13',
       materials: [
-        { id: 1, code: 'RAW016', name: '소고기(불고기용)', amount: 180 },
-        { id: 2, code: 'RAW003', name: '양파', amount: 80 },
-        { id: 3, code: 'RAW006', name: '마늘', amount: 20 },
+        { id: 1, code: 'RAW016', name: '소고기(불고기용)', amount: 180, unit: 'g' },
+        { id: 2, code: 'RAW003', name: '양파', amount: 80, unit: 'g' },
+        { id: 3, code: 'RAW006', name: '마늘', amount: 20, unit: 'g' },
       ],
     },
   ]);

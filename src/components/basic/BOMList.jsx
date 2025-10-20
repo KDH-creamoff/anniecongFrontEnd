@@ -126,14 +126,17 @@ const BOMList = ({ bomList, onDelete }) => {
                           <table className='w-full'>
                             <thead className='border-b border-gray-200'>
                               <tr>
-                                <th className='px-4 py-2 text-left text-xs font-medium text-gray-700'>
+                                <th className='w-[12%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
                                   원재료 코드
                                 </th>
-                                <th className='px-4 py-2 text-left text-xs font-medium text-gray-700'>
+                                <th className='w-[50%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
                                   원재료명
                                 </th>
-                                <th className='px-4 py-2 text-left text-xs font-medium text-gray-700'>
+                                <th className='w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
                                   필요량
+                                </th>
+                                <th className='w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
+                                  단위
                                 </th>
                               </tr>
                             </thead>
@@ -150,7 +153,10 @@ const BOMList = ({ bomList, onDelete }) => {
                                     {material.name}
                                   </td>
                                   <td className='px-4 py-2 text-xs text-gray-700'>
-                                    {material.amount}g
+                                    {material.amount}
+                                  </td>
+                                  <td className='px-4 py-2 text-xs text-gray-700'>
+                                    {material.unit}
                                   </td>
                                 </tr>
                               ))}
