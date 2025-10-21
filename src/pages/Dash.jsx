@@ -16,6 +16,7 @@ const Dash = () => {
       '제조관리-nav1': '/manufacturing/nav1',
       '제조관리-nav2': '/manufacturing/nav2',
       '제조관리-nav3': '/manufacturing/nav3',
+      '제조관리-nav4': '/manufacturing/nav4',
       재고관리: '/inventory',
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
