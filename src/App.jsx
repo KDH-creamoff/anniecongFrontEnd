@@ -50,6 +50,10 @@ export default function App() {
           path='manufacturing/nav3'
           element={<Manufacturing subPage='nav3' />}
         />
+        <Route
+          path='manufacturing/nav4'
+          element={<Manufacturing subPage='nav4' />}
+        />
         <Route path='inventory' element={<Inventory />} />
         <Route path='shipping/nav1' element={<Shipping subPage='nav1' />} />
         <Route path='shipping/nav2' element={<Shipping subPage='nav2' />} />

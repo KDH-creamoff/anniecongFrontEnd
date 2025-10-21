@@ -35,6 +35,12 @@ const usePdfDownload = () => {
         throw new Error("PDF로 변환할 요소를 찾을 수 없습니다.");
       }
 
+      // 폰트 로딩 대기 (중요!)
+      await document.fonts.ready;
+
+      // 추가 딜레이로 렌더링 완료 보장
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // HTML -> Canvas 변환
       const canvas = await html2canvas(element, {
         scale: scale,
@@ -84,15 +90,6 @@ const usePdfDownload = () => {
       // 첫 페이지 추가
       pdf.addImage(imgData, "PNG", margin, margin + position, imgWidth, imgHeight, undefined, "FAST");
       heightLeft -= contentHeight;
-
-      // 추가 페이지가 필요한 경우
-      while (heightLeft > 0) {
-        page++;
-        position = -(contentHeight * page);
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", margin, margin + position, imgWidth, imgHeight, undefined, "FAST");
-        heightLeft -= contentHeight;
-      }
 
       // 다운로드
       pdf.save(filename);

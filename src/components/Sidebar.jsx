@@ -264,6 +264,16 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
               >
                 2공장 제조
               </button>
+              <button
+                onClick={() => setActiveNav('제조관리-nav4')}
+                className={`block w-full rounded p-1.5 text-left text-xs ${
+                  activeNav === '제조관리-nav4'
+                    ? 'bg-[#674529] text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                작업내용추가
+              </button>
             </div>
           )}
         </div>

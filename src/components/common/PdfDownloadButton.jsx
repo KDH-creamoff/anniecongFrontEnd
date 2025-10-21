@@ -32,13 +32,77 @@ const PdfDownloadButton = ({
 
       // HTML -> Canvas 변환 (높은 품질로 설정)
       const canvas = await html2canvas(element, {
-        scale: 2, // 해상도 향상 (2배)
+        scale: 3, // 해상도 향상 (3배로 증가)
         useCORS: true, // 외부 이미지 사용 허용
         allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff", // 배경색 명시
         windowWidth: element.scrollWidth, // 전체 너비 캡처
         windowHeight: element.scrollHeight, // 전체 높이 캡처
+        onclone: (clonedDoc) => {
+          // 복제된 문서에서 테이블 셀들의 정렬을 강제 적용
+          const clonedElement = clonedDoc.querySelector('[ref="contentRef"]') || clonedDoc.body.querySelector('div');
+          if (clonedElement) {
+            // 모든 테이블에 border-collapse 적용
+            const tables = clonedElement.querySelectorAll('table');
+            tables.forEach(table => {
+              table.style.borderCollapse = 'collapse';
+            });
+
+            const cells = clonedElement.querySelectorAll('td, th');
+            cells.forEach(cell => {
+              // 테이블 셀의 display를 table-cell로 강제 설정
+              cell.style.display = 'table-cell';
+              cell.style.verticalAlign = 'middle';
+
+              // input 요소들을 처리
+              const inputs = cell.querySelectorAll('input');
+              inputs.forEach(input => {
+                const value = input.value;
+                const placeholder = input.placeholder;
+                const textAlign = window.getComputedStyle(input).textAlign;
+
+                // input을 div로 감싸진 텍스트로 변환
+                const textDiv = clonedDoc.createElement('div');
+                textDiv.textContent = value || placeholder || '';
+                textDiv.style.textAlign = textAlign;
+                textDiv.style.lineHeight = '1.5';
+                textDiv.style.padding = '2px 0';
+                textDiv.style.display = 'flex';
+                textDiv.style.alignItems = 'center';
+                textDiv.style.justifyContent = textAlign === 'center' ? 'center' : textAlign === 'right' ? 'flex-end' : 'flex-start';
+                textDiv.style.height = '100%';
+                textDiv.style.minHeight = input.offsetHeight + 'px';
+
+                input.parentNode.replaceChild(textDiv, input);
+              });
+
+              // 기존 div 래퍼의 스타일 개선
+              const divs = cell.querySelectorAll('div');
+              divs.forEach(div => {
+                // flex가 아닌 div는 flex로 변환
+                if (window.getComputedStyle(div).display !== 'flex') {
+                  div.style.display = 'flex';
+                }
+                div.style.alignItems = 'center';
+                div.style.minHeight = '24px';
+
+                // span 자식이 있는 경우
+                const spans = div.querySelectorAll('span');
+                spans.forEach(span => {
+                  span.style.lineHeight = '1.5';
+                  span.style.display = 'inline-flex';
+                  span.style.alignItems = 'center';
+                });
+              });
+
+              // 셀 자체에 최소 높이 설정
+              if (cell.style.height) {
+                cell.style.minHeight = cell.style.height;
+              }
+            });
+          }
+        }
       });
 
       const imgData = canvas.toDataURL("image/png");
