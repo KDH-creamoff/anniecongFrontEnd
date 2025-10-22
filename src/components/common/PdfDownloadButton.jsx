@@ -66,7 +66,7 @@ const PdfDownloadButton = ({
                 const textDiv = clonedDoc.createElement('div');
                 textDiv.textContent = value || placeholder || '';
                 textDiv.style.textAlign = textAlign;
-                textDiv.style.lineHeight = '1.5';
+                textDiv.style.lineHeight = '1';
                 textDiv.style.padding = '2px 0';
                 textDiv.style.display = 'flex';
                 textDiv.style.alignItems = 'center';
@@ -90,7 +90,7 @@ const PdfDownloadButton = ({
                 // span 자식이 있는 경우
                 const spans = div.querySelectorAll('span');
                 spans.forEach(span => {
-                  span.style.lineHeight = '1.5';
+                  span.style.lineHeight = '1';
                   span.style.display = 'inline-flex';
                   span.style.alignItems = 'center';
                 });
