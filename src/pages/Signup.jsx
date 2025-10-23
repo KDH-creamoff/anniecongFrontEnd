@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, User, Lock, Phone, Mail, Calendar, IdCard } from 'lucide-react';
+import { UserPlus, User, Lock, Phone, Mail, Calendar, IdCard, Briefcase, Building2 } from 'lucide-react';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ const Signup = () => {
     name: '',
     phone: '',
     email: '',
+    position: '',
+    department: '',
     hireDate: ''
   });
 
@@ -91,7 +93,7 @@ const Signup = () => {
                   name="userId"
                   value={formData.userId}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                   placeholder="아이디를 입력하세요"
                   required
                 />
@@ -114,7 +116,7 @@ const Signup = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="비밀번호"
                     required
                   />
@@ -135,7 +137,7 @@ const Signup = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="비밀번호 확인"
                     required
                   />
@@ -158,7 +160,7 @@ const Signup = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                   placeholder="이름을 입력하세요"
                   required
                 />
@@ -181,7 +183,7 @@ const Signup = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="010-0000-0000"
                     required
                   />
@@ -202,10 +204,63 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="example@email.com"
                     required
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* 직급 및 소속 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="position" className="block text-sm font-medium text-[#674529] mb-2">
+                  직급 <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Briefcase className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <select
+                    id="position"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
+                    style={{ color: formData.position ? '#111827' : '#9ca3af' }}
+                    required
+                  >
+                    <option value="" disabled hidden style={{ color: '#9ca3af' }}>직급을 선택하세요</option>
+                    <option value="이사" style={{ color: '#111827' }}>이사</option>
+                    <option value="팀장" style={{ color: '#111827' }}>팀장</option>
+                    <option value="직원" style={{ color: '#111827' }}>직원</option>
+                    <option value="알바" style={{ color: '#111827' }}>알바</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="department" className="block text-sm font-medium text-[#674529] mb-2">
+                  소속 <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Building2 className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <select
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
+                    style={{ color: formData.department ? '#111827' : '#9ca3af' }}
+                    required
+                  >
+                    <option value="" disabled hidden style={{ color: '#9ca3af' }}>소속을 선택하세요</option>
+                    <option value="경영지원팀" style={{ color: '#111827' }}>경영지원팀</option>
+                    <option value="생산팀" style={{ color: '#111827' }}>생산팀</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -225,7 +280,8 @@ const Signup = () => {
                   name="hireDate"
                   value={formData.hireDate}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                  style={{ color: formData.hireDate ? '#111827' : '#9ca3af' }}
                   required
                 />
               </div>
@@ -243,7 +299,7 @@ const Signup = () => {
           {/* 로그인 링크 */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              이미 계정이 있으신가요?{' '}
+              이미 계정이 있으신가요?
               <Link
                 to="/login"
                 className="text-[#724323] font-semibold hover:text-[#5a3419] transition-colors"

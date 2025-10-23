@@ -24,7 +24,7 @@ const MainModule = ({ onNavigate }) => {
       title: '입고/검수',
       description: '구매입고 스캔, 원재료 라벨프린트',
       icon: <Truck className='h-6 w-6' />,
-      nav: '입출고관리',
+      nav: '입출고관리-nav1',
       color: 'bg-[#A3C478]',
       count: 12,
     },

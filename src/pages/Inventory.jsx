@@ -5,7 +5,6 @@ import InventoryStatusFilter from '../components/inventory/InventoryStatusFilter
 import InventoryStatusSummary from '../components/inventory/InventoryStatusSummary';
 import InventoryStatusList from '../components/inventory/InventoryStatusList';
 import InventoryMovementList from '../components/inventory/InventoryMovementList';
-import InventoryAlertsSummary from '../components/inventory/InventoryAlertsSummary';
 import WarehouseUtilization from '../components/inventory/WarehouseUtilization';
 import TemperatureInput from '../components/inventory/TemperatureInput';
 import TemperatureList from '../components/inventory/TemperatureList';
@@ -50,7 +49,6 @@ const Inventory = () => {
       case 'dashboard':
         return (
           <>
-            <InventoryAlertsSummary />
             <WarehouseUtilization />
           </>
         );

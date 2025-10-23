@@ -1,9 +1,7 @@
 const UserManagementTabSelector = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'users', name: '사용자 관리' },
-    { id: 'roles', name: '역할 관리' },
     { id: 'permissions', name: '권한 관리' },
-    { id: 'access-log', name: '접근 로그' },
   ];
   return (
     <div className='mb-6 flex space-x-0 rounded-xl bg-[#E8E8E8] p-1'>

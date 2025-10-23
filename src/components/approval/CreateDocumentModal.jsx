@@ -9,7 +9,20 @@ import ProcessControl from '../template/PrerequisitePrograms/04_ProcessControl';
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showSettingsForm, setShowSettingsForm] = useState(false);
   const pdfContentRef = useRef(null);
+
+  // 문서 설정 상태
+  const [documentSettings, setDocumentSettings] = useState({
+    requiredDocuments: '',
+    ceo: '',
+    director: '',
+    teamLeader: '',
+    signatureImage: null
+  });
+
+  // 이미지 미리보기 URL
+  const [signaturePreview, setSignaturePreview] = useState(null);
 
   // 템플릿 목록 (50개)
   const templates = [
@@ -53,19 +66,193 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
 
   const handleCreateDocument = () => {
     if (selectedTemplate) {
-      setIsEditMode(true);
+      setShowSettingsForm(true);
     }
   };
 
+  const handleSettingsSubmit = () => {
+    setShowSettingsForm(false);
+    setIsEditMode(true);
+  };
+
   const handleBackToList = () => {
+    setIsEditMode(false);
+    setShowSettingsForm(false);
+  };
+
+  const handleBackToSettings = () => {
     setIsEditMode(false);
   };
 
   const handleClose = () => {
     setIsEditMode(false);
+    setShowSettingsForm(false);
     setSelectedTemplate(null);
+    setDocumentSettings({
+      requiredDocuments: '',
+      ceo: '',
+      director: '',
+      teamLeader: '',
+      signatureImage: null
+    });
+    setSignaturePreview(null);
     onClose();
   };
+
+  const handleSettingsChange = (field, value) => {
+    setDocumentSettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSignatureImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // 이미지 파일만 허용
+      if (file.type.startsWith('image/')) {
+        setDocumentSettings(prev => ({
+          ...prev,
+          signatureImage: file
+        }));
+      } else {
+        alert('이미지 파일만 업로드 가능합니다.');
+      }
+    }
+  };
+
+  // 문서 설정 폼 화면
+  if (showSettingsForm && selectedTemplate) {
+    return (
+      <div
+        className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4'
+        onClick={handleClose}
+      >
+        <div
+          className='w-full max-w-2xl rounded-2xl bg-white shadow-xl flex flex-col overflow-hidden'
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* 헤더 */}
+          <div className='flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50'>
+            <div className='flex items-center gap-4'>
+              <button
+                onClick={handleBackToList}
+                className='rounded-lg p-2 transition-colors hover:bg-gray-200'
+                aria-label='뒤로가기'
+              >
+                <ArrowLeft className='h-5 w-5 text-gray-600' />
+              </button>
+              <div>
+                <h3 className='text-ㅣㅎ font-bold text-gray-900'>문서 설정</h3>
+                <p className='text-sm text-gray-500 mt-1'>{selectedTemplate.name}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className='rounded-lg p-2 transition-colors hover:bg-gray-100'
+              aria-label='닫기'
+            >
+              <X className='h-6 w-6 text-gray-500' />
+            </button>
+          </div>
+
+          {/* 설정 폼 */}
+          <div className='flex-1 overflow-y-auto p-6'>
+            <div className='space-y-5'>
+              {/* 필요서류 */}
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  필요서명
+                </label>
+
+              {/* 대표 */}
+              <div>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  대표
+                </label>
+                <select
+                  value={documentSettings.ceo}
+                  onChange={(e) => handleSettingsChange('ceo', e.target.value)}
+                  className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
+                >
+                  <option value=''>대표 선택</option>
+                  <option value='김대표'>김대표</option>
+                  <option value='이대표'>이대표</option>
+                  <option value='박대표'>박대표</option>
+                </select>
+              </div>
+
+              {/* 이사 */}
+              <div>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  이사
+                </label>
+                <select
+                  value={documentSettings.director}
+                  onChange={(e) => handleSettingsChange('director', e.target.value)}
+                  className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
+                >
+                  <option value=''>이사 선택</option>
+                  <option value='김이사'>김이사</option>
+                  <option value='이이사'>이이사</option>
+                  <option value='박이사'>박이사</option>
+                </select>
+              </div>
+
+              {/* 팀장 */}
+              <div>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  팀장
+                </label>
+                <select
+                  value={documentSettings.teamLeader}
+                  onChange={(e) => handleSettingsChange('teamLeader', e.target.value)}
+                  className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
+                >
+                  <option value=''>팀장 선택</option>
+                  <option value='김팀장'>김팀장</option>
+                  <option value='이팀장'>이팀장</option>
+                  <option value='박팀장'>박팀장</option>
+                </select>
+              </div>
+
+              {/* 본인서명 */}
+              <div>
+                <label className='block text-base font-semibold text-gray-700 mb-2'>
+                  본인서명
+                </label>
+                <div className='space-y-3'>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={handleSignatureImageChange}
+                    className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#724323] file:text-white hover:file:bg-[#5a3419] file:cursor-pointer'
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 푸터 */}
+          <div className='flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50'>
+            <div className='flex gap-3'>
+              <button
+                onClick={handleBackToList}
+                className='px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors'
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSettingsSubmit}
+                className='px-6 py-2 rounded-lg font-semibold bg-[#724323] text-white hover:bg-[#5a3419] transition-colors'
+              >
+                작성하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 편집 모드일 때 전체 화면 표시
   if (isEditMode && selectedTemplate) {
@@ -82,7 +269,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
           <div className='flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50'>
             <div className='flex items-center gap-4'>
               <button
-                onClick={handleBackToList}
+                onClick={handleBackToSettings}
                 className='rounded-lg p-2 transition-colors hover:bg-gray-200'
                 aria-label='뒤로가기'
               >

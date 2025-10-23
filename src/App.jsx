@@ -6,7 +6,6 @@ import Receiving from './pages/Receiving';
 import Manufacturing from './pages/Manufacturing';
 import Inventory from './pages/Inventory';
 import Shipping from './pages/Shipping';
-import Production from './pages/Production';
 import ApprovalDashboard from './pages/ApprovalDashboard';
 import Label from './pages/Label';
 import UserManagement from './pages/UserManagement';
@@ -58,8 +57,6 @@ export default function App() {
         <Route path='shipping/nav1' element={<Shipping subPage='nav1' />} />
         <Route path='shipping/nav2' element={<Shipping subPage='nav2' />} />
         <Route path='shipping/nav3' element={<Shipping subPage='nav3' />} />
-        <Route path='production/nav1' element={<Production subPage='nav1' />} />
-        <Route path='production/nav2' element={<Production subPage='nav2' />} />
         <Route
           path='approval/nav1'
           element={<ApprovalDashboard subPage='nav1' />}
@@ -69,7 +66,8 @@ export default function App() {
           element={<ApprovalDashboard subPage='nav2' />}
         />
         <Route path='label' element={<Label />} />
-        <Route path='user' element={<UserManagement />} />
+        <Route path='user/nav1' element={<UserManagement subPage='nav1' />} />
+        <Route path='user/nav2' element={<UserManagement subPage='nav2' />} />
         <Route path='mypage' element={<Mypage />} />
       </Route>
     </Routes>

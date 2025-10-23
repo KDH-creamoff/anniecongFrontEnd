@@ -11,7 +11,6 @@ import {
   BarChart3,
   Home,
   FileText,
-  FolderOpen,
 } from 'lucide-react';
 
 const Sidebar = ({ activeNav, setActiveNav }) => {
@@ -21,8 +20,8 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
     입출고관리: false,
     제조관리: false,
     배송관리: false,
-    생산관리: false,
     전자결재: false,
+    사용자관리: false,
   });
 
   const toggleSection = (section) => {
@@ -349,67 +348,6 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
           )}
         </div>
 
-        {/* 생산관리 */}
-        <div className='mb-2'>
-          <button
-            onClick={() =>
-              isCollapsed
-                ? setActiveNav('생산관리-nav1')
-                : toggleSection('생산관리')
-            }
-            className={`flex items-center rounded text-left text-sm ${
-              isCollapsed
-                ? 'aspect-square w-full justify-center p-2'
-                : 'w-full justify-between p-1.5'
-            } ${
-              isCollapsed && activeNav === '생산관리-nav1'
-                ? 'bg-[#674529] text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-            title='생산관리'
-          >
-            <div
-              className={`flex items-center ${!isCollapsed && 'space-x-1.5'}`}
-            >
-              <FolderOpen size={16} />
-              {!isCollapsed && <span>생산관리</span>}
-            </div>
-            {!isCollapsed && (
-              <>
-                {openSections.생산관리 ? (
-                  <ChevronDown size={14} />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
-              </>
-            )}
-          </button>
-          {!isCollapsed && openSections.생산관리 && (
-            <div className='ml-5 mt-1 space-y-0.5'>
-              <button
-                onClick={() => setActiveNav('생산관리-nav1')}
-                className={`block w-full rounded p-1.5 text-left text-xs ${
-                  activeNav === '생산관리-nav1'
-                    ? 'bg-[#674529] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                생산지시서 관리
-              </button>
-              <button
-                onClick={() => setActiveNav('생산관리-nav2')}
-                className={`block w-full rounded p-1.5 text-left text-xs ${
-                  activeNav === '생산관리-nav2'
-                    ? 'bg-[#674529] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                제조이력 캘린더
-              </button>
-            </div>
-          )}
-        </div>
-
         {/* 전자결재 */}
         <div className='mb-2'>
           <button
@@ -491,24 +429,65 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
           </button>
         </div>
 
-        {/* 사용자 관리 */}
+        {/* 사용자관리 */}
         <div className='mb-2'>
           <button
-            onClick={() => setActiveNav('사용자관리')}
+            onClick={() =>
+              isCollapsed
+                ? setActiveNav('사용자관리-nav1')
+                : toggleSection('사용자관리')
+            }
             className={`flex items-center rounded text-left text-sm ${
               isCollapsed
                 ? 'aspect-square w-full justify-center p-2'
-                : 'w-full space-x-1.5 p-1.5'
+                : 'w-full justify-between p-1.5'
             } ${
-              activeNav === '사용자관리'
+              isCollapsed && activeNav === '사용자관리-nav1'
                 ? 'bg-[#674529] text-white'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
-            title='사용자 관리'
+            title='사용자관리'
           >
-            <Users size={16} />
-            {!isCollapsed && <span>사용자 관리</span>}
+            <div
+              className={`flex items-center ${!isCollapsed && 'space-x-1.5'}`}
+            >
+              <Users size={16} />
+              {!isCollapsed && <span>사용자관리</span>}
+            </div>
+            {!isCollapsed && (
+              <>
+                {openSections.사용자관리 ? (
+                  <ChevronDown size={14} />
+                ) : (
+                  <ChevronRight size={14} />
+                )}
+              </>
+            )}
           </button>
+          {!isCollapsed && openSections.사용자관리 && (
+            <div className='ml-5 mt-1 space-y-0.5'>
+              <button
+                onClick={() => setActiveNav('사용자관리-nav1')}
+                className={`block w-full rounded p-1.5 text-left text-xs ${
+                  activeNav === '사용자관리-nav1'
+                    ? 'bg-[#674529] text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                직원 관리
+              </button>
+              <button
+                onClick={() => setActiveNav('사용자관리-nav2')}
+                className={`block w-full rounded p-1.5 text-left text-xs ${
+                  activeNav === '사용자관리-nav2'
+                    ? 'bg-[#674529] text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                권한 관리
+              </button>
+            </div>
+          )}
         </div>
       </nav>
     </div>

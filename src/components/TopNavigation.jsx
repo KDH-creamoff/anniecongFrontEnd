@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Bell,
   User,
@@ -10,10 +10,15 @@ import {
   Tags,
   ShoppingCart,
   Truck,
+  Home,
+  Package,
+  FileText,
+  Users,
 } from 'lucide-react';
 
 const TopNavigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -21,10 +26,28 @@ const TopNavigation = () => {
 
   const tabs = [
     {
+      id: 'dash',
+      label: '대시보드',
+      icon: <Home className='h-4 w-4' />,
+      page: 'dash',
+    },
+    {
       id: 'basicInfo',
       label: '기초정보',
       icon: <Settings className='h-4 w-4' />,
       page: 'basic',
+    },
+    {
+      id: 'quality',
+      label: '재고',
+      icon: <BarChart3 className='h-4 w-4' />,
+      page: 'inventory',
+    },
+    {
+      id: 'receiving',
+      label: '입출고',
+      icon: <Package className='h-4 w-4' />,
+      page: 'receiving/nav1',
     },
     {
       id: 'manufacturing',
@@ -33,11 +56,17 @@ const TopNavigation = () => {
       page: 'manufacturing/nav1',
     },
     {
-      id: 'quality',
-      label: '품질',
-      icon: <BarChart3 className='h-4 w-4' />,
-      page: 'inventory',
-    },
+      id: 'shipping',
+      label: '배송',
+      icon: <Truck className='h-4 w-4' />,
+      page: 'shipping/nav1',
+    },   
+    {
+      id: 'approval',
+      label: '결재',
+      icon: <FileText className='h-4 w-4' />,
+      page: 'approval/nav1',
+    },   
     {
       id: 'label',
       label: '라벨',
@@ -45,17 +74,11 @@ const TopNavigation = () => {
       page: 'label',
     },
     {
-      id: 'order',
-      label: '주문',
-      icon: <ShoppingCart className='h-4 w-4' />,
-      page: 'receiving',
-    },
-    {
-      id: 'shipping',
-      label: '출고',
-      icon: <Truck className='h-4 w-4' />,
-      page: 'shipping/nav1',
-    },
+      id: 'user',
+      label: '사용자',
+      icon: <Users className='h-4 w-4' />,
+      page: 'user/nav1',
+    },  
   ];
 
   // 로그인 상태 확인 (localStorage 사용)
@@ -82,22 +105,6 @@ const TopNavigation = () => {
     };
   }, []);
 
-  const handleUserIconClick = () => {
-    if (isLoggedIn) {
-      setShowUserMenu(!showUserMenu);
-    } else {
-      navigate('/login');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUserName('');
-    setShowUserMenu(false);
-    navigate('/login');
-  };
-
   const handleMyPage = () => {
     // if (isLoggedIn) {
     //   navigate('/mypage');
@@ -107,7 +114,33 @@ const TopNavigation = () => {
     navigate('/mypage');
   };
 
-  const [activeTab, setActiveTab] = useState('basicInfo');
+  const [activeTab, setActiveTab] = useState('dash');
+
+  // URL 변경에 따라 activeTab 업데이트 (Sidebar 네비게이션과 동기화)
+  useEffect(() => {
+    const path = location.pathname;
+
+    // URL 경로에서 activeTab ID를 추출
+    if (path.startsWith('/dash')) {
+      setActiveTab('dash');
+    } else if (path.startsWith('/basic')) {
+      setActiveTab('basicInfo');
+    } else if (path.startsWith('/inventory')) {
+      setActiveTab('quality');
+    } else if (path.startsWith('/receiving')) {
+      setActiveTab('receiving');
+    } else if (path.startsWith('/manufacturing')) {
+      setActiveTab('manufacturing');
+    } else if (path.startsWith('/shipping')) {
+      setActiveTab('shipping');
+    } else if (path.startsWith('/approval')) {
+      setActiveTab('approval');
+    } else if (path.startsWith('/label')) {
+      setActiveTab('label');
+    } else if (path.startsWith('/user')) {
+      setActiveTab('user');
+    }
+  }, [location.pathname]);
 
   const handleTabClick = (tabId, page) => {
     setActiveTab(tabId);
