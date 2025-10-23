@@ -1,173 +1,692 @@
 import { useState } from 'react';
-import { Package, Edit, Trash2, Search } from 'lucide-react';
+import { Package, Edit, Trash2, Clock, Factory } from 'lucide-react';
 import Pagination from '../common/Pagination';
 
-const BOMList = ({ bomList, onDelete }) => {
+const BasicItemList = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBOM, setSelectedBOM] = useState(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
-  // 검색 필터링
-  const filteredBomList = bomList.filter((bom) =>
-    bom.bomName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const items = [
+    {
+      code: 'RAW001',
+      name: '닭고기 (가슴살)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '7일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW002',
+      name: '당근',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '14일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW003',
+      name: '양파',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '21일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW004',
+      name: '감자',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '30일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW005',
+      name: '대파',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '7일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW006',
+      name: '마늘',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '60일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW007',
+      name: '생강',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '45일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW008',
+      name: '간장',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '365일',
+      unit: 'L',
+    },
+    {
+      code: 'RAW009',
+      name: '설탕',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '730일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW010',
+      name: '참기름',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '180일',
+      unit: 'L',
+    },
+    {
+      code: 'RAW011',
+      name: '소금',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '1095일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW012',
+      name: '후추',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '365일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW013',
+      name: '고춧가루',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '180일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW014',
+      name: '식용유',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '365일',
+      unit: 'L',
+    },
+    {
+      code: 'RAW015',
+      name: '돼지고기 (삼겹살)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '5일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW016',
+      name: '소고기 (불고기용)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '5일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW017',
+      name: '두부',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '7일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW018',
+      name: '배추',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '14일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW019',
+      name: '무',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '21일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW020',
+      name: '애호박',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '14일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP001',
+      name: '전처리 믹스 A',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '3일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP002',
+      name: '전처리 믹스 B',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '3일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP003',
+      name: '반가공 치킨 믹스',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '2일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP004',
+      name: '반가공 소고기 믹스',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '2일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP005',
+      name: '반가공 채소 믹스',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '2일',
+      unit: 'kg',
+    },
+    {
+      code: 'FG001',
+      name: '애니콩 펫베이커리 A',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '30일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG002',
+      name: '애니콩 펫베이커리 B',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '30일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG003',
+      name: '애니콩 펫베이커리 C',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '30일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG004',
+      name: '애니콩 펫베이커리 D',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '30일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG005',
+      name: '애니콩 펫베이커리 E',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '30일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG006',
+      name: '애니콩 펫디너 치킨',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '45일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG007',
+      name: '애니콩 펫디너 비프',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '45일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG008',
+      name: '애니콩 펫디너 포크',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '45일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG009',
+      name: '애니콩 펫스낵 치킨',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '60일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG010',
+      name: '애니콩 펫스낵 비프',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '60일',
+      unit: 'ea',
+    },
+    {
+      code: 'RAW021',
+      name: '버섯 (표고)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '10일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW022',
+      name: '버섯 (양송이)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '10일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW023',
+      name: '파프리카 (빨강)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '14일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW024',
+      name: '파프리카 (노랑)',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '14일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW025',
+      name: '브로콜리',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '10일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW026',
+      name: '양배추',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '21일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW027',
+      name: '청경채',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '10일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW028',
+      name: '시금치',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '7일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW029',
+      name: '숙주',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '5일',
+      unit: 'kg',
+    },
+    {
+      code: 'RAW030',
+      name: '콩나물',
+      category: '원재료',
+      categoryColor: 'bg-green-100 text-green-700',
+      factory: '1공장',
+      storage: '냉온',
+      storageColor: 'bg-yellow-100 text-yellow-700',
+      storageIcon: '🌡️',
+      shelfLife: '5일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP006',
+      name: '전처리 믹스 C',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '3일',
+      unit: 'kg',
+    },
+    {
+      code: 'WIP007',
+      name: '전처리 믹스 D',
+      category: 'WIP',
+      categoryColor: 'bg-[#f9b679] text-white',
+      factory: '2공장',
+      storage: '냉장',
+      storageColor: 'bg-blue-100 text-blue-700',
+      storageIcon: '❄️',
+      shelfLife: '3일',
+      unit: 'kg',
+    },
+    {
+      code: 'FG011',
+      name: '애니콩 펫트릿 믹스',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '90일',
+      unit: 'ea',
+    },
+    {
+      code: 'FG012',
+      name: '애니콩 펫밀 스페셜',
+      category: '완제품',
+      categoryColor: 'bg-[#724323] text-white',
+      factory: '2공장',
+      storage: '냉동',
+      storageColor: 'bg-purple-200 text-purple-700',
+      storageIcon: '🧊',
+      shelfLife: '90일',
+      unit: 'ea',
+    },
+  ];
 
-  const totalPages = Math.ceil(filteredBomList.length / itemsPerPage);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = filteredBomList.slice(startIndex, endIndex);
-
-  // BOM 목록 삭제
-  const handleDeleteBOM = (id) => {
-    if (window.confirm('이 BOM을 삭제하시겠습니까?')) {
-      if (onDelete) {
-        onDelete(id);
-      }
-      if (selectedBOM && selectedBOM.id === id) {
-        setSelectedBOM(null);
-      }
-    }
-  };
-
-  // BOM 목록 클릭 시 상세 보기
-  const handleBOMClick = (bom) => {
-    if (selectedBOM && selectedBOM.id === bom.id) {
-      setSelectedBOM(null);
-    } else {
-      setSelectedBOM(bom);
-    }
-  };
+  const currentItems = items.slice(startIndex, endIndex);
 
   return (
     <div className='rounded-xl bg-white p-6 shadow-sm'>
       <div className='mb-6 flex items-center gap-2'>
         <Package className='h-5 w-5 text-[#674529]' />
-        <h2 className='text-base text-[#674529]'>BOM 목록 관리</h2>
+        <h2 className='text-base text-[#674529]'>등록된 품목 목록</h2>
       </div>
 
-      {/* 검색창 */}
-      <div className='mb-6'>
-        <div className='relative'>
-          <Search className='absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400' />
-          <input
-            type='text'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder='BOM 명으로 검색'
-            className='w-full rounded-xl border border-gray-100 bg-gray-100 py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20'
-          />
-        </div>
-      </div>
-
-      {/* BOM 목록 테이블 */}
       <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead className='border-b border-gray-200'>
             <tr>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
-                BOM 명
+                품목코드
               </th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
-                업데이트 날짜
+                품목명
               </th>
-              <th className='px-4 py-3 text-center text-sm font-medium text-gray-900'>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                카테고리
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                담당공장
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                보관조건
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                유통기한
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
+                단위
+              </th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>
                 작업
               </th>
             </tr>
           </thead>
-          <tbody>
-            {currentData.map((bom) => (
-              <>
-                <tr
-                  key={bom.id}
-                  className='cursor-pointer border-b border-gray-100 transition-colors hover:bg-gray-50/50'
-                  onClick={() => handleBOMClick(bom)}
-                >
-                  <td className='px-4 py-4 text-sm font-medium text-gray-900'>
-                    {bom.bomName}
-                  </td>
-                  <td className='px-4 py-4 text-sm text-gray-700'>
-                    {bom.updatedDate}
-                  </td>
-                  <td className='px-4 py-4 text-center'>
-                    <div className='flex items-center justify-center gap-2'>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // 수정 기능 (추후 구현)
-                        }}
-                        className='text-gray-500 transition-colors hover:text-[#674529]'
-                      >
-                        <Edit className='h-4 w-4' />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteBOM(bom.id);
-                        }}
-                        className='text-gray-500 transition-colors hover:text-red-600'
-                      >
-                        <Trash2 className='h-4 w-4' />
-                      </button>
+          <tbody className='divide-y divide-gray-100'>
+            {currentItems.map((item, index) => (
+              <tr key={index} className='transition-colors hover:bg-gray-50/50'>
+                <td className='px-4 py-4 text-sm font-medium text-gray-900'>
+                  {item.code}
+                </td>
+                <td className='px-4 py-4 text-sm text-gray-900'>{item.name}</td>
+                <td className='px-4 py-4'>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${item.categoryColor}`}
+                  >
+                    {item.category}
+                  </span>
+                </td>
+                <td className='px-4 py-4'>
+                  <span className='inline-flex items-center gap-1 text-sm text-gray-700'>
+                    <div className='text-[#724323]'>
+                      <Factory />
                     </div>
-                  </td>
-                </tr>
-
-                {/* 상세 보기 행 */}
-                {selectedBOM && selectedBOM.id === bom.id && (
-                  <tr className='bg-gray-50'>
-                    <td colSpan={3} className='px-4 py-4'>
-                      <div className='rounded-lg bg-white p-4'>
-                        <h3 className='mb-3 text-sm font-medium text-gray-900'>
-                          등록된 원재료 목록
-                        </h3>
-                        <div className='overflow-x-auto'>
-                          <table className='w-full'>
-                            <thead className='border-b border-gray-200'>
-                              <tr>
-                                <th className='w-[12%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
-                                  원재료 코드
-                                </th>
-                                <th className='w-[50%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
-                                  원재료명
-                                </th>
-                                <th className='w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
-                                  필요량
-                                </th>
-                                <th className='w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700'>
-                                  단위
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {bom.materials.map((material) => (
-                                <tr
-                                  key={material.id}
-                                  className='border-b border-gray-100'
-                                >
-                                  <td className='px-4 py-2 text-xs text-gray-700'>
-                                    {material.code}
-                                  </td>
-                                  <td className='px-4 py-2 text-xs text-gray-700'>
-                                    {material.name}
-                                  </td>
-                                  <td className='px-4 py-2 text-xs text-gray-700'>
-                                    {material.amount}
-                                  </td>
-                                  <td className='px-4 py-2 text-xs text-gray-700'>
-                                    {material.unit}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </>
+                    <span>{item.factory}</span>
+                  </span>
+                </td>
+                <td className='px-4 py-4'>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${item.storageColor}`}
+                  >
+                    <span>{item.storageIcon}</span>
+                    <span>{item.storage}</span>
+                  </span>
+                </td>
+                <td className='px-4 py-4'>
+                  <span className='inline-flex items-center gap-1 text-sm text-gray-700'>
+                    <Clock className='h-4 w-4 text-gray-500' />
+                    <span>{item.shelfLife}</span>
+                  </span>
+                </td>
+                <td className='px-4 py-4 text-sm text-gray-700'>{item.unit}</td>
+                <td className='px-4 py-4'>
+                  <div className='flex items-center gap-2'>
+                    <button className='text-gray-500 transition-colors hover:text-[#674529]'>
+                      <Edit className='h-4 w-4' />
+                    </button>
+                    <button className='text-gray-500 transition-colors hover:text-red-600'>
+                      <Trash2 className='h-4 w-4' />
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -182,4 +701,4 @@ const BOMList = ({ bomList, onDelete }) => {
   );
 };
 
-export default BOMList;
+export default BasicItemList;
