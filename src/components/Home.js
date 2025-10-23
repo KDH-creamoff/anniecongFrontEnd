@@ -24,12 +24,11 @@ const Home = () => {
       '/shipping/nav1': '배송관리-nav1',
       '/shipping/nav2': '배송관리-nav2',
       '/shipping/nav3': '배송관리-nav3',
-      '/production/nav1': '생산관리-nav1',
-      '/production/nav2': '생산관리-nav2',
       '/approval/nav1': '전자결재-nav1',
       '/approval/nav2': '전자결재-nav2',
       '/label': '라벨관리',
-      '/user': '사용자관리',
+      '/user/nav1': '사용자관리-nav1',
+      '/user/nav2': '사용자관리-nav2',
     };
 
     setActiveNav(pathMap[path] || '대시보드');
@@ -51,12 +50,12 @@ const Home = () => {
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
       '배송관리-nav3': '/shipping/nav3',
-      '생산관리-nav1': '/production/nav1',
-      '생산관리-nav2': '/production/nav2',
       '전자결재-nav1': '/approval/nav1',
       '전자결재-nav2': '/approval/nav2',
       라벨관리: '/label',
       사용자관리: '/user',
+      '사용자관리-nav1': '/user/nav1',
+      '사용자관리-nav2': '/user/nav2',
     };
 
     navigate(navMap[nav] || '/dash');

@@ -13,6 +13,8 @@ const Dash = () => {
       '기초정보-공정정보': '/basic',
       '기초정보-BOM관리': '/basic',
       입출고관리: '/receiving',
+      '입출고관리-nav1': '/receiving/nav1',
+      '입출고관리-nav2': '/receiving/nav2',
       '제조관리-nav1': '/manufacturing/nav1',
       '제조관리-nav2': '/manufacturing/nav2',
       '제조관리-nav3': '/manufacturing/nav3',
@@ -21,12 +23,11 @@ const Dash = () => {
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
       '배송관리-nav3': '/shipping/nav3',
-      '생산관리-nav1': '/production/nav1',
-      '생산관리-nav2': '/production/nav2',
       '전자결재-nav1': '/approval/nav1',
       '전자결재-nav2': '/approval/nav2',
       라벨관리: '/label',
-      사용자관리: '/user',
+      '사용자관리-nav1': '/user/nav1',
+      '사용자관리-nav2': '/user/nav2',
     };
 
     navigate(navMap[nav] || '/dash');

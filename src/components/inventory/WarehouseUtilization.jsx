@@ -38,7 +38,7 @@ const WarehouseUtilization = () => {
         <h2 className='text-lg text-[#674529]'>창고별 이용률</h2>
       </div>
 
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+      <div className='grid grid-cols-1 gap-6'>
         {warehouses.map((warehouse, index) => (
           <div key={index} className='rounded-lg border border-gray-200 p-4'>
             <div className='mb-3 flex items-center justify-between'>
