@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-const TrainingManagement = ({ pdfRef }) => {
+const HaccpStandardForm = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
 
   // 상단 헤더 정보
@@ -64,12 +64,12 @@ const TrainingManagement = ({ pdfRef }) => {
           <tbody>
             <tr>
               <td rowSpan={5} className="border border-black text-center font-semibold" style={{verticalAlign: 'middle', padding: '4px'}}>
-                003
+                HACCP
               </td>
             </tr>
             <tr style={{height: '35px'}}>
-              <td rowSpan={2} colSpan={2} className="border border-black text-center font-bold" style={{verticalAlign: 'middle', fontSize: '18px', padding: '2px'}}>
-                선행요건관리
+              <td rowSpan={5} colSpan={2} className="border border-black text-center font-bold" style={{verticalAlign: 'middle', fontSize: '18px', padding: '2px'}}>
+                HACCP관리기준
               </td>
               <td className="border border-black text-sm" style={{verticalAlign: 'middle', padding: '4px', lineHeight: '1'}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
@@ -100,9 +100,6 @@ const TrainingManagement = ({ pdfRef }) => {
             </tr>
 
             <tr style={{height: '35px'}}>
-              <td rowSpan={2} colSpan={2} className="border border-black text-center font-bold" style={{verticalAlign: 'middle', fontSize: '18px', padding: '2px'}}>
-                교육훈련 관리기준
-              </td>
               <td className="border border-black text-sm" style={{verticalAlign: 'middle', padding: '4px', lineHeight: '1'}}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                   <span style={{whiteSpace: 'nowrap'}}>개정일자:</span>
@@ -442,4 +439,4 @@ const TrainingManagement = ({ pdfRef }) => {
   );
 };
 
-export default TrainingManagement;
+export default HaccpStandardForm;

@@ -23,7 +23,8 @@ const EquipmentManagement = ({ pdfRef }) => {
 
   // 서명 정보
   const [signatureInfo, setSignatureInfo] = useState({
-    작성: { team: "", position: "", signature: "", date: "" },
+    작성1: { team: "", position: "", signature: "", date: "" },
+    작성2: { team: "", position: "", signature: "", date: "" },
     검토1: { team: "", position: "", signature: "", date: "" },
     검토2: { team: "", position: "", signature: "", date: "" },
     검토3: { team: "", position: "", signature: "", date: "" },
@@ -183,6 +184,16 @@ const EquipmentManagement = ({ pdfRef }) => {
 
         {/* 서명 섹션 */}
         <table className="w-full border-collapse" style={{tableLayout: 'fixed', borderCollapse: 'collapse'}}>
+          <colgroup>
+            <col style={{width: '65px'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+            <col style={{width: '12.5%'}} />
+          </colgroup>
           <tbody>
             <tr style={{height: '28px'}}>
               <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', width: '65px', padding: '2px', lineHeight: '1'}}>구 분</td>
@@ -195,8 +206,17 @@ const EquipmentManagement = ({ pdfRef }) => {
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
-                  value={signatureInfo.작성.team}
-                  onChange={(e) => handleSignatureChange("작성", "team", e.target.value)}
+                  value={signatureInfo.작성1.team}
+                  onChange={(e) => handleSignatureChange("작성1", "team", e.target.value)}
+                  className="w-full border-0 outline-none bg-transparent text-sm text-center"
+                  style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
+                />
+              </td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+                <input
+                  type="text"
+                  value={signatureInfo.작성2.team}
+                  onChange={(e) => handleSignatureChange("작성2", "team", e.target.value)}
                   className="w-full border-0 outline-none bg-transparent text-sm text-center"
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
@@ -228,8 +248,7 @@ const EquipmentManagement = ({ pdfRef }) => {
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
               </td>
-              <td className="border border-black text-sm" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}></td>
-              <td colSpan={2} rowSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+              <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
                   value={signatureInfo.승인.team}
@@ -244,8 +263,17 @@ const EquipmentManagement = ({ pdfRef }) => {
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
-                  value={signatureInfo.작성.position}
-                  onChange={(e) => handleSignatureChange("작성", "position", e.target.value)}
+                  value={signatureInfo.작성1.position}
+                  onChange={(e) => handleSignatureChange("작성1", "position", e.target.value)}
+                  className="w-full border-0 outline-none bg-transparent text-sm text-center"
+                  style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
+                />
+              </td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+                <input
+                  type="text"
+                  value={signatureInfo.작성2.position}
+                  onChange={(e) => handleSignatureChange("작성2", "position", e.target.value)}
                   className="w-full border-0 outline-none bg-transparent text-sm text-center"
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
@@ -277,15 +305,32 @@ const EquipmentManagement = ({ pdfRef }) => {
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
               </td>
-              <td className="border border-black text-sm" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}></td>
+              <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+                <input
+                  type="text"
+                  value={signatureInfo.승인.position}
+                  onChange={(e) => handleSignatureChange("승인", "position", e.target.value)}
+                  className="w-full border-0 outline-none bg-transparent text-sm text-center"
+                  style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
+                />
+              </td>
             </tr>
             <tr style={{height: '40px'}}>
               <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>서 명</td>
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
-                  value={signatureInfo.작성.signature}
-                  onChange={(e) => handleSignatureChange("작성", "signature", e.target.value)}
+                  value={signatureInfo.작성1.signature}
+                  onChange={(e) => handleSignatureChange("작성1", "signature", e.target.value)}
+                  className="w-full border-0 outline-none bg-transparent text-sm text-center"
+                  style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
+                />
+              </td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+                <input
+                  type="text"
+                  value={signatureInfo.작성2.signature}
+                  onChange={(e) => handleSignatureChange("작성2", "signature", e.target.value)}
                   className="w-full border-0 outline-none bg-transparent text-sm text-center"
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
@@ -317,7 +362,6 @@ const EquipmentManagement = ({ pdfRef }) => {
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                 />
               </td>
-              <td className="border border-black text-sm" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}></td>
               <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
@@ -333,8 +377,18 @@ const EquipmentManagement = ({ pdfRef }) => {
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
-                  value={signatureInfo.작성.date}
-                  onChange={(e) => handleSignatureChange("작성", "date", e.target.value)}
+                  value={signatureInfo.작성1.date}
+                  onChange={(e) => handleSignatureChange("작성1", "date", e.target.value)}
+                  className="w-full border-0 outline-none bg-transparent text-sm text-center"
+                  style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
+                  placeholder="/"
+                />
+              </td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
+                <input
+                  type="text"
+                  value={signatureInfo.작성2.date}
+                  onChange={(e) => handleSignatureChange("작성2", "date", e.target.value)}
                   className="w-full border-0 outline-none bg-transparent text-sm text-center"
                   style={{verticalAlign: 'middle', padding: '0', margin: '0', lineHeight: '1'}}
                   placeholder="/"
@@ -370,7 +424,6 @@ const EquipmentManagement = ({ pdfRef }) => {
                   placeholder="/"
                 />
               </td>
-              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>/</td>
               <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"

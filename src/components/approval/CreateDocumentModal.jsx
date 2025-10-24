@@ -5,6 +5,19 @@ import FeedMillStandards from '../template/PrerequisitePrograms/01_FeedMillStand
 import EquipmentManagement from '../template/PrerequisitePrograms/02_EquipmentManagement';
 import TrainingManagement from '../template/PrerequisitePrograms/03_TrainingManagement';
 import ProcessControl from '../template/PrerequisitePrograms/04_ProcessControl';
+import ReprocessingControl from '../template/PrerequisitePrograms/05_ReprocessingControl';
+import TraceabilityManagement from '../template/PrerequisitePrograms/06_TraceabilityManagement';
+import NonconformanceManagement from '../template/PrerequisitePrograms/07_NonconformanceManagement';
+import ProductManagement from '../template/PrerequisitePrograms/08_ProductManagement';
+import RecallManagement from '../template/PrerequisitePrograms/09_RecallManagement';
+import TransportManagement from '../template/PrerequisitePrograms/10_TransportManagement';
+
+import EquipmentHistoryCard from '../template/PrerequisitePrograms/16_EquipmentHistoryCard';
+import SanitationManagement from '../template/PrerequisitePrograms/11_SanitationManagement';
+import PestControlManagement from '../template/PrerequisitePrograms/12_PestControlManagement';
+import TestingAndAnalysis from '../template/PrerequisitePrograms/13_TestingAndAnalysis';
+import SamplingProcedure from '../template/PrerequisitePrograms/14_SamplingProcedure';
+import HaccpStandardForm from '../template/PrerequisitePrograms/15_HaccpStandardForm';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -28,34 +41,100 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
   const templates = [
     {
       id: 'template-1',
-      name: '사료공장관리기준',
-      description: '선행요건관리',
+      name: '선행요건관리',
+      description: '사료공장관리기준',
       component: FeedMillStandards,
     },
     {
       id: 'template-2',
-      name: '설비관리기준',
-      description: '선행요건관리',
+      name: '선행요건관리',
+      description: '설비관리기준',
       component: EquipmentManagement,
     },
     {
       id: 'template-3',
-      name: '교육훈련관리기준',
-      description: '선행요건관리',
+      name: '선행요건관리',
+      description: '교육훈련관리기준',
       component: TrainingManagement,
     },
     {
       id: 'template-4',
-      name: '공정관리기준',
-      description: '선행요건관리',
+      name: '선행요건관리',
+      description: '공정관리기준',
       component: ProcessControl,
     },
-    ...Array.from({ length: 40 }, (_, i) => ({
-      id: `template-${i + 15}`,
-      name: `템플릿 ${i + 15}`,
-      description: `추후 추가될 템플릿 ${i + 15}`,
-      component: null,
-    })),
+    {
+      id: 'template-5',
+      name: '선행요건관리',
+      description: '재처리 관리기준',
+      component: ReprocessingControl,
+    },
+    {
+      id: 'template-6',
+      name: '선행요건관리',
+      description: '제품식별 및 추적성관리기준',
+      component: TraceabilityManagement,
+    },
+    {
+      id: 'template-7',
+      name: '선행요건관리',
+      description: '부적합품관리기준',
+      component: NonconformanceManagement,
+    },
+    {
+      id: 'template-8',
+      name: '선행요건관리',
+      description: '제품관리기준',
+      component: ProductManagement,
+    },
+    {
+      id: 'template-9',
+      name: '선행요건관리',
+      description: '제품회수관리기준',
+      component: RecallManagement,
+    },
+    {
+      id: 'template-10',
+      name: '선행요건관리',
+      description: '운송관리기준',
+      component: TransportManagement,
+    },
+    {
+      id: 'template-11',
+      name: '선행요건관리',
+      description: '위생관리기준',
+      component: SanitationManagement,
+    },
+    {
+      id: 'template-12',
+      name: '선행요건관리',
+      description: '방역관리기준',
+      component: PestControlManagement,
+    },
+    {
+      id: 'template-13',
+      name: '선행요건관리',
+      description: '시험 및 분석업무기준',
+      component: TestingAndAnalysis,
+    },
+    {
+      id: 'template-14',
+      name: '선행요건관리',
+      description: '시료채취기준',
+      component: SamplingProcedure,
+    },
+    {
+      id: 'template-15',
+      name: 'HACCP관리기준',
+      description: '',
+      component: HaccpStandardForm,
+    },
+    {
+      id: 'template-16',
+      name: '설비이력카드',
+      description: '',
+      component: EquipmentHistoryCard,
+    },
   ];
 
   if (!isOpen) return null;
