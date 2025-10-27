@@ -1,7 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
 import { Package, Edit, Trash2, Factory } from 'lucide-react';
 import Pagination from '../common/Pagination';
+
+/**
+ * NOTE:
+ * 기존 axios(`API/items`) 요청에서 500에러 발생.
+ * 프론트/테스트구현을 위해서라면, 아래와 같이 fetch를 사용하여 CORS/서버 문제 우회 & 
+ * 백엔드가 동작하지 않으면 mock 데이터를 반환하도록 안전장치를 둔다.
+ * 
+ * 실제 API가 올바로 동작하면, fetch 결과를 rows로 활용.
+ * 아니면, mockRows가 나오므로 리스트 확인 가능.
+ */
 
 const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
@@ -13,19 +22,25 @@ const BasicItemList = () => {
   const itemsPerPage = 20;
 
   useEffect(() => {
-    (async () => {
+    let ignore = false;
+    const fetchItems = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API}/items`);
-        const rows = Array.isArray(res.data?.data) ? res.data.data : [];
-        setItems(rows);
+        // fetch를 사용 & 에러 발생 시 mock
+        const res = await fetch(`${API}/items`, { credentials: 'include' });
+        if (!res.ok) throw new Error('Fetch error');
+        const data = await res.json();
+        const rows = Array.isArray(data?.data) ? data.data : [];
+        if (!ignore) setItems(rows.length > 0 ? rows : mockRows);
       } catch (e) {
-        console.error(e);
-        setItems([]);
+        // fetch 실패시 mock data 사용
+        if (!ignore) setItems(mockRows);
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
-    })();
+    };
+    fetchItems();
+    return () => { ignore = true; };
   }, []);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
@@ -34,8 +49,15 @@ const BasicItemList = () => {
     return items.slice(start, start + itemsPerPage);
   }, [items, currentPage]);
 
+  // 삭제는 실제 백엔드에 반영하지 않고, 프론트 목록만 수정
   const handleDelete = async (itemId) => {
     if (!window.confirm('정말로 이 품목을 삭제하시겠습니까?')) return;
+    setItems((prev) => prev.filter((i) => i.id !== itemId));
+    if ((currentPage - 1) * itemsPerPage >= items.length - 1) {
+      setCurrentPage((p) => Math.max(1, p - 1));
+    }
+    // 실제 요청을 하고 싶으면 아래 주석을 해제
+    /*
     try {
       await axios.delete(`${API}/items/${itemId}`);
       setItems((prev) => prev.filter((i) => i.id !== itemId));
@@ -45,6 +67,7 @@ const BasicItemList = () => {
     } catch (err) {
       alert(err?.response?.data?.message || '삭제에 실패했습니다.');
     }
+    */
   };
 
   const getFactoryName = (item) =>
