@@ -16,7 +16,6 @@ import Mypage from './pages/Mypage';
 export default function App() {
   return (
     <Routes>
-      {/* 로그인/회원가입 라우트 */}
       <Route path='/login' element={<Login />} />
       <Route path='/signup' element={<Signup />} />
 
