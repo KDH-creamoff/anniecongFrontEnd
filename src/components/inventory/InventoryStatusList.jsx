@@ -30,23 +30,7 @@ export default function InventoryStatusList({ filters }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const query = useMemo(() => {
-    const q = new URLSearchParams();
-    const cat = korToEnumCategory[filters?.category];
-    const st = korToEnumStatus[filters?.status];
-    const search = (filters?.searchTerm ?? "").trim();
-    const factoryId = warehouseNameToId[filters?.warehouse];
-
-    if (cat) q.set("category", cat);
-    if (st) q.set("status", st);
-    if (search) q.set("search", search);
-    if (factoryId) q.set("factoryId", String(factoryId));
-
-    q.set("page", "1");
-    q.set("limit", "50");
-    return q.toString();
-  }, [filters]);
-
+  // 초기 데이터 불러오기 (한 번만)
   useEffect(() => {
     const ac = new AbortController();
     setLoading(true);
@@ -56,19 +40,74 @@ export default function InventoryStatusList({ filters }) {
         if (ac.signal.aborted) return;
         setItems(Array.isArray(json?.data) ? json.data : []);
       })
+      .catch((err) => {
+        if (!ac.signal.aborted) {
+          console.error("재고 데이터 불러오기 실패:", err);
+          setItems([]);
+        }
+      })
       .finally(() => {
         if (!ac.signal.aborted) setLoading(false);
       });
-    console.log(ac)
     return () => ac.abort();
-  }, [query]);
+  }, []);
+
+  // 받아온 데이터를 filters 기준으로 클라이언트 측 필터링
+  const filteredItems = useMemo(() => {
+    if (!filters || items.length === 0) return items;
+
+    return items.filter((item) => {
+      // 1. 카테고리 필터
+      if (filters.category && filters.category !== '전체') {
+        const categoryEnum = korToEnumCategory[filters.category];
+        if (categoryEnum && item?.item?.category !== categoryEnum) {
+          return false;
+        }
+      }
+
+      // 2. 상태 필터
+      if (filters.status && filters.status !== '전체') {
+        const statusEnum = korToEnumStatus[filters.status];
+        if (statusEnum && item?.status !== statusEnum) {
+          return false;
+        }
+      }
+
+      // 3. 창고 필터
+      if (filters.warehouse && filters.warehouse !== '전체') {
+        const factoryName = item?.factory?.name || '';
+        if (!factoryName.includes(filters.warehouse)) {
+          return false;
+        }
+      }
+
+      // 4. 검색어 필터 (품목명, 품목코드, 바코드번호)
+      if (filters.searchTerm && filters.searchTerm.trim()) {
+        const search = filters.searchTerm.toLowerCase().trim();
+        const itemName = (item?.item?.name || '').toLowerCase();
+        const itemCode = (item?.item?.code || '').toLowerCase();
+        const lotNumber = (item?.lotNumber || '').toLowerCase();
+        
+        if (!itemName.includes(search) && 
+            !itemCode.includes(search) && 
+            !lotNumber.includes(search)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [items, filters]);
 
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-sm">
       <div className="border-b border-gray-200 px-6 py-4">
         <div className="flex items-center space-x-2">
           <Package className="h-5 w-5 text-[#674529]" />
-          <h3 className="text-base text-[#674529]">재고 현황 ({items.length}건)</h3>
+          <h3 className="text-base text-[#674529]">
+            재고 현황 ({filteredItems.length}건
+            {items.length !== filteredItems.length && ` / 전체 ${items.length}건`})
+          </h3>
         </div>
       </div>
 
@@ -90,18 +129,20 @@ export default function InventoryStatusList({ filters }) {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td className="px-4 py-6 text-sm text-gray-500" colSpan={9}>
+                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
                   불러오는 중…
                 </td>
               </tr>
-            ) : items.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
               <tr>
-                <td className="px-4 py-6 text-sm text-gray-500" colSpan={9}>
-                  데이터가 없습니다.
+                <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
+                  {items.length === 0 
+                    ? '데이터가 없습니다.' 
+                    : '필터 조건에 맞는 재고가 없습니다.'}
                 </td>
               </tr>
             ) : (
-              items.map((d) => {
+              filteredItems.map((d) => {
                 const days = Number(d?.daysLeft ?? 0);
                 const daysLabel = days >= 0 ? `- ${days}일` : `+ ${Math.abs(days)}일`;
                 const badge =
