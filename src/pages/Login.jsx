@@ -8,6 +8,7 @@ const Login = () => {
     userId: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,23 +18,55 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 로그인 로직 구현 (임시: 아이디만 확인)
-    if (formData.userId && formData.password) {
-      // localStorage에 사용자 정보 저장
-      const userData = {
-        userId: formData.userId,
-        name: formData.userId, // 실제로는 서버에서 받아온 이름을 사용
-        loginTime: new Date().toISOString()
-      };
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // 대시보드로 이동
-      navigate('/dash');
-    } else {
+    // 유효성 체크
+    if (!formData.userId || !formData.password) {
       alert('아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
+    setLoading(true);
+
+    try {
+      // API로 로그인 요청보내기
+      const response = await fetch('http://localhost:4000/api/auth/login', {
+        method: 'POST',
+        credentials: 'include', // 세션 쿠키 받아오기 위해 필요!
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: formData.userId,
+          password: formData.password
+        })
+      });
+
+      if (!response.ok) {
+        // 서버에서 401 등 에러 메세지 내려주면
+        let msg = '로그인에 실패했습니다.';
+        try {
+          const res = await response.json();
+          msg = res?.message || msg;
+        } catch (err) {}
+        throw new Error(msg);
+      }
+
+      // 로그인 성공 시(여기선 로그인 성공 후 사용자의 정보는 직접 내려오는 API 따로 필요해 보임)
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          userId: formData.userId,
+          name: formData.userId, // TODO: 서버에서 이름이나 정보를 내려주도록 바꿀 수 있음
+          loginTime: new Date().toISOString()
+        })
+      );
+
+      navigate('/dash');
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +110,7 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
                   placeholder="아이디를 입력하세요"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -99,6 +133,7 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
                   placeholder="비밀번호를 입력하세요"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -106,9 +141,10 @@ const Login = () => {
             {/* 로그인 버튼 */}
             <button
               type="submit"
-              className="w-full bg-[#724323] text-white py-3 rounded-lg font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6"
+              disabled={loading}
+              className={`w-full bg-[#724323] text-white py-3 rounded-lg font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              로그인
+              {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
 
