@@ -11,13 +11,15 @@ import NonconformanceManagement from '../template/PrerequisitePrograms/07_Noncon
 import ProductManagement from '../template/PrerequisitePrograms/08_ProductManagement';
 import RecallManagement from '../template/PrerequisitePrograms/09_RecallManagement';
 import TransportManagement from '../template/PrerequisitePrograms/10_TransportManagement';
-
-import EquipmentHistoryCard from '../template/PrerequisitePrograms/16_EquipmentHistoryCard';
 import SanitationManagement from '../template/PrerequisitePrograms/11_SanitationManagement';
 import PestControlManagement from '../template/PrerequisitePrograms/12_PestControlManagement';
 import TestingAndAnalysis from '../template/PrerequisitePrograms/13_TestingAndAnalysis';
 import SamplingProcedure from '../template/PrerequisitePrograms/14_SamplingProcedure';
-import HaccpStandardForm from '../template/PrerequisitePrograms/15_HaccpStandardForm';
+import HaccpStandardForm from '../template/15_HaccpStandardForm';
+import EquipmentInspectionForm from '../template/16_EquipmentInspectionForm';
+import EquipmentHistoryCard from '../template/17_EquipmentHistoryCard';
+import ManufacturingFacilityManagementForm from '../template/18_ManufacturingFacilityManagementForm';
+import TrainingMeetingReportForm from '../template/19_TrainingMeetingReportForm';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -131,9 +133,27 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
     },
     {
       id: 'template-16',
+      name: '설비정기점검표',
+      description: '',
+      component: EquipmentInspectionForm,
+    },
+    {
+      id: 'template-17',
       name: '설비이력카드',
       description: '',
       component: EquipmentHistoryCard,
+    },
+    {
+      id: 'template-18',
+      name: '제조시설 및 공정관리 대장',
+      description: '',
+      component: ManufacturingFacilityManagementForm,
+    },
+    {
+      id: 'template-19',
+      name: '교육/회의 결과보고서',
+      description: '',
+      component: TrainingMeetingReportForm,
     },
   ];
 

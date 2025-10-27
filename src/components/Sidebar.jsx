@@ -241,7 +241,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                1공장 전처리
+                제조이력 캘린더
               </button>
               <button
                 onClick={() => setActiveNav('제조관리-nav2')}
@@ -251,7 +251,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                공장간 이동
+                1공장 전처리
               </button>
               <button
                 onClick={() => setActiveNav('제조관리-nav3')}
@@ -261,7 +261,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                2공장 제조
+                공장간 이동
               </button>
               <button
                 onClick={() => setActiveNav('제조관리-nav4')}
@@ -271,7 +271,17 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                작업내용추가
+                2공장 제조
+              </button>
+              <button
+                onClick={() => setActiveNav('제조관리-nav5')}
+                className={`block w-full rounded p-1.5 text-left text-xs ${
+                  activeNav === '제조관리-nav5'
+                    ? 'bg-[#674529] text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                작업지시서 관리
               </button>
             </div>
           )}

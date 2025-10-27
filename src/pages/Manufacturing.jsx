@@ -1,11 +1,25 @@
 import StatusSummaryBar from '../components/manufacturing/StatusSummaryBar';
 import WorkOrderList from '../components/manufacturing/WorkOrderList';
+import TransferRegistration from '../components/manufacturing/TransferRegistration';
+import TransferStatus from '../components/manufacturing/TransferStatus';
+import { ArrowRightLeft } from 'lucide-react';
 
 const Manufacturing = ({ subPage }) => {
   // 서브 페이지에 따른 컴포넌트 렌더링
   const renderContent = () => {
     switch (subPage) {
       case 'nav1':
+        // 제조이력 캘린더
+        return (
+          <div className="p-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-[#674529] mb-4">제조이력 캘린더</h2>
+              <p className="text-gray-600">제조이력 캘린더 페이지입니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'nav2':
         // 1공장 전처리
         return (
           <div className="p-6">
@@ -14,18 +28,20 @@ const Manufacturing = ({ subPage }) => {
           </div>
         );
 
-      case 'nav2':
+      case 'nav3':
         // 공장간 이동
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#674529] mb-4">공장간 이동</h2>
-              <p className="text-gray-600">공장간 이동 관리 페이지입니다.</p>
+          <div>
+            <div className='mb-1 flex items-center space-x-2'>
+              <ArrowRightLeft className='h-5 w-5 text-[#674529]'/>
+              <h2 className="text-lg font-semibold text-[#674529]">공장간 이동 관리</h2>
             </div>
+              <TransferRegistration />
+              <TransferStatus />
           </div>
         );
 
-      case 'nav3':
+      case 'nav4':
         // 2공장 제조
         return (
           <div className="p-6">
@@ -36,13 +52,13 @@ const Manufacturing = ({ subPage }) => {
           </div>
         );
 
-      case 'nav4':
-        // 작업내용추가
+      case 'nav5':
+        // 작업지시서 관리
         return (
           <div className="p-6">
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#674529] mb-4">작업내용추가</h2>
-              <p className="text-gray-600">작업내용 추가 페이지입니다.</p>
+              <h2 className="text-xl font-semibold text-[#674529] mb-4">작업지시서 관리</h2>
+              <p className="text-gray-600">작업지시서 관리 페이지입니다.</p>
             </div>
           </div>
         );
@@ -51,8 +67,10 @@ const Manufacturing = ({ subPage }) => {
         // 기본값: nav1 표시
         return (
           <div className="p-6">
-            <StatusSummaryBar />
-            <WorkOrderList />
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-[#674529] mb-4">제조이력 캘린더</h2>
+              <p className="text-gray-600">제조이력 캘린더 페이지입니다.</p>
+            </div>
           </div>
         );
     }
