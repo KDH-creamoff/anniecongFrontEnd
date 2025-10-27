@@ -21,17 +21,6 @@ export default function WarehouseUtilization() {
         <h2 className="text-lg text-[#674529]">창고별 이용률</h2>
       </div>
 
-      <div className='grid grid-cols-1 gap-6'>
-        {warehouses.map((warehouse, index) => (
-          <div key={index} className='rounded-lg border border-gray-200 p-4'>
-            <div className='mb-3 flex items-center justify-between'>
-              <h3 className='text-lg font-semibold text-[#674529]'>
-                {warehouse.name}
-              </h3>
-              <span
-                className={`rounded px-3 py-1 text-sm font-semibold ${warehouse.bgColor} ${warehouse.percentage >= 85 ? 'text-red-600' : 'text-green-600'}`}
-              >
-                {warehouse.percentage}%
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {rows.map((w, idx) => (
           <div key={idx} className="rounded-lg border border-gray-200 p-4">
