@@ -138,10 +138,10 @@ const FeedMillStandards = ({ pdfRef }) => {
         <table className="w-full border-collapse" style={{tableLayout: 'fixed', borderCollapse: 'collapse'}}>
           <thead>
             <tr style={{height: '28px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', width: '60px', padding: '2px', lineHeight: '1'}}>개정번호</td>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 일자</td>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 사유</td>
-              <td colSpan={2} className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 내용 요약</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', width: '60px', padding: '2px', lineHeight: '1'}}>개정번호</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 일자</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 사유</td>
+              <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>제·개정 내용 요약</td>
             </tr>
           </thead>
           <tbody>
@@ -196,13 +196,13 @@ const FeedMillStandards = ({ pdfRef }) => {
           </colgroup>
           <tbody>
             <tr style={{height: '28px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', width: '65px', padding: '2px', lineHeight: '1'}}>구 분</td>
-              <td colSpan={2} className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>작 성</td>
-              <td colSpan={3} className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>검 토</td>
-              <td colSpan={2} className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>승 인</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', width: '65px', padding: '2px', lineHeight: '1'}}>구 분</td>
+              <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>작 성</td>
+              <td colSpan={3} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>검 토</td>
+              <td colSpan={2} className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>승 인</td>
             </tr>
             <tr style={{height: '40px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>팀 명</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>팀 명</td>
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
@@ -259,7 +259,7 @@ const FeedMillStandards = ({ pdfRef }) => {
               </td>
             </tr>
             <tr style={{height: '40px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>직 책</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>직 책</td>
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
@@ -316,7 +316,7 @@ const FeedMillStandards = ({ pdfRef }) => {
               </td>
             </tr>
             <tr style={{height: '40px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>서 명</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>서 명</td>
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"
@@ -373,7 +373,7 @@ const FeedMillStandards = ({ pdfRef }) => {
               </td>
             </tr>
             <tr style={{height: '40px'}}>
-              <td className="border border-black bg-gray-100 text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>서명일자</td>
+              <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px', lineHeight: '1'}}>서명일자</td>
               <td className="border border-black text-sm text-center" style={{verticalAlign: 'middle', padding: '2px 4px', lineHeight: '1'}}>
                 <input
                   type="text"

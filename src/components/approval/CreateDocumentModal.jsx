@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, FileText, ChevronRight, ArrowLeft } from 'lucide-react';
+import { X, FileText, ChevronRight, ArrowLeft, Search } from 'lucide-react';
 import PuppeteerPdfButton from '../common/PuppeteerPdfButton';
 import FeedMillStandards from '../template/PrerequisitePrograms/01_FeedMillStandards';
 import EquipmentManagement from '../template/PrerequisitePrograms/02_EquipmentManagement';
@@ -20,11 +20,24 @@ import EquipmentInspectionForm from '../template/16_EquipmentInspectionForm';
 import EquipmentHistoryCard from '../template/17_EquipmentHistoryCard';
 import ManufacturingFacilityManagementForm from '../template/18_ManufacturingFacilityManagementForm';
 import TrainingMeetingReportForm from '../template/19_TrainingMeetingReportForm';
+import ProductionManagementSheet from '../template/20_ProductionManagementSheet';
+import NonconformingProductReport from '../template/21_NonconformingProductReport';
+import WarehouseInspectionChecklist from '../template/22_WarehouseInspectionChecklist';
+import MaterialReceivingInspectionLog from '../template/23_MaterialReceivingInspectionLog';
+import MaterialProductQualityControlLog from '../template/24_MaterialProductQualityControlLog';
+import ReturnOccurrenceReport from '../template/25_ReturnOccurrenceReport';
+import FeedCarrierDisinfectionLog from '../template/26_FeedCarrierDisinfectionLog';
+import VehicleInspectionLog from '../template/27_VehicleInspectionLog';
+import HygieneInspectionChecklist from '../template/28_HygieneInspectionChecklist';
+import DisinfectantInventoryAndFacilityInspection from '../template/29_DisinfectantInventoryAndFacilityInspection';
+import DisinfectionImplementationRecord from '../template/30_DisinfectionImplementationRecord';
+import DecontaminationWorkRecord from '../template/31_DecontaminationWorkRecord';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showSettingsForm, setShowSettingsForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const pdfContentRef = useRef(null);
 
   // 문서 설정 상태
@@ -155,6 +168,78 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       description: '',
       component: TrainingMeetingReportForm,
     },
+    {
+      id: 'template-20',
+      name: '제품 생산관리 대장',
+      description: '',
+      component: ProductionManagementSheet,
+    },
+    {
+      id: 'template-21',
+      name: '부적합품 보고서',
+      description: '',
+      component: NonconformingProductReport,
+    },
+    {
+      id: 'template-22',
+      name: '보관 창고 점검표',
+      description: '',
+      component: WarehouseInspectionChecklist,
+    },
+    {
+      id: 'template-23',
+      name: '원료 입고 및 검사 대장',
+      description: '',
+      component: MaterialReceivingInspectionLog,
+    },
+    {
+      id: 'template-24',
+      name: '원료 및 제품 품질관리 대장',
+      description: '자가',
+      component: MaterialProductQualityControlLog,
+    },
+    {
+      id: 'template-25',
+      name: '반품발생보고',
+      description: '',
+      component: ReturnOccurrenceReport,
+    },
+    {
+      id: 'template-26',
+      name: '사료운반자 소독실시 대장',
+      description: '운전자 지참용',
+      component: FeedCarrierDisinfectionLog,
+    },
+    {
+      id: 'template-27',
+      name: '차량 점검대장',
+      description: '',
+      component: VehicleInspectionLog,
+    },
+    {
+      id: 'template-28',
+      name: '위생점검 체크리스트',
+      description: '',
+      component: HygieneInspectionChecklist,
+    },
+    {
+      id: 'template-29',
+      name: '소독약품 수불대장 및 소독시설 점검대장',
+      description: '',
+      component: DisinfectantInventoryAndFacilityInspection,
+    },
+    {
+      id: 'template-30',
+      name: '소독실시기록부',
+      description: '',
+      component: DisinfectionImplementationRecord,
+    },
+    {
+      id: 'template-31',
+      name: '구서작업기록부',
+      description: '',
+      component: DecontaminationWorkRecord,
+    },
   ];
 
   if (!isOpen) return null;
@@ -187,6 +272,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
     setIsEditMode(false);
     setShowSettingsForm(false);
     setSelectedTemplate(null);
+    setSearchQuery('');
     setDocumentSettings({
       requiredDocuments: '',
       ceo: '',
@@ -197,6 +283,15 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
     setSignaturePreview(null);
     onClose();
   };
+
+  // 검색어로 템플릿 필터링
+  const filteredTemplates = templates.filter((template) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      template.name.toLowerCase().includes(query) ||
+      template.description.toLowerCase().includes(query)
+    );
+  });
 
   const handleSettingsChange = (field, value) => {
     setDocumentSettings(prev => ({
@@ -455,38 +550,72 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
           {/* 왼쪽: 템플릿 목록 */}
           <div className='w-80 border-r border-gray-200 overflow-y-auto bg-gray-50'>
             <div className='p-4'>
-              <h3 className='text-sm font-semibold text-gray-700 mb-3'>템플릿 목록</h3>
-              <div className='space-y-2'>
-                {templates.map((template) => (
+              <div className='flex items-center justify-between mb-3'>
+                <h3 className='text-sm font-semibold text-gray-700'>템플릿 목록</h3>
+                <span className='text-xs text-gray-500'>
+                  {filteredTemplates.length}개
+                </span>
+              </div>
+
+              {/* 검색창 */}
+              <div className='relative mb-4'>
+                <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                <input
+                  type='text'
+                  placeholder='템플릿 검색...'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className='w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white placeholder:text-gray-400'
+                />
+                {searchQuery && (
                   <button
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                      selectedTemplate?.id === template.id
-                        ? 'border-[#724323] bg-[#724323]/10'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                    }`}
+                    onClick={() => setSearchQuery('')}
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors'
+                    aria-label='검색어 지우기'
                   >
-                    <div className='flex items-start justify-between'>
-                      <div className='flex items-start gap-3 flex-1'>
-                        <div className={`p-2 rounded-lg ${
-                          selectedTemplate?.id === template.id ? 'bg-[#724323]/20' : 'bg-gray-100'
-                        }`}>
-                          <FileText className={`h-5 w-5 ${
-                            selectedTemplate?.id === template.id ? 'text-[#724323]' : 'text-gray-600'
-                          }`} />
-                        </div>
-                        <div className='flex-1 min-w-0'>
-                          <h4 className='font-semibold text-gray-900 text-sm mb-1'>{template.name}</h4>
-                          <p className='text-xs text-gray-500 line-clamp-2'>{template.description}</p>
-                        </div>
-                      </div>
-                      {selectedTemplate?.id === template.id && (
-                        <ChevronRight className='h-5 w-5 text-[#724323] flex-shrink-0 ml-2' />
-                      )}
-                    </div>
+                    <X className='h-4 w-4' />
                   </button>
-                ))}
+                )}
+              </div>
+
+              <div className='space-y-2'>
+                {filteredTemplates.length > 0 ? (
+                  filteredTemplates.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => handleTemplateSelect(template)}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                        selectedTemplate?.id === template.id
+                          ? 'border-[#724323] bg-[#724323]/10'
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className='flex items-start justify-between'>
+                        <div className='flex items-start gap-3 flex-1'>
+                          <div className={`p-2 rounded-lg ${
+                            selectedTemplate?.id === template.id ? 'bg-[#724323]/20' : 'bg-gray-100'
+                          }`}>
+                            <FileText className={`h-5 w-5 ${
+                              selectedTemplate?.id === template.id ? 'text-[#724323]' : 'text-gray-600'
+                            }`} />
+                          </div>
+                          <div className='flex-1 min-w-0'>
+                            <h4 className='font-semibold text-gray-900 text-sm mb-1'>{template.name}</h4>
+                            <p className='text-xs text-gray-500 line-clamp-2'>{template.description}</p>
+                          </div>
+                        </div>
+                        {selectedTemplate?.id === template.id && (
+                          <ChevronRight className='h-5 w-5 text-[#724323] flex-shrink-0 ml-2' />
+                        )}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className='text-center py-8'>
+                    <FileText className='h-12 w-12 text-gray-300 mx-auto mb-3' />
+                    <p className='text-sm text-gray-500'>검색 결과가 없습니다</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

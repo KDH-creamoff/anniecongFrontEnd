@@ -59,21 +59,21 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
         {/* 상단 테이블 */}
         <table className="w-full border-collapse border-2 border-black mb-0">
           <tbody>
-            {/* 첫 번째 행 - 제목 + 제/담당자/책임자 */}
+            {/* 첫 번째 행 - 제목 + 결재/담당자/책임자 */}
             <tr>
-              <td className="border border-black text-center font-bold text-lg py-2 leading-tight" colSpan="2" rowSpan="2">
+              <td className="border border-black text-center font-bold text-lg py-3 leading-tight" colSpan="4" rowSpan="2">
                 <div>교육/회의 결과보고서</div>
                 <div className="text-base font-normal mt-1">(☐ 교육, ☐ 회의)</div>
               </td>
-              <td className="border border-black text-center w-12 py-1.5 text-sm tracking-[0.3em]" rowSpan={2}>결<br />재</td>
-              <td className="border border-black text-center w-20 py-1.5 text-sm tracking-[0.3em]">담당자</td>
-              <td className="border border-black text-center w-20 py-1.5 text-sm tracking-[0.3em]">책임자</td>
+              <td className="border border-black text-center w-12 py-1.5 text-sm tracking-[0.3em]" rowSpan="2">결<br />재</td>
+              <td className="border border-black text-center w-36 py-1.5 text-sm tracking-[0.3em]">담당자</td>
+              <td className="border border-black text-center w-24 py-1.5 text-sm tracking-[0.3em]">책임자</td>
             </tr>
 
-            {/* 두 번째 행 - 개/서명란 */}
+            {/* 두 번째 행 - 서명란 */}
             <tr>
               <td
-                className="border border-black h-14 cursor-pointer hover:bg-gray-50"
+                className="border border-black h-16 cursor-pointer hover:bg-gray-50"
                 onClick={handleManagerClick}
               >
                 {managerImage ? (
@@ -85,7 +85,7 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
                 ) : null}
               </td>
               <td
-                className="border border-black h-14 cursor-pointer hover:bg-gray-50"
+                className="border border-black h-16 cursor-pointer hover:bg-gray-50"
                 onClick={handleSupervisorClick}
               >
                 {supervisorImage ? (
@@ -98,57 +98,52 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
               </td>
             </tr>
 
-            {/* 세 번째 행 - 주제 */}
+            {/* 세 번째 행 - 주제 + 강사 */}
             <tr>
-              <td className="border border-black text-center w-16 py-1.5 text-sm tracking-[0.3em]">주 제</td>
-              <td className="border border-black py-1.5" colSpan="5"></td>
+              <td className="border border-black text-center w-20 py-2 text-sm tracking-[0.3em]">주 제</td>
+              <td className="border border-black py-2" colSpan="3"><input type="text" className="w-full outline-none pl-1" /></td>
+              <td className="border border-black text-center w-20 py-2 text-sm tracking-[0.5em]">강 사</td>
+              <td className="border border-black py-2" colSpan="2"><input type="text" className="w-xl outline-none pl-1" /></td>
             </tr>
 
-            {/* 네 번째 행 - 일자 */}
+            {/* 네 번째 행 - 일자 + 장소 */}
             <tr>
-              <td className="border border-black text-center py-1.5 text-sm tracking-[0.3em]">일 자</td>
-              <td className="border border-black py-1.5" colSpan="3">
+              <td className="border border-black text-center py-2 text-sm tracking-[0.3em]">일 자</td>
+              <td className="border border-black py-2" colSpan="3">
                 <div className="flex items-center gap-1 px-2">
-                  <input type="text" className="w-12 outline-none text-center text-sm" placeholder="201" />
+                  <input type="text" className="w-10 outline-none text-center text-sm" defaultValue="20" />
                   <span className="text-sm">년</span>
-                  <input type="text" className="w-12 outline-none text-center text-sm" />
+                  <input type="text" className="w-10 outline-none text-center text-sm" />
                   <span className="text-sm">월</span>
-                  <input type="text" className="w-12 outline-none text-center text-sm" />
-                  <span className="text-sm">일 (시간 :</span>
+                  <input type="text" className="w-10 outline-none text-center text-sm" />
+                  <span className="text-sm">일 [시간 :</span>
                   <input type="text" className="w-16 outline-none text-center text-sm" />
-                  <span className="text-sm">)</span>
+                  <span className="text-sm">]</span>
                 </div>
               </td>
-              <td className="border border-black text-center py-1.5 text-sm tracking-[0.5em]">강 사</td>
-              <td className="border border-black py-1.5"></td>
+              <td className="border border-black text-center py-2 text-sm tracking-[0.5em]">장 소</td>
+              <td className="border border-black py-2" colSpan="2"><input type="text" className="w-full outline-none pl-1" /></td>
             </tr>
 
             {/* 다섯 번째 행 - 대상 */}
             <tr>
-              <td className="border border-black text-center py-1.5 text-sm tracking-[0.3em]">대 상</td>
-              <td className="border border-black py-1.5" colSpan="1">
-                <div className="flex items-center gap-1 px-2">
-                  <span className="text-sm">관석인원</span>
-                  <input type="text" className="w-16 outline-none text-center text-sm border-b border-black" />
-                  <span className="text-sm">명</span>
+              <td className="border border-black text-center py-2 text-sm tracking-[0.3em]">대 상</td>
+              <td className="border border-black py-2"><input type="text" className="outline-none pl-2" /></td>
+              <td className="border border-black text-center py-2 text-sm w-32 tracking-[0.3em]">참석인원</td>
+              <td className="border border-black py-2">
+                <div className="flex items-center justify-center">
+                  <input type="text" className="outline-none texts text-sm" />
+                  <span className="text-sm mr-1">명</span>
                 </div>
               </td>
-              <td className="border border-black py-1.5" colSpan="2">
-                <div className="flex items-center gap-1 px-2">
-                  <span className="text-sm">작성일자</span>
-                  <input type="text" className="w-12 outline-none text-center text-sm" placeholder="201" />
+              <td className="border border-black text-center py-2 text-sm tracking-[0.3em] w-32">작성일자</td>
+              <td className="border border-black py-2 px-2" colSpan="2">
+                <div className="flex items-center gap-1 justify-start">
+                  <input type="text" className="w-10 outline-none text-center text-sm" defaultValue="20" />
                   <span className="text-sm">.</span>
-                  <input type="text" className="w-10 outline-none text-center text-sm" />
+                  <input type="text" className="w-8 outline-none text-center text-sm" />
                   <span className="text-sm">.</span>
-                </div>
-              </td>
-              <td className="border border-black text-center py-1.5 text-sm tracking-[0.3em]">작성일자</td>
-              <td className="border border-black py-1.5">
-                <div className="flex items-center gap-1 px-2">
-                  <input type="text" className="w-12 outline-none text-center text-sm" placeholder="201" />
-                  <span className="text-sm">.</span>
-                  <input type="text" className="w-10 outline-none text-center text-sm" />
-                  <span className="text-sm">.</span>
+                  <input type="text" className="w-8 outline-none text-center text-sm" />
                 </div>
               </td>
             </tr>
@@ -161,12 +156,15 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
           <div className="space-y-3 px-2">
             <div className="flex items-start gap-1">
               <span className="text-sm">○.</span>
+              <input type="text" className="outline-none w-full text-sm" />
             </div>
             <div className="flex items-start gap-1">
               <span className="text-sm">○.</span>
+              <input type="text" className="outline-none w-full text-sm" />
             </div>
             <div className="flex items-start gap-1">
               <span className="text-sm">○.</span>
+              <input type="text" className="outline-none w-full text-sm" />
             </div>
           </div>
         </div>
@@ -174,7 +172,7 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
         {/* 결과교육목표 섹션 */}
         <div className="border-2 border-black border-t-0 py-2.5 px-3">
           <div className="text-sm tracking-[0.05em]">
-            ◎ 결과교육목표 □ 달성교육목표 □ 교육보고서 □ 교육보고서 □과정 및 치료 실적 발표
+            □전달교육필요 □전달교육 불필요 □교육보고서 첨부 ※ 자필 서명 할 것.
           </div>
         </div>
 
@@ -201,43 +199,58 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
         </table>
 
         {/* 평가 섹션 */}
-        <div className="border-2 border-black border-t-0 py-2.5 px-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm tracking-[0.3em]">평 가</span>
-            <div className="flex items-center gap-3 ml-6">
-              <label className="flex items-center gap-1">
-                <span className="text-sm">□ 매우좋음</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <span className="text-sm">□ 좋음</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <span className="text-sm">□ 보통</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <span className="text-sm">□ 부족</span>
-              </label>
-              <label className="flex items-center gap-1">
-                <span className="text-sm">□ 매우부족함</span>
-              </label>
+        <div className="border-2 border-black mt-3 flex">
+          <div className="flex py-2.5 px-3 border-r-2 border-black w-32 justify-center">
+            <div className="flex text-sm tracking-[0.3em] text-center whitespace-nowrap justify-center items-center">
+              평 가    
             </div>
-            <div className="flex items-center gap-1 ml-2">
-              <span className="text-sm">(추가점검)</span>
-              <input type="text" className="outline-none border-b border-black w-24 text-center text-sm" />
+          </div>
+          <div className="py-2.5 px-3 flex-1">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-1">
+                  <span className="text-sm whitespace-nowrap">□ 매우좋음</span>
+                </label>
+                <label className="flex items-center gap-1">
+                  <span className="text-sm whitespace-nowrap">□ 좋음</span>
+                </label>
+                <label className="flex items-center gap-1">
+                  <span className="text-sm whitespace-nowrap">□ 보통</span>
+                </label>
+                <label className="flex items-center gap-1">
+                  <span className="text-sm whitespace-nowrap">□ 부족</span>
+                </label>
+                <label className="flex items-center gap-1">
+                  <span className="text-sm whitespace-nowrap">□ 재교육필요</span>
+                </label>
+              </div>
+              <div className="items-center gap-1">
+                <p>(추가의견)</p>
+                <div className='flex'>
+                  <span className="text-sm whitespace-nowrap">주관 :</span>
+                  <input type="text" className="outline-none flex-1 text-sm" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* 하단 안내 문구 */}
-        <div className="border-2 border-black border-t-0 py-2.5 px-3">
+        <div className="border-t-0 py-2.5 px-3">
           <div className="text-sm tracking-[0.02em]">
-            ※ 표준교육절차는 교구제작을 설치할 것.
+            ※ 교육불참자는 보수교육을 실시할 것.
           </div>
           <div className="mt-2 text-xs leading-relaxed tracking-[0.01em]">
-            <div>&lt;교구교육 내용&gt;</div>
-            <div>1. 대상 :</div>
-            <div>2. 방법 :</div>
-            <div>3. 일시 :</div>
+            <div>&lt;보수교육 내용&gt;</div>
+            <div className='flex'>
+              <span>1. 대상 : </span> <input type="text" className="outline-none text-sm" />
+            </div>
+            <div className='flex'>
+              <span>2. 방법 : </span> <input type="text" className="outline-none w-5xl text-sm" />
+            </div>
+            <div className='flex'>
+              <span>3. 일시 : </span> <input type="text" className="outline-none w-5xl text-sm" />
+            </div>
           </div>
         </div>
       </div>

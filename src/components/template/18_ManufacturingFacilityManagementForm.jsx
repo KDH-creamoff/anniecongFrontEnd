@@ -133,7 +133,7 @@ const ManufacturingFacilityManagementForm = ({ pdfRef }) => {
           </div>
           <table className="w-full border-collapse border-2 border-black">
             <thead>
-              <tr className="bg-gray-100">
+              <tr>
                 <th className="border border-black py-2 px-2 text-center font-medium text-sm w-[15%]">
                   시설명칭
                 </th>
@@ -200,7 +200,7 @@ const ManufacturingFacilityManagementForm = ({ pdfRef }) => {
           </div>
           <table className="w-full border-collapse border-2 border-black">
             <thead>
-              <tr className="bg-gray-100">
+              <tr>
                 <th className="border border-black py-2 px-2 text-center font-medium text-sm w-[40%]">
                   안전성 점검
                 </th>
@@ -249,7 +249,7 @@ const ManufacturingFacilityManagementForm = ({ pdfRef }) => {
           </div>
           <table className="w-full border-collapse border-2 border-black">
             <thead>
-              <tr className="bg-gray-100">
+              <tr>
                 <th className="border border-black py-2 px-2 text-center font-medium text-sm w-[18%]">
                   약품 / 도구
                 </th>
