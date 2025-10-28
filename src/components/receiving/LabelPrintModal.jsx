@@ -77,9 +77,10 @@ const LabelPrintModal = ({ isOpen, onClose, onPrintComplete, itemData }) => {
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
                 >
                   <option value='템플릿 양식 선택'>템플릿 양식 선택</option>
+                  <option value='100X100'>100X100</option>
+                  <option value='80X60'>80X60</option>
                   <option value='40X20'>40X20</option>
-                  <option value='50X30'>50X30</option>
-                  <option value='60X40'>60X40</option>
+                  <option value='15X26'>15X26</option>
                 </select>
               </div>
 

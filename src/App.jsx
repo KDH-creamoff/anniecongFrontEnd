@@ -33,10 +33,6 @@ export default function App() {
           element={<Receiving subPage='nav2' />}
         />
         <Route
-          path='receiving/nav3'
-          element={<Receiving subPage='nav3' />}
-        />
-        <Route
           path='manufacturing/nav1'
           element={<Manufacturing subPage='nav1' />}
         />
