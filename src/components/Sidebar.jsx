@@ -335,7 +335,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                 B2B 출고
               </button>
               <button
-                onClick={() => setActiveNav('배송관리-nav2')}
+                onClick={() => setActiveNav('배송관S-nav2')}
                 className={`block w-full rounded p-1.5 text-left text-xs ${
                   activeNav === '배송관리-nav2'
                     ? 'bg-[#674529] text-white'
@@ -343,16 +343,6 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                 }`}
               >
                 B2C 출고
-              </button>
-              <button
-                onClick={() => setActiveNav('배송관리-nav3')}
-                className={`block w-full rounded p-1.5 text-left text-xs ${
-                  activeNav === '배송관리-nav3'
-                    ? 'bg-[#674529] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                출고 간편등록
               </button>
             </div>
           )}

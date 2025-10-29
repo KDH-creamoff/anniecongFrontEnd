@@ -32,6 +32,8 @@ import HygieneInspectionChecklist from '../template/28_HygieneInspectionChecklis
 import DisinfectantInventoryAndFacilityInspection from '../template/29_DisinfectantInventoryAndFacilityInspection';
 import DisinfectionImplementationRecord from '../template/30_DisinfectionImplementationRecord';
 import DecontaminationWorkRecord from '../template/31_DecontaminationWorkRecord';
+import CCPMonitoringLog from '../template/32_CCPMonitoringLog';
+import HACCPTrainingPlan from '../template/33_HACCPTrainingPlan';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -239,6 +241,18 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       name: '구서작업기록부',
       description: '',
       component: DecontaminationWorkRecord,
+    },
+    {
+      id: 'template-32',
+      name: '중요관리점 모니터링 및 검증 일지',
+      description: 'CCP',
+      component: CCPMonitoringLog,
+    },
+    {
+      id: 'template-33',
+      name: '연간 HACCP 교육 계획',
+      description: '',
+      component: HACCPTrainingPlan,
     },
   ];
 

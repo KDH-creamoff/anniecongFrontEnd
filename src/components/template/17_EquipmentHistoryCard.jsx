@@ -1,35 +1,37 @@
 import { useState, useRef } from 'react';
 
-const EquipmentHistoryCard = () => {
-  const [imagePreview, setImagePreview] = useState(null);
+const EquipmentHistoryCard = ({ pdfRef }) => {
+  const contentRef = pdfRef || useRef();
+  const [imagePreview, setImagePreview] = useState([]);
   const fileInputRef = useRef(null);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const handleImagePreview = (e) => {
+    let previewList = [...imagePreview]
+    const uploadFilesObject = e.target.files
+    for (let i = 0; i < uploadFilesObject.length; i++) {
+      const currentImgUrl = URL.createObjectURL(uploadFilesObject[i])
+      previewList.push(currentImgUrl)
     }
-  };
+    setImagePreview(previewList)
+  }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto p-5 bg-white">
-      <h1 className="text-xl font-bold text-center mb-3 py-1.5">설비이력카드</h1>
-
+    <>
       <input
         type="file"
+        multiple
         ref={fileInputRef}
-        onChange={handleImageChange}
+        onChange={handleImagePreview}
         accept="image/*"
         className="hidden"
       />
+
+      <div ref={contentRef} className="w-full max-w-[1400px] mx-auto p-5 bg-white">
+        <h1 className="text-xl font-bold text-center mb-3 py-1.5">설비이력카드</h1>
 
       <table className="w-full border-collapse border-2 border-black mb-0">
         <tbody>
@@ -41,21 +43,23 @@ const EquipmentHistoryCard = () => {
 
           <tr>
             <td className="border border-black p-1.5 text-center whitespace-nowrap tracking-[0.5em]">품 명</td>
-            <td className="border border-black p-1.5 text-center" colSpan="3"></td>
+            {/* <td className="border border-black p-1.5 text-center" colSpan="3"><input type="text" className="w-full outline-none text-sm min-h-8 size-auto" /></td> */}
+            <td className="border border-black p-1.5 text-center" colSpan="3"><textarea className="flex w-full outline-none text-sm resize-none overflow-hidden" rows="1" onInput={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }} /></td>
             <td
               className="border border-black text-center min-w-[320px] max-w-[320px] cursor-pointer hover:bg-gray-50"
               rowSpan="7"
               onClick={handleImageClick}
             >
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="설비 사진"
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <span className="text-gray-400 text-sm">클릭하여 이미지 추가</span>
-              )}
+              {imagePreview.map((image, id) => (
+                <div key={id}>
+                  <img
+                    src={image}
+                    alt=""
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              ))}
+              <button className="print:hidden">이미지추가</button>
             </td>
           </tr>
 
@@ -126,7 +130,8 @@ const EquipmentHistoryCard = () => {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 };
 

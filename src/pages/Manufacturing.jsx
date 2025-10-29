@@ -2,7 +2,7 @@ import StatusSummaryBar from '../components/manufacturing/StatusSummaryBar';
 import WorkOrderList from '../components/manufacturing/WorkOrderList';
 import TransferRegistration from '../components/manufacturing/TransferRegistration';
 import TransferStatus from '../components/manufacturing/TransferStatus';
-import { ArrowRightLeft } from 'lucide-react';
+import { CalendarCheck, ArrowRightLeft, Factory } from 'lucide-react';
 
 const Manufacturing = ({ subPage }) => {
   // 서브 페이지에 따른 컴포넌트 렌더링
@@ -11,10 +11,10 @@ const Manufacturing = ({ subPage }) => {
       case 'nav1':
         // 제조이력 캘린더
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#674529] mb-4">제조이력 캘린더</h2>
-              <p className="text-gray-600">제조이력 캘린더 페이지입니다.</p>
+          <div>
+            <div className='mb-1 flex items-center space-x-2'>
+              <CalendarCheck className='h-5 w-5 text-[#674529]'/>
+              <h2 className="text-lg font-semibold text-[#674529]">제조이력 캘린더</h2>
             </div>
           </div>
         );
@@ -44,10 +44,10 @@ const Manufacturing = ({ subPage }) => {
       case 'nav4':
         // 2공장 제조
         return (
-          <div className="p-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#674529] mb-4">2공장 제조</h2>
-              <p className="text-gray-600">2공장 제조 관리 페이지입니다.</p>
+          <div>
+            <div className='mb-1 flex items-center space-x-2'>
+              <Factory className='h-5 w-5 text-[#674529]'/>
+              <h2 className="text-lg font-semibold text-[#674529]">2공장 제조</h2>
             </div>
           </div>
         );

@@ -17,17 +17,48 @@ export const generatePdfWithPuppeteer = async (element, filename = 'document.pdf
     // DOM 요소를 복제하여 처리
     const clonedElement = element.cloneNode(true);
 
-    // input 요소들을 텍스트로 변환
-    const inputs = clonedElement.querySelectorAll('input');
-    inputs.forEach(input => {
-      const value = input.value || input.placeholder || '';
-      const textSpan = document.createElement('span');
-      textSpan.textContent = value;
-      textSpan.style.cssText = window.getComputedStyle(input).cssText;
-      textSpan.style.display = 'inline-block';
-      textSpan.style.width = '100%';
-      input.parentNode.replaceChild(textSpan, input);
+    // 원본 요소에서 input 값을 가져와서 복제본에 적용
+    const originalInputs = element.querySelectorAll('input[type="text"], input:not([type])');
+    const clonedInputs = clonedElement.querySelectorAll('input[type="text"], input:not([type])');
+    originalInputs.forEach((input, index) => {
+      if (clonedInputs[index]) {
+        clonedInputs[index].setAttribute('value', input.value || '');
+      }
     });
+
+    // 원본 요소에서 textarea 값을 가져와서 복제본에 적용
+    const originalTextareas = element.querySelectorAll('textarea');
+    const clonedTextareas = clonedElement.querySelectorAll('textarea');
+    originalTextareas.forEach((textarea, index) => {
+      if (clonedTextareas[index]) {
+        clonedTextareas[index].textContent = textarea.value || '';
+      }
+    });
+
+    // 이미지를 Base64로 변환 (blob: URL을 data: URL로 변환)
+    const images = clonedElement.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(async (img) => {
+      const src = img.getAttribute('src');
+      if (src && src.startsWith('blob:')) {
+        try {
+          const response = await fetch(src);
+          const blob = await response.blob();
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              img.setAttribute('src', reader.result);
+              resolve();
+            };
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error('이미지 변환 실패:', error);
+        }
+      }
+    });
+
+    // 모든 이미지 변환 완료 대기
+    await Promise.all(imagePromises);
 
     // 전체 HTML 문서 생성
     const styles = Array.from(document.styleSheets)

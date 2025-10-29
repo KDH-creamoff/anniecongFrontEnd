@@ -22,7 +22,6 @@ const Dash = () => {
       재고관리: '/inventory',
       '배송관리-nav1': '/shipping/nav1',
       '배송관리-nav2': '/shipping/nav2',
-      '배송관리-nav3': '/shipping/nav3',
       '전자결재-nav1': '/approval/nav1',
       '전자결재-nav2': '/approval/nav2',
       라벨관리: '/label',
