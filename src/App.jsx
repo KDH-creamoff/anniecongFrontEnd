@@ -53,9 +53,7 @@ export default function App() {
           element={<Manufacturing subPage='nav5' />}
         />
         <Route path='inventory' element={<Inventory />} />
-        <Route path='shipping/nav1' element={<Shipping subPage='nav1' />} />
-        <Route path='shipping/nav2' element={<Shipping subPage='nav2' />} />
-        <Route path='shipping/nav3' element={<Shipping subPage='nav3' />} />
+        <Route path='shipping' element={<Shipping />} />
         <Route
           path='approval/nav1'
           element={<ApprovalDashboard subPage='nav1' />}

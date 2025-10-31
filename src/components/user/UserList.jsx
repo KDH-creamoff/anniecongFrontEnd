@@ -14,7 +14,6 @@ const UserList = () => {
       status: '활성',
       statusBg: 'bg-green-100',
       statusText: 'text-green-700',
-      registeredAt: '2025-09-11 14:30',
       isActive: false,
     },
     {
@@ -29,7 +28,6 @@ const UserList = () => {
       status: '활성',
       statusBg: 'bg-green-100',
       statusText: 'text-green-700',
-      registeredAt: '2025-09-11 09:15',
       isActive: false,
     },
     {
@@ -44,7 +42,6 @@ const UserList = () => {
       status: '활성',
       statusBg: 'bg-green-100',
       statusText: 'text-green-700',
-      registeredAt: '2025-09-11 08:45',
       isActive: false,
     },
     {
@@ -59,7 +56,6 @@ const UserList = () => {
       status: '활성',
       statusBg: 'bg-green-100',
       statusText: 'text-green-700',
-      registeredAt: '2025-09-11 13:20',
       isActive: false,
     },
     {
@@ -74,7 +70,6 @@ const UserList = () => {
       status: '비활성',
       statusBg: 'bg-gray-100',
       statusText: 'text-gray-700',
-      registeredAt: '2025-09-09 16:00',
       isActive: true,
     },
   ];
@@ -116,9 +111,6 @@ const UserList = () => {
                 상태
               </th>
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
-                최근 로그인
-              </th>
-              <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 작업
               </th>
             </tr>
@@ -150,9 +142,6 @@ const UserList = () => {
                   >
                     {user.status}
                   </span>
-                </td>
-                <td className='px-4 py-3 text-sm text-gray-600'>
-                  {user.registeredAt}
                 </td>
                 <td className='px-4 py-3'>
                   <div className='flex items-center space-x-2'>

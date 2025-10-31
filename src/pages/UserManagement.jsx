@@ -1,7 +1,7 @@
 import { Users } from 'lucide-react';
 import UserSummaryCards from '../components/user/UserSummaryCards';
-import CreateUser from '../components/user/CreateUser';
 import UserList from '../components/user/UserList';
+import PermissionManagement from '../components/user/PermissionManagement';
 
 const UserManagement = ({ subPage }) => {
   const renderContent = () => {
@@ -10,14 +10,13 @@ const UserManagement = ({ subPage }) => {
         return (
           <>
             <UserSummaryCards />
-            <CreateUser />
             <UserList />
           </>
         );
       case 'nav2': // 권한 관리
         return (
           <>
-            <div>권한 관리 페이지 (만드는 중...)</div>
+            <PermissionManagement />
           </>
         );
       default:

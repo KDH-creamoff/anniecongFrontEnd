@@ -1,39 +1,32 @@
-import { Users, CheckCircle2 } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 const UserSummaryCards = () => {
   const summaryData = [
     {
       label: '전체 사용자',
-      count: 5,
+      count: 20,
       icon: Users,
       bgColor: 'bg-[#674529]',
       iconColor: 'text-white',
     },
     {
-      label: '활성 사용자',
-      count: 4,
-      icon: CheckCircle2,
+      label: '생산팀',
+      count: 14,
+      icon: Users,
+      bgColor: 'bg-orange-300',
+      iconColor: 'text-white',
+    },
+    {
+      label: '경영지원팀',
+      count: 6,
+      icon: Users,
       bgColor: 'bg-[#86A956]',
-      iconColor: 'text-white',
-    },
-    {
-      label: '1공장 사용자',
-      count: 2,
-      icon: Users,
-      bgColor: 'bg-[#A8B86C]',
-      iconColor: 'text-white',
-    },
-    {
-      label: '2공장 사용자',
-      count: 2,
-      icon: Users,
-      bgColor: 'bg-[#E29D4D]',
       iconColor: 'text-white',
     },
   ];
 
   return (
-    <div className='mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+    <div className='mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
       {summaryData.map((item, index) => {
         const Icon = item.icon;
         return (

@@ -290,62 +290,21 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
         {/* 배송관리 */}
         <div className='mb-2'>
           <button
-            onClick={() =>
-              isCollapsed
-                ? setActiveNav('배송관리-nav1')
-                : toggleSection('배송관리')
-            }
+            onClick={() => setActiveNav('배송관리')}
             className={`flex items-center rounded text-left text-sm ${
               isCollapsed
                 ? 'aspect-square w-full justify-center p-2'
-                : 'w-full justify-between p-1.5'
+                : 'w-full space-x-1.5 p-1.5'
             } ${
-              isCollapsed && activeNav === '배송관리-nav1'
+              activeNav === '배송관리'
                 ? 'bg-[#674529] text-white'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
             title='배송관리'
           >
-            <div
-              className={`flex items-center ${!isCollapsed && 'space-x-1.5'}`}
-            >
-              <Truck size={16} />
-              {!isCollapsed && <span>배송관리</span>}
-            </div>
-            {!isCollapsed && (
-              <>
-                {openSections.배송관리 ? (
-                  <ChevronDown size={14} />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
-              </>
-            )}
+            <Truck size={16} />
+            {!isCollapsed && <span>배송관리</span>}
           </button>
-          {!isCollapsed && openSections.배송관리 && (
-            <div className='ml-5 mt-1 space-y-0.5'>
-              <button
-                onClick={() => setActiveNav('배송관리-nav1')}
-                className={`block w-full rounded p-1.5 text-left text-xs ${
-                  activeNav === '배송관리-nav1'
-                    ? 'bg-[#674529] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                B2B 출고
-              </button>
-              <button
-                onClick={() => setActiveNav('배송관S-nav2')}
-                className={`block w-full rounded p-1.5 text-left text-xs ${
-                  activeNav === '배송관리-nav2'
-                    ? 'bg-[#674529] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                B2C 출고
-              </button>
-            </div>
-          )}
         </div>
 
         {/* 전자결재 */}
