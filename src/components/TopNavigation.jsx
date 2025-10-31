@@ -59,7 +59,7 @@ const TopNavigation = () => {
       id: 'shipping',
       label: '배송',
       icon: <Truck className='h-4 w-4' />,
-      page: 'shipping/nav1',
+      page: 'shipping',
     },   
     {
       id: 'approval',
