@@ -1,70 +1,363 @@
 import { useState } from "react";
-import { CalendarCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
+import ManufacturingCalendar from "./ManufacturingCalendar";
+import ManufacturingHistoryList from "./ManufacturingHistoryList";
 
 const ManufacturingHistoryView = () => {
-    const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
 
-    // 달력 데이터 생성
-    const generateCalendar = () => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
+    // 캘린더에 표시될 날짜별 요약 데이터 (날짜 키: YYYY-MM-DD)
+    const calendarSummaryData = {
+        '2025-11-03': { pending: 1, completed: 2 },
+        '2025-11-05': { pending: 0, completed: 1 },
+        '2025-11-07': { pending: 2, completed: 0 },
+        '2025-11-10': { pending: 1, completed: 1 },
+        '2025-11-12': { pending: 0, completed: 3 },
+        '2025-11-14': { pending: 1, completed: 0 },
+        '2025-11-15': { pending: 0, completed: 2 },
+        '2025-11-18': { pending: 3, completed: 1 },
+        '2025-11-20': { pending: 0, completed: 1 },
+        '2025-11-22': { pending: 2, completed: 2 },
+        '2025-11-23': { pending: 0, completed: 1 },
+        '2025-11-25': { pending: 1, completed: 1 },
+        '2025-11-27': { pending: 0, completed: 2 },
+        '2025-11-28': { pending: 2, completed: 1 },
+        '2025-11-30': { pending: 1, completed: 0 }
+    };
 
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay();
-
-        const days = [];
-
-        // 빈 칸 추가
-        for (let i = 0; i < startingDayOfWeek; i++) {
-            days.push(null);
+    // 날짜별 상세 제조이력 데이터 (날짜 키: YYYY-MM-DD)
+    const detailedHistoryData = {
+        '2025-11-03': {
+            pending: [
+                {
+                    title: '애니콩 쿠키 제조',
+                    material: '밀가루',
+                    quantity: 200,
+                    worker: '김민수'
+                }
+            ],
+            completed: [
+                {
+                    title: '초코 케이크 제조',
+                    material: '초콜릿',
+                    quantity: 150,
+                    damaged: 3,
+                    completedQuantity: 147,
+                    duration: 120,
+                    worker: '이영희'
+                },
+                {
+                    title: '바닐라 쿠키 제조',
+                    material: '설탕',
+                    quantity: 100,
+                    damaged: 2,
+                    completedQuantity: 98,
+                    duration: 90,
+                    worker: '박철수'
+                }
+            ]
+        },
+        '2025-11-05': {
+            pending: [],
+            completed: [
+                {
+                    title: '딸기 케이크 제조',
+                    material: '딸기',
+                    quantity: 80,
+                    damaged: 1,
+                    completedQuantity: 79,
+                    duration: 100,
+                    worker: '최지민'
+                }
+            ]
+        },
+        '2025-11-07': {
+            pending: [
+                {
+                    title: '마카롱 제조',
+                    material: '아몬드 가루',
+                    quantity: 300,
+                    worker: '강서연'
+                },
+                {
+                    title: '치즈 케이크 제조',
+                    material: '크림치즈',
+                    quantity: 120,
+                    worker: '윤하늘'
+                }
+            ],
+            completed: []
+        },
+        '2025-11-10': {
+            pending: [
+                {
+                    title: '레몬 타르트 제조',
+                    material: '레몬',
+                    quantity: 90,
+                    worker: '정우진'
+                }
+            ],
+            completed: [
+                {
+                    title: '브라우니 제조',
+                    material: '다크 초콜릿',
+                    quantity: 180,
+                    damaged: 5,
+                    completedQuantity: 175,
+                    duration: 110,
+                    worker: '한소희'
+                }
+            ]
+        },
+        '2025-11-12': {
+            pending: [],
+            completed: [
+                {
+                    title: '크루아상 제조',
+                    material: '버터',
+                    quantity: 250,
+                    damaged: 8,
+                    completedQuantity: 242,
+                    duration: 180,
+                    worker: '송민호'
+                },
+                {
+                    title: '도넛 제조',
+                    material: '밀가루',
+                    quantity: 200,
+                    damaged: 4,
+                    completedQuantity: 196,
+                    duration: 95,
+                    worker: '김태희'
+                },
+                {
+                    title: '애플파이 제조',
+                    material: '사과',
+                    quantity: 100,
+                    damaged: 2,
+                    completedQuantity: 98,
+                    duration: 130,
+                    worker: '이동욱'
+                }
+            ]
+        },
+        '2025-11-14': {
+            pending: [
+                {
+                    title: '티라미수 제조',
+                    material: '마스카포네 치즈',
+                    quantity: 70,
+                    worker: '박보검'
+                }
+            ],
+            completed: []
+        },
+        '2025-11-15': {
+            pending: [],
+            completed: [
+                {
+                    title: '마들렌 제조',
+                    material: '버터',
+                    quantity: 160,
+                    damaged: 3,
+                    completedQuantity: 157,
+                    duration: 85,
+                    worker: '전지현'
+                },
+                {
+                    title: '휘낭시에 제조',
+                    material: '아몬드 가루',
+                    quantity: 140,
+                    damaged: 2,
+                    completedQuantity: 138,
+                    duration: 75,
+                    worker: '공유'
+                }
+            ]
+        },
+        '2025-11-18': {
+            pending: [
+                {
+                    title: '오페라 케이크 제조',
+                    material: '커피',
+                    quantity: 60,
+                    worker: '배수지'
+                },
+                {
+                    title: '몽블랑 제조',
+                    material: '밤',
+                    quantity: 50,
+                    worker: '남주혁'
+                },
+                {
+                    title: '에클레어 제조',
+                    material: '슈크림',
+                    quantity: 110,
+                    worker: '아이유'
+                }
+            ],
+            completed: [
+                {
+                    title: '카스테라 제조',
+                    material: '계란',
+                    quantity: 220,
+                    damaged: 6,
+                    completedQuantity: 214,
+                    duration: 140,
+                    worker: '정해인'
+                }
+            ]
+        },
+        '2025-11-20': {
+            pending: [],
+            completed: [
+                {
+                    title: '롤케이크 제조',
+                    material: '생크림',
+                    quantity: 130,
+                    damaged: 3,
+                    completedQuantity: 127,
+                    duration: 105,
+                    worker: '김고은'
+                }
+            ]
+        },
+        '2025-11-22': {
+            pending: [
+                {
+                    title: '프레즐 제조',
+                    material: '밀가루',
+                    quantity: 190,
+                    worker: '박서준'
+                },
+                {
+                    title: '스콘 제조',
+                    material: '버터밀크',
+                    quantity: 150,
+                    worker: '손예진'
+                }
+            ],
+            completed: [
+                {
+                    title: '머핀 제조',
+                    material: '블루베리',
+                    quantity: 170,
+                    damaged: 4,
+                    completedQuantity: 166,
+                    duration: 90,
+                    worker: '현빈'
+                },
+                {
+                    title: '베이글 제조',
+                    material: '밀가루',
+                    quantity: 200,
+                    damaged: 5,
+                    completedQuantity: 195,
+                    duration: 125,
+                    worker: '한지민'
+                }
+            ]
+        },
+        '2025-11-23': {
+            pending: [],
+            completed: [
+                {
+                    title: '시폰 케이크 제조',
+                    material: '계란',
+                    quantity: 100,
+                    damaged: 2,
+                    completedQuantity: 98,
+                    duration: 110,
+                    worker: '김선생'
+                }
+            ]
+        },
+        '2025-11-25': {
+            pending: [
+                {
+                    title: '파운드 케이크 제조',
+                    material: '버터',
+                    quantity: 120,
+                    worker: '이민호'
+                }
+            ],
+            completed: [
+                {
+                    title: '당근 케이크 제조',
+                    material: '당근',
+                    quantity: 95,
+                    damaged: 2,
+                    completedQuantity: 93,
+                    duration: 115,
+                    worker: '수지'
+                }
+            ]
+        },
+        '2025-11-27': {
+            pending: [],
+            completed: [
+                {
+                    title: '녹차 쿠키 제조',
+                    material: '녹차 가루',
+                    quantity: 200,
+                    damaged: 5,
+                    completedQuantity: 195,
+                    duration: 150,
+                    worker: '이선생'
+                },
+                {
+                    title: '초코칩 쿠키 제조',
+                    material: '초코칩',
+                    quantity: 180,
+                    damaged: 3,
+                    completedQuantity: 177,
+                    duration: 95,
+                    worker: '박신혜'
+                }
+            ]
+        },
+        '2025-11-28': {
+            pending: [
+                {
+                    title: '타르트 제조',
+                    material: '과일',
+                    quantity: 85,
+                    worker: '조인성'
+                },
+                {
+                    title: '푸딩 제조',
+                    material: '우유',
+                    quantity: 150,
+                    worker: '송혜교'
+                }
+            ],
+            completed: [
+                {
+                    title: '피낭시에 제조',
+                    material: '버터',
+                    quantity: 130,
+                    damaged: 2,
+                    completedQuantity: 128,
+                    duration: 80,
+                    worker: '강동원'
+                }
+            ]
+        },
+        '2025-11-30': {
+            pending: [
+                {
+                    title: '젤라또 제조',
+                    material: '우유',
+                    quantity: 250,
+                    worker: '박선생'
+                }
+            ],
+            completed: []
         }
-
-        // 날짜 추가
-        for (let day = 1; day <= daysInMonth; day++) {
-            days.push(day);
-        }
-
-        return days;
     };
 
-    const handlePrevMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-    };
-
-    const handleNextMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
-    };
-
-    const handleDateClick = (day) => {
-        if (day) {
-            setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day));
-        }
-    };
-
-    const isToday = (day) => {
-        const today = new Date();
-        return day === today.getDate() &&
-               currentDate.getMonth() === today.getMonth() &&
-               currentDate.getFullYear() === today.getFullYear();
-    };
-
-    const isSelectedDate = (day) => {
-        return day === selectedDate.getDate() &&
-               currentDate.getMonth() === selectedDate.getMonth() &&
-               currentDate.getFullYear() === selectedDate.getFullYear();
-    };
-
-    const calendarDays = generateCalendar();
-    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
-    // 제조 이력 데이터 (예시)
-    const manufacturingData = {
-        23: [{ type: '작업완료 1개', color: 'bg-green-200' }],
-        27: [{ type: '작업완료 1개', color: 'bg-green-200' }],
-        31: [{ type: '작업대기 1개', color: 'bg-yellow-200' }]
+    const handleDateSelect = (date) => {
+        setSelectedDate(date);
     };
 
     return (
@@ -74,150 +367,17 @@ const ManufacturingHistoryView = () => {
                 <h2 className="text-lg font-semibold text-[#674529]">제조이력 캘린더</h2>
             </div>
             <div className="flex">
-                {/* 캘린더 영역 */}
-                <div className="flex-1 bg-white shadow-sm mr-4">
-                    {/* 월 네비게이션 */}
-                    <div className="flex items-center justify-between mb-4 bg-[#F5E6D3] py-3">
-                        <span className="mx-4 text-[#674529] font-medium">
-                            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
-                        </span>
-                        <div className="flex px-2 gap-2">
-                            <button
-                                onClick={handlePrevMonth}
-                                className="p-1 bg-[#fff] rounded border border-[#674529]"
-                            >
-                                <ChevronLeft className="h-5 w-5 text-[#674529]" />
-                            </button>
-                            <button
-                                onClick={handleNextMonth}
-                                className="p-1 bg-[#fff] rounded border border-[#674529]"
-                            >
-                                <ChevronRight className="h-5 w-5 text-[#674529]" />
-                            </button>
-                        </div>
-                    </div>
+                {/* 캘린더 컴포넌트 */}
+                <ManufacturingCalendar
+                    onDateSelect={handleDateSelect}
+                    manufacturingData={calendarSummaryData}
+                />
 
-                    {/* 요일 헤더 */}
-                    <div className="grid grid-cols-7 mx-6">
-                        {weekDays.map((day, index) => (
-                            <div
-                                key={day}
-                                className={`text-center py-2 font-semibold text-sm ${
-                                    index === 0 ? 'text-red-600' :
-                                    index === 6 ? 'text-blue-600' :
-                                    'text-[#674529]'
-                                } bg-[#674529] text-white`}
-                            >
-                                {day}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* 달력 그리드 */}
-                    <div className="grid grid-cols-7 border border-[#F5E6D3] mx-6 mb-4">
-                        {calendarDays.map((day, index) => (
-                            <div
-                                key={index}
-                                onClick={() => handleDateClick(day)}
-                                className={`
-                                    min-h-[80px] p-2 border border-[#F5E6D3]
-                                    ${day ? 'cursor-pointer hover:bg-gray-50' : ''}
-                                    ${isSelectedDate(day) ? 'bg-[#FFF8DC]' : ''}
-                                    ${isToday(day) ? 'bg-[#FFF8DC]' : ''}
-                                `}
-                            >
-                                {day && (
-                                    <>
-                                        <div className={`text-sm mb-1 ${
-                                            index % 7 === 0 ? 'text-red-600' :
-                                            index % 7 === 6 ? 'text-blue-600' :
-                                            'text-gray-700'
-                                        }`}>
-                                            {day}
-                                        </div>
-                                        {manufacturingData[day] && (
-                                            <div className="space-y-1">
-                                                {manufacturingData[day].map((item, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className={`text-xs px-2 py-1 rounded ${item.color} text-gray-100`}
-                                                    >
-                                                        {item.type}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 작업대기목록 영역 */}
-                <div className="flex-col">
-                    <div>
-                        <div className="bg-[#F5E6D3] px-4 py-3 rounded">
-                            <h3 className="text-[#674529] font-semibold">
-                                {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 제조이력
-                            </h3>
-                        </div>
-                    </div>
-                    <div className="w-80 bg-white rounded-lg shadow-sm p-6">
-                        <div className="space-y-3 mb-6">
-                            <div className="mb-2">
-                                <h4 className="text-sm font-semibold text-[#674529] mb-2">작업대기목록</h4>
-                            </div>
-
-                            {/* 작업 항목 예시 */}
-                            <div className="border border-[#674529] rounded p-3">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="font-semibold text-sm text-[#674529]">Title</span>
-                                </div>
-                                <div className="text-xs text-[#674529]">
-                                    <div>원자재 이름 - 100개</div>
-                                </div>
-                                <div className="text-xs text-[#674529] mt-2 text-right">
-                                    작업자: 김선생
-                                </div>
-                            </div>
-                        </div>
-                        <div className="space-y-3">
-                            <div className="mb-2">
-                                <h4 className="text-sm font-semibold text-[#674529] mb-2">작업완료목록</h4>
-                            </div>
-
-                            {/* 작업 항목 예시 */}
-                            <div className="border border-[#674529] rounded p-3">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="font-semibold text-sm text-[#674529]">Title</span>
-                                </div>
-                                <div className="text-xs text-[#674529]">
-                                    <div>원자재 이름 - 100개</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="text-xs text-[#674529]">
-                                        <div>파손량: 2</div>
-                                    </div>
-                                    <div className="text-xs text-[#674529]">
-                                        <div>작업 완료량: 98</div>
-                                    </div>
-                                </div>
-                                <div className="text-xs text-[#674529]">
-                                    <div>소요시간: 110분</div>
-                                </div>
-                                <div className="text-xs text-[#674529] mt-2 text-right">
-                                    작업자: 김선생
-                                </div>
-                            </div>
-
-                            {/* 항목이 없을 때 */}
-                            <div className="text-center py-8 text-gray-400 text-sm">
-                                선택한 날짜에 제조 이력이 없습니다.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* 제조이력 목록 컴포넌트 */}
+                <ManufacturingHistoryList
+                    selectedDate={selectedDate}
+                    historyData={detailedHistoryData}
+                />
             </div>
         </div>
     )

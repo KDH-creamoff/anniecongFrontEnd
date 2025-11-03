@@ -5,6 +5,8 @@ import TransferStatus from '../components/manufacturing/TransferStatus';
 import { ArrowRightLeft, Factory } from 'lucide-react';
 import ManufacturingHistoryView from '../components/manufacturing/ManufacturingHistoryView';
 import WorkOrderManagement from '../components/manufacturing/WorkOrderManagement';
+import Factory2WorkList from '../components/manufacturing/Factory2WorkList';
+import Factory2OrderList from '../components/manufacturing/Factory2OrderList';
 
 const Manufacturing = ({ subPage }) => {
   // 서브 페이지에 따른 컴포넌트 렌더링
@@ -44,10 +46,12 @@ const Manufacturing = ({ subPage }) => {
         // 2공장 제조
         return (
           <div>
-            <div className='mb-1 flex items-center space-x-2'>
+            <div className='mb-3 flex items-center space-x-2'>
               <Factory className='h-5 w-5 text-[#674529]'/>
               <h2 className="text-lg font-semibold text-[#674529]">2공장 제조</h2>
             </div>
+            <Factory2WorkList />
+            <Factory2OrderList />
           </div>
         );
 

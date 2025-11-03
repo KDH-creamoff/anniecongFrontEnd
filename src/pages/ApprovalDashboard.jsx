@@ -4,6 +4,8 @@ import DocumentStatusSummary from '../components/approval/DocumentStatusSummary'
 import ApprovalTabSelector from '../components/approval/ApprovalTabSelector';
 import DocumentList from '../components/approval/DocumentList';
 import CreateDocumentModal from '../components/approval/CreateDocumentModal';
+import SubmittedDocumentList from '../components/approval/SubmittedDocumentList';
+import PendingDocumentList from '../components/approval/PendingDocumentList';
 
 const ApprovalDashboard = ({ subPage }) => {
   const [activeTab, setActiveTab] = useState('all')
@@ -20,13 +22,13 @@ const ApprovalDashboard = ({ subPage }) => {
       case 'pending':
         return (
           <>
-            <div>만드는 중..</div>
+            <PendingDocumentList />
           </>
         );
       case 'draft':
         return (
           <>
-            <div>만드는 중...</div>
+            <SubmittedDocumentList />
           </>
         );
       default:

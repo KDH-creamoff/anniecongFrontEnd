@@ -1,7 +1,7 @@
 import { BarChart3, Clock, CheckCircle, Users } from "lucide-react";
 
-const StatusSummaryBar = () => {
-  const statusCards = [
+const Factory2WorkList = () => {
+ const statusCards = [
     {
       label: "진행중 작업",
       count: 1,
@@ -33,19 +33,7 @@ const StatusSummaryBar = () => {
   ];
 
   return (
-    <div className="mb-6">
-      <div className="items-center mb-5">
-        <div className="flex items-center">
-        <BarChart3 className="w-5 h-5 text-[#674529] mr-2" />
-          <h2 className="text-lg font-semibold text-[#674529]">
-            1공장 전처리 공정
-          </h2>
-        </div>
-          <p className="text-sm text-gray-500">
-            공정시작 스캔, 투입 바코드 스캔, 전처리 산출 라벨 생성
-        </p>
-      </div>
-
+    <div className="p-5 mb-6">
       <div className="grid grid-cols-4 gap-4">
         {statusCards.map((card, index) => (
           <div
@@ -70,4 +58,4 @@ const StatusSummaryBar = () => {
   );
 };
 
-export default StatusSummaryBar;
+export default Factory2WorkList;

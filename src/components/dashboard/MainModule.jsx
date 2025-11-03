@@ -60,7 +60,7 @@ const MainModule = ({ onNavigate }) => {
       title: '배송관리',
       description: 'B2B/B2C 피킹, FEFO 우선',
       icon: <Truck className='h-6 w-6' />,
-      nav: '배송관리-nav1',
+      nav: '배송관리',
       color: 'bg-[#F9B679]',
       count: 6,
     },
