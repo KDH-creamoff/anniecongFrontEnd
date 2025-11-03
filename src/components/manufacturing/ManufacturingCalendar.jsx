@@ -47,13 +47,6 @@ const ManufacturingCalendar = ({ onDateSelect, manufacturingData }) => {
         }
     };
 
-    const isToday = (day) => {
-        const today = new Date();
-        return day === today.getDate() &&
-               currentDate.getMonth() === today.getMonth() &&
-               currentDate.getFullYear() === today.getFullYear();
-    };
-
     const isSelectedDate = (day) => {
         return day === selectedDate.getDate() &&
                currentDate.getMonth() === selectedDate.getMonth() &&
@@ -123,7 +116,6 @@ const ManufacturingCalendar = ({ onDateSelect, manufacturingData }) => {
                                 min-h-[80px] p-2 border border-[#F5E6D3]
                                 ${day ? 'cursor-pointer hover:bg-gray-50' : ''}
                                 ${isSelectedDate(day) ? 'bg-[#FFF8DC]' : ''}
-                                ${isToday(day) ? 'bg-[#FFF8DC]' : ''}
                             `}
                         >
                             {day && (

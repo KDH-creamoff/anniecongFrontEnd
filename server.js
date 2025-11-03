@@ -58,9 +58,23 @@ app.post('/api/generate-pdf', async (req, res) => {
       `
     });
 
+    // 페이지 컨텐츠 크기 측정하여 orientation 자동 결정
+    const dimensions = await page.evaluate(() => {
+      const body = document.body;
+      const html = document.documentElement;
+      const width = Math.max(body.scrollWidth, body.offsetWidth, html.clientWidth, html.scrollWidth, html.offsetWidth);
+      const height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+      return { width, height };
+    });
+
+    const isLandscape = dimensions.width > dimensions.height;
+
+    console.log(`Content dimensions: ${dimensions.width}x${dimensions.height}, Landscape: ${isLandscape}`);
+
     // PDF 생성
     const pdfBuffer = await page.pdf({
       format: 'A4',
+      landscape: isLandscape,
       printBackground: true,
       margin: {
         top: '10mm',

@@ -113,11 +113,10 @@ const PermissionManagement = () => {
   };
 
   // 권한 항목 컴포넌트
-  const PermissionItem = ({ title, subtitle, isEnabled, onToggle }) => (
+  const PermissionItem = ({ title, isEnabled, onToggle }) => (
     <div className='flex items-center justify-between py-4 px-6 bg-gray-50 rounded-lg'>
       <div>
         <div className='font-medium text-gray-900'>{title}</div>
-        <div className='text-sm text-gray-500'>{subtitle}</div>
       </div>
       <button
         onClick={onToggle}
@@ -152,31 +151,26 @@ const PermissionManagement = () => {
           <div className='space-y-4'>
             <PermissionItem
               title='기초정보 관리'
-              subtitle='기초정보'
               isEnabled={user.permissions['기초정보관리']}
               onToggle={() => handlePermissionToggle(user.id, '기초정보관리')}
             />
             <PermissionItem
               title='1공장 전처리'
-              subtitle='제조관리'
               isEnabled={user.permissions['1공장전처리']}
               onToggle={() => handlePermissionToggle(user.id, '1공장전처리')}
             />
             <PermissionItem
               title='2공장 제조'
-              subtitle='제조관리'
               isEnabled={user.permissions['2공장제조']}
               onToggle={() => handlePermissionToggle(user.id, '2공장제조')}
             />
             <PermissionItem
               title='라벨관리'
-              subtitle='라벨관리'
               isEnabled={user.permissions['라벨관리']}
               onToggle={() => handlePermissionToggle(user.id, '라벨관리')}
             />
             <PermissionItem
               title='배송관리'
-              subtitle='배송관리'
               isEnabled={user.permissions['배송관리']}
               onToggle={() => handlePermissionToggle(user.id, '배송관리')}
             />
@@ -186,31 +180,26 @@ const PermissionManagement = () => {
           <div className='space-y-4'>
             <PermissionItem
               title='입고'
-              subtitle='입출고관리'
               isEnabled={user.permissions['입고검수']}
               onToggle={() => handlePermissionToggle(user.id, '입고검수')}
             />
             <PermissionItem
               title='공장간 이동'
-              subtitle='제조관리'
               isEnabled={user.permissions['공장간이동']}
               onToggle={() => handlePermissionToggle(user.id, '공장간이동')}
             />
             <PermissionItem
               title='출고관리'
-              subtitle='입출고관리'
               isEnabled={user.permissions['출고관리']}
               onToggle={() => handlePermissionToggle(user.id, '출고관리')}
             />
             <PermissionItem
               title='재고조회'
-              subtitle='재고관리'
               isEnabled={user.permissions['재고조회']}
               onToggle={() => handlePermissionToggle(user.id, '재고조회')}
             />
             <PermissionItem
               title='사용자관리'
-              subtitle='사용자관리'
               isEnabled={user.permissions['사용자관리']}
               onToggle={() => handlePermissionToggle(user.id, '사용자관리')}
             />

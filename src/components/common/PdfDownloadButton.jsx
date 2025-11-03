@@ -107,9 +107,13 @@ const PdfDownloadButton = ({
 
       const imgData = canvas.toDataURL("image/png");
 
+      // 컨텐츠 크기를 기반으로 orientation 자동 결정
+      const isLandscape = canvas.width > canvas.height;
+      const orientation = isLandscape ? "landscape" : "portrait";
+
       // PDF 생성
       const pdf = new jsPDF({
-        orientation: "portrait",
+        orientation: orientation,
         unit: "mm",
         format: "a4",
         compress: true,

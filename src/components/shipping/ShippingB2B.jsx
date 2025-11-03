@@ -16,7 +16,7 @@ const ShippingB2B = ({ selectedPlatform, onPlatformSelect }) => {
         <div className="grid grid-cols-3 gap-6">
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="text-center mb-4">
-              <div className="text-base font-medium text-gray-800">자사몰 (선택)</div>
+              <div className="text-base font-medium text-gray-800">자사몰</div>
             </div>
             <div className="flex items-center justify-center">
               <button

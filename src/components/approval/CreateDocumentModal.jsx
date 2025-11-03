@@ -34,6 +34,8 @@ import DisinfectionImplementationRecord from '../template/30_DisinfectionImpleme
 import DecontaminationWorkRecord from '../template/31_DecontaminationWorkRecord';
 import CCPMonitoringLog from '../template/32_CCPMonitoringLog';
 import HACCPTrainingPlan from '../template/33_HACCPTrainingPlan';
+import WasteManagementLedger from '../template/34_WasteManagementLedger';
+import HygieneSafetyInspectionLog from '../template/35_HygieneSafetyInspectionLog';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -253,6 +255,18 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       name: '연간 HACCP 교육 계획',
       description: '',
       component: HACCPTrainingPlan,
+    },
+    {
+      id: 'template-34',
+      name: '폐기물(폐사료) 관리대장',
+      description: '',
+      component: WasteManagementLedger,
+    },
+    {
+      id: 'template-35',
+      name: '위생점검입지',
+      description: '',
+      component: HygieneSafetyInspectionLog,
     },
   ];
 

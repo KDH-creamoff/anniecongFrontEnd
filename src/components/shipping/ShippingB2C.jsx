@@ -17,7 +17,7 @@ const ShippingB2C = ({ selectedPlatform, onPlatformSelect }) => {
           {/* 자사몰 */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="text-center mb-4">
-              <div className="text-base font-medium text-gray-800">자사몰 (선택)</div>
+              <div className="text-base font-medium text-gray-800">자사몰</div>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <button
@@ -36,7 +36,7 @@ const ShippingB2C = ({ selectedPlatform, onPlatformSelect }) => {
           {/* 구몬 */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="text-center mb-4">
-              <div className="text-base font-medium text-gray-800">구몬 (선택)</div>
+              <div className="text-base font-medium text-gray-800">쿠팡</div>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <button
@@ -55,7 +55,7 @@ const ShippingB2C = ({ selectedPlatform, onPlatformSelect }) => {
           {/* 스마트스토어 */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <div className="text-center mb-4">
-              <div className="text-base font-medium text-gray-800">스마트스토어 (선택)</div>
+              <div className="text-base font-medium text-gray-800">스마트스토어</div>
             </div>
             <div className="flex items-center justify-center space-x-3">
               <button
