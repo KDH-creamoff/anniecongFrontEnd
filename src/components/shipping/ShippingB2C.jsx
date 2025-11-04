@@ -1,4 +1,5 @@
 import { Upload } from 'lucide-react';
+import ShippingList from './ShippingList';
 
 const ShippingB2C = ({ selectedPlatform, onPlatformSelect }) => {
   return (
@@ -75,9 +76,7 @@ const ShippingB2C = ({ selectedPlatform, onPlatformSelect }) => {
 
       {/* Table Section - Placeholder for future implementation */}
       <div className="mb-6 border-t border-gray-200 pt-6">
-        <div className="bg-gray-50 rounded-lg p-12 text-center text-gray-400">
-          CJ 업로드용 엑셀 파일
-        </div>
+        <ShippingList />
       </div>
 
       {/* CJ Upload Button */}

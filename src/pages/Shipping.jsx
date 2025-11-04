@@ -37,7 +37,7 @@ const Shipping = () => {
         <div className='text-xl text-[#674529] font-semibold'>배송 관리</div>
       </div>
       {/* Tab Navigation - matching first image style */}
-      <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-xl grid grid-cols-3">
+      <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-xl grid grid-cols-2">
         <button
           onClick={() => setActiveTab('B2B')}
           className={`px-8 py-2.5 rounded-xl font-medium transition-all ${
@@ -58,16 +58,6 @@ const Shipping = () => {
         >
           B2C 출고
         </button>
-        <button
-          onClick={() => setActiveTab('배송목록')}
-          className={`px-8 py-2.5 rounded-xl font-medium transition-all ${
-            activeTab === '배송목록'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          배송 목록
-        </button>
       </div>
 
       {/* Content based on active tab */}
@@ -83,10 +73,6 @@ const Shipping = () => {
           selectedPlatform={selectedPlatform}
           onPlatformSelect={handlePlatformSelect}
         />
-      )}
-
-      {activeTab === '배송목록' && (
-        <ShippingList />
       )}
     </div>
   );

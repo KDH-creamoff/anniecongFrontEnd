@@ -1,6 +1,25 @@
-import { FileText, Eye, Download } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, Download, Filter, ChevronDown } from 'lucide-react';
 
 const DocumentList = () => {
+  const [filters, setFilters] = useState({
+    type: '전체',
+    status: '전체',
+    searchTerm: '',
+  });
+
+  const handleFilterChange = (key, value) => {
+    setFilters({ ...filters, [key]: value });
+  };
+
+  const handleReset = () => {
+    setFilters({
+      type: '전체',
+      status: '전체',
+      searchTerm: '',
+    });
+  };
+
   const documents = [
     {
       id: 1,
@@ -49,21 +68,107 @@ const DocumentList = () => {
     },
   ];
 
+  const documentTypes = ['전체', '생산 원료 보고서', '불량 보고서', '안전점검표'];
+  const documentStatuses = ['전체', '결재중', '반려', '승인완료'];
+
+  // 필터링 로직
+  const filteredDocuments = documents.filter((doc) => {
+
+    // 상태 필터
+    if (filters.status !== '전체' && doc.status !== filters.status) {
+      return false;
+    }
+
+    // 검색어 필터 (문서번호, 제목, 작성자)
+    if (filters.searchTerm.trim()) {
+      const search = filters.searchTerm.toLowerCase().trim();
+      const docNumber = doc.docNumber.toLowerCase();
+      const title = doc.title.toLowerCase();
+      const type = doc.type.toLowerCase();
+      const author = doc.author.toLowerCase();
+      const createdDate = doc.createdDate.toLowerCase();
+
+      if (!docNumber.includes(search) && !title.includes(search) && !type.includes(search) && !author.includes(search) && !createdDate.includes(search)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   return (
-    <div className='overflow-hidden rounded-xl bg-white shadow-sm'>
-      <div className='border-b border-gray-200 bg-[#FEF3E8] px-6 py-4'>
-        <div className='flex items-center space-x-2'>
-          <FileText className='h-5 w-5 text-[#674529]' />
-          <h3 className='text-base font-semibold text-[#674529]'>
-            전체 결재 문서
-          </h3>
+    <div className='space-y-6'>
+      {/* 필터 및 검색 섹션 */}
+      <div className='rounded-xl bg-white p-6 shadow-sm'>
+        <div className='mb-4 flex items-center space-x-2'>
+          <h3 className='text-base font-semibold text-[#674529]'>필터 및 검색</h3>
         </div>
-        <p className='mt-1 text-sm text-gray-600'>
-          시스템에 등록된 모든 결재 문서 목록입니다
-        </p>
+
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+
+          {/* 결재 상태 */}
+          <div>
+            <label className='mb-2 block text-sm font-medium text-[#000]'>
+              결재 상태
+            </label>
+            <div className='relative'>
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className='w-full cursor-pointer appearance-none rounded-xl border-0 bg-[#f3f3f5] px-4 py-2.5 text-[#000] outline-none transition-all'
+              >
+                {documentStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-[#674529]' />
+            </div>
+          </div>
+
+          {/* 검색 */}
+          <div>
+            <label className='mb-2 block text-sm font-medium text-[#000]'>
+              검색
+            </label>
+            <input
+              type='text'
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+              placeholder='문서번호, 제목, 유형, 작성자, 작성일'
+              className='w-full rounded-xl border border-gray-300 px-4 py-2.5 placeholder-gray-400 outline-none'
+            />
+          </div>
+
+          {/* 초기화 버튼 */}
+          <div className='flex items-end'>
+            <button
+              onClick={handleReset}
+              className='w-full rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-medium text-[#000] transition-colors hover:bg-gray-50'
+            >
+              초기화
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className='overflow-x-auto'>
+      {/* 문서 목록 */}
+      <div className='overflow-hidden rounded-xl bg-white shadow-sm'>
+        <div className='border-b border-gray-200 bg-[#FEF3E8] px-6 py-4'>
+          <div className='flex items-center space-x-2'>
+            <FileText className='h-5 w-5 text-[#674529]' />
+            <h3 className='text-base font-semibold text-[#674529]'>
+              전체 결재 문서 ({filteredDocuments.length}건
+              {documents.length !== filteredDocuments.length && ` / ${documents.length}건`})
+            </h3>
+          </div>
+          <p className='mt-1 text-sm text-gray-600'>
+            시스템에 등록된 모든 결재 문서 목록입니다
+          </p>
+        </div>
+
+        <div className='overflow-x-auto'>
         <table className='w-full'>
           <thead className='bg-gray-50 border-b border-gray-200'>
             <tr>
@@ -94,7 +199,7 @@ const DocumentList = () => {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-100'>
-            {documents.map((doc) => (
+            {filteredDocuments.map((doc) => (
               <tr
                 key={doc.id}
                 className='transition-colors hover:bg-gray-50/50'
@@ -145,21 +250,17 @@ const DocumentList = () => {
                   </div>
                 </td>
                 <td className='px-4 py-4'>
-                  <div className='flex items-center space-x-2'>
+                  {doc.status === '승인완료' && (
                     <button className='text-gray-500 transition-colors hover:text-[#674529]'>
-                      <Eye className='h-5 w-5' />
+                      <Download className='h-5 w-5' />
                     </button>
-                    {doc.status === '승인완료' && (
-                      <button className='text-gray-500 transition-colors hover:text-[#674529]'>
-                        <Download className='h-5 w-5' />
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );

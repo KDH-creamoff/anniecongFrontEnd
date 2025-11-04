@@ -6,6 +6,7 @@ import DocumentList from '../components/approval/DocumentList';
 import CreateDocumentModal from '../components/approval/CreateDocumentModal';
 import SubmittedDocumentList from '../components/approval/SubmittedDocumentList';
 import PendingDocumentList from '../components/approval/PendingDocumentList';
+import ArchivedDocumentList from '../components/approval/ArchivedDocumentList';
 
 const ApprovalDashboard = ({ subPage }) => {
   const [activeTab, setActiveTab] = useState('all')
@@ -49,7 +50,7 @@ const ApprovalDashboard = ({ subPage }) => {
       case 'nav2': // 문서보관함
         return (
           <>
-            <div>문서보관함 페이지 (만드는 중...)</div>
+            <ArchivedDocumentList />
           </>
         );
       default:
