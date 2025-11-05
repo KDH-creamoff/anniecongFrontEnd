@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Clock } from "lucide-react";
-
-const BASE = import.meta.env.VITE_API_BASE_URL;
+import { fetchInventoryMovements } from "../../store/modules/inventory/actions";
+import { selectInventoryMovements } from "../../store/modules/inventory/selectors";
 
 const typeBadge = (type) => {
   if (type === "입고") return "bg-blue-50 text-blue-600";
@@ -10,6 +11,7 @@ const typeBadge = (type) => {
   if (type === "이동") return "bg-yellow-50 text-yellow-600";
   return "bg-gray-50 text-gray-600";
 };
+
 const qtyColor = (q) => {
   const s = String(q).trim();
   if (s.startsWith("+")) return "text-green-600";
@@ -18,18 +20,13 @@ const qtyColor = (q) => {
 };
 
 export default function InventoryMovementList() {
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const rows = useSelector(selectInventoryMovements) || [];
+  const loading = useSelector((state) => state.inventory.inventoryMovements.loading);
 
   useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    fetch(`${BASE}/inventories/movements?page=1&limit=50`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((json) => { if (alive && json?.ok) setRows(json.data ?? []); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, []);
+    dispatch(fetchInventoryMovements.request({ page: 1, limit: 50 }));
+  }, [dispatch]);
 
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">

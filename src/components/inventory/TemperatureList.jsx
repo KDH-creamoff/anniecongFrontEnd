@@ -1,35 +1,18 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { fetchTemperatureHistory } from '../../store/modules/inventory/actions';
+import { selectTemperatureHistory, selectInventoryStatusLoading } from '../../store/modules/inventory/selectors';
+import { useDispatch, useSelector } from 'react-redux';
 
 const TemperatureList = ({ filters }) => {
-  // 임시 데이터 (실제로는 API에서 가져올 데이터)
-  const [temperatureData] = useState([
-    {
-      id: 1,
-      time: '00:15',
-      storageType: '냉장고',
-      temperature: '3°C',
-      inspector: '임직원',
-      registeredAt: '2025-10-18 00:20',
-    },
-    {
-      id: 2,
-      time: '06:30',
-      storageType: '냉동고',
-      temperature: '-18°C',
-      inspector: '김철수',
-      registeredAt: '2025-10-23 06:35',
-    },
-    {
-      id: 3,
-      time: '12:00',
-      storageType: '상온',
-      temperature: '22°C',
-      inspector: '이영희',
-      registeredAt: '2025-10-23 12:05',
-    },
-    // 추가 데이터는 여기에...
-  ]);
+  const dispatch = useDispatch();
+
+  const items = useSelector(selectTemperatureHistory) || [];
+  const loading = useSelector(selectInventoryStatusLoading);
+
+  useEffect(() => {
+    dispatch(fetchTemperatureHistory.request());
+  }, [dispatch]);
 
   const [currentDate, setCurrentDate] = useState(
     new Date().toISOString().split('T')[0]
@@ -58,12 +41,12 @@ const TemperatureList = ({ filters }) => {
 
   // 현재 선택된 날짜와 등록일시가 일치하는 데이터만 필터링
   const filteredData = useMemo(() => {
-    return temperatureData.filter((item) => {
+    return items.filter((item) => {
       // registeredAt에서 날짜 부분만 추출 (YYYY-MM-DD)
-      const itemDate = item.registeredAt.split(' ')[0];
+      const itemDate = item.date.split(' ')[0];
       return itemDate === currentDate;
     });
-  }, [temperatureData, currentDate]);
+  }, [items, currentDate]);
 
   return (
     <div className='rounded-xl bg-white p-6 shadow-sm'>
@@ -129,7 +112,7 @@ const TemperatureList = ({ filters }) => {
                     {item.inspector}
                   </td>
                   <td className='px-6 py-4 text-center text-sm text-[#000]'>
-                    {item.registeredAt}
+                    {item.date}
                   </td>
                   <td className='px-6 py-4 text-center'>
                     <button

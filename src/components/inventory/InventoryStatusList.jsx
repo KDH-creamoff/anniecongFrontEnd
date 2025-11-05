@@ -7,15 +7,6 @@ import {
   selectInventoryStatusLoading,
 } from "../../store/modules/inventory/selectors";
 
-/**
- * 재고 현황 리스트 컴포넌트
- *
- * Redux Saga 연결:
- * - Redux에서 재고 데이터를 가져옴
- * - 로딩 상태를 Redux로 관리
- * - API 호출은 Saga에서 자동 처리
- */
-
 // 한글 ↔ 백엔드 ENUM 매핑
 const korToEnumCategory = {
   전체: undefined,
@@ -147,24 +138,24 @@ export default function InventoryStatusList({ filters }) {
                 const days = Number(d?.daysLeft ?? 0);
                 const daysLabel = days >= 0 ? `- ${days}일` : `+ ${Math.abs(days)}일`;
                 const badge =
-                  d?.status === "Normal"
+                  d?.status === "정상"
                     ? "bg-green-100 text-green-700"
-                    : d?.status === "LowStock"
+                    : d?.status === "재고부족"
                     ? "bg-yellow-100 text-yellow-700"
-                    : d?.status === "Expiring"
-                    ? "bg-orange-100 text-orange-700"
+                    : d?.status === "임박"
+                    ? "bg-red-100 text-red-700"
                     : "bg-red-100 text-red-700";
 
                 return (
                   <tr key={d.id} className="transition-colors hover:bg-gray-50/50">
-                    <td className="px-4 py-4 text-sm font-medium text-gray-900">{d?.item?.code}</td>
-                    <td className="px-4 py-4 text-sm text-gray-900">{d?.item?.name}</td>
-                    <td className="px-4 py-4 text-sm text-gray-700">{d?.item?.categoryLabel}</td>
+                    <td className="px-4 py-4 text-sm font-medium text-gray-900">{d?.code}</td>
+                    <td className="px-4 py-4 text-sm text-gray-900">{d?.item}</td>
+                    <td className="px-4 py-4 text-sm text-gray-700">{d?.category}</td>
                     <td className="px-4 py-4 text-sm font-medium text-gray-900">{`${d?.quantity} ${d?.unit}`}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center space-x-1 text-sm text-gray-700">
                         <MapPin className="h-4 w-4 text-[#674529]" />
-                        <span>{d?.factory ? d.factory.code ?? d.factory.name : "-"}</span>
+                        <span>{d?.factory}</span>
                       </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-700">{d?.lotNumber}</td>
@@ -175,7 +166,7 @@ export default function InventoryStatusList({ filters }) {
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className={`inline-flex rounded px-3 py-1 text-xs font-medium ${badge}`}>{d?.statusLabel}</span>
+                      <span className={`inline-flex rounded px-3 py-1 text-xs font-medium ${badge}`}>{d?.status}</span>
                     </td>
                     <td className="px-4 py-4">
                       <button className="text-gray-500 transition-colors hover:text-[#674529]">

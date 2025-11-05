@@ -1,18 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { MapPin } from "lucide-react";
-
-const BASE = import.meta.env.VITE_API_BASE_URL;
+import { fetchWarehouseUtilization } from "../../store/modules/inventory/actions";
+import { selectWarehouseUtilization } from "../../store/modules/inventory/selectors";
 
 export default function WarehouseUtilization() {
-  const [rows, setRows] = useState([]);
+  const dispatch = useDispatch();
+  const rows = useSelector(selectWarehouseUtilization) || [];
 
   useEffect(() => {
-    let alive = true;
-    fetch(`${BASE}/inventories/utilization`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((json) => { if (alive && json?.ok) setRows(json.data ?? []); });
-    return () => { alive = false; };
-  }, []);
+    dispatch(fetchWarehouseUtilization.request());
+  }, [dispatch]);
 
   return (
     <div className="mt-6 rounded-xl bg-white p-6 shadow-sm">

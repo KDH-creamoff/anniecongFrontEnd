@@ -41,30 +41,58 @@ apiClient.interceptors.response.use(
 
 // ==================== 인증 API ====================
 export const authAPI = {
-  login: (credentials) => apiClient.post('/auth/login', credentials),
-  logout: () => apiClient.post('/auth/logout'),
-  signup: (userData) => apiClient.post('/auth/signup', userData),
-  refreshToken: () => apiClient.post('/auth/refresh'),
+  login: (credentials) => apiClient.post('/auth/login', credentials), //로그인
+  logout: () => apiClient.post('/auth/logout'), //로그아웃
+  signup: (userData) => apiClient.post('/auth/join', userData), //회원가입
+  
 };
 
 // ==================== 사용자 관리 API ====================
 export const userAPI = {
-  getUsers: (params) => apiClient.get('/users', { params }),
-  getUserById: (id) => apiClient.get(`/users/${id}`),
-  createUser: (userData) => apiClient.post('/users', userData),
-  updateUser: (id, userData) => apiClient.put(`/users/${id}`, userData),
-  deleteUser: (id) => apiClient.delete(`/users/${id}`),
-  getAccessLogs: (params) => apiClient.get('/users/access-logs', { params }),
+  getUsers: (params) => apiClient.get('/auth', { params }), // 사용자 목록 (PaginationQuery & SortQuery)
+  getUserById: (id) => apiClient.get(`/auth/${id}`), // 사용자 상세
+  updateUser: (id, userData) => apiClient.put(`/auth/${id}`, userData), // 사용자 정보 수정
+  deleteUser: (id) => apiClient.delete(`/auth/${id}`), // 사용자 삭제
+  changePassword: (passwordData) => apiClient.post('/auth/password', passwordData), // 비밀번호 변경
+  changePosition: (positionData) => apiClient.post('/auth/position', positionData), // 직급 변경
 };
+
+// ==================== 기초 정보 API ====================
+// 품목 등록
+export const itemsAPI = {
+  getItems: (params) => apiClient.get('/items', { params }), // 품목 목록 조회 (PaginationQuery & { category, factoryId, code, name })
+  getItemById: (id) => apiClient.get(`/items/id/${id}`), // 품목 상세 조회 (ID)
+  getItemByCode: (code) => apiClient.get(`/items/code/${code}`), // 품목 상세 조회 (코드)
+  createItem: (data) => apiClient.post('/items', data), // 품목 등록
+  updateItem: (id, data) => apiClient.patch(`/items/${id}`, data), // 품목 수정
+  deleteItem: (id) => apiClient.delete(`/items/${id}`), // 품목 삭제
+};
+//BOM 관리
+export const bomsAPI = {
+  getBoms: (params) => apiClient.get('/boms', { params }), // BOM 목록 조회 ({ itemId })
+  getBomById: (id) => apiClient.get(`/boms/${id}`), // BOM 상세 조회
+  createBom: (data) => apiClient.post('/boms', data), // BOM 등록
+  updateBom: (id, data) => apiClient.put(`/boms/${id}`, data), // BOM 수정
+  deleteBom: (id) => apiClient.delete(`/boms/${id}`), // BOM 삭제
+};
+// 보관 조건
+export const storageAPI = {
+  getStorage: () => apiClient.get('/storage-conditions'),
+  getStorage: (id) => apiClient.get(`/storage-conitions/${id}`),
+  createStorage: (data) => apiClient.post('/storage-conditions', data),
+  updateStorage: (id, data) => apiClient.put(`/storage-conditions${id}`, data),
+} 
 
 // ==================== 재고 관리 API ====================
 export const inventoryAPI = {
-  getInventoryStatus: (params) => apiClient.get('/inventory/status', { params }),
-  getInventoryMovements: (params) => apiClient.get('/inventory/movements', { params }),
-  getWarehouseUtilization: () => apiClient.get('/inventory/warehouse-utilization'),
-  getAlerts: () => apiClient.get('/inventory/alerts'),
-  updateTemperature: (data) => apiClient.post('/inventory/temperature', data),
-  getTemperatureHistory: (params) => apiClient.get('/inventory/temperature-history', { params }),
+  getInventoryStatus: (params) => apiClient.get('/inventories', { params }), // 재고 현황/상태 (PaginationQuery & { itemId, factoryId, includeZero })
+  getSummary: (params) => apiClient.get('/inventories/summary', { params }), // 재고 요약 ({ factoryId })
+  getUtilization: (params) => apiClient.get('/inventories/utilization', { params }), // 창고 이용률 (DateRangeQuery & { factoryId })
+  getMovements: (params) => apiClient.get('/inventories/movements', { params }), // 재고 이동 이력 (PaginationQuery & DateRangeQuery & { itemId, factoryId })
+  receiveInventory: (data) => apiClient.post('/inventories/receive', data), // 입고
+  issueInventory: (data) => apiClient.post('/inventories/issue', data), // 출고
+  transferInventory: (data) => apiClient.post('/inventories/transfer', data), // 공장간 이동
+  deleteInventory: (id) => apiClient.delete(`/inventories/${id}`), // 재고 삭제
 };
 
 // ==================== 제조 관리 API ====================
@@ -104,7 +132,7 @@ export const approvalAPI = {
   rejectDocument: (id, data) => apiClient.post(`/approvals/${id}/reject`, data),
 };
 
-// ==================== 기준 정보 API ====================
+// ==================== 기초 정보 API ====================
 export const basicAPI = {
   getItems: (params) => apiClient.get('/basic/items', { params }),
   createItem: (data) => apiClient.post('/basic/items', data),

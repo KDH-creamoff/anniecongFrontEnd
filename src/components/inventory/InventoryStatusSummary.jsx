@@ -1,26 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Package, AlertTriangle, Clock, MapPin } from "lucide-react";
-
-const BASE = import.meta.env.VITE_API_BASE_URL;
+import { fetchInventoryAlerts } from "../../store/modules/inventory/actions";
+import { selectInventoryAlerts } from "../../store/modules/inventory/selectors";
 
 export default function InventoryStatusSummary() {
-  const [data, setData] = useState({
+  const dispatch = useDispatch();
+  const alerts = useSelector(selectInventoryAlerts);
+
+  const data = alerts || {
     totalItems: 0,
     lowStock: 0,
     expiringSoon: 0,
     expired: 0,
     warehouseCount: 0,
-  });
+  };
 
   useEffect(() => {
-    let alive = true;
-    fetch(`${BASE}/inventories/summary`, { credentials: "include" })
-      .then((r) => r.json())
-      .then((json) => {
-        if (alive && json?.ok) setData(json.data ?? data);
-      });
-    return () => { alive = false; };
-  }, []);
+    dispatch(fetchInventoryAlerts.request());
+  }, [dispatch]);
 
   const summaryCards = [
     { id: 1, title: "총 품목수", value: data.totalItems, icon: <Package className="h-6 w-6" />, bgColor: "bg-[#724323]", iconTextColor: "text-[#fff]" },
