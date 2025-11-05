@@ -1,7 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { MapPin, Clock, Search, Package } from "lucide-react";
+import { fetchInventoryStatus } from "../../store/modules/inventory/actions";
+import {
+  selectInventoryStatus,
+  selectInventoryStatusLoading,
+} from "../../store/modules/inventory/selectors";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+/**
+ * 재고 현황 리스트 컴포넌트
+ *
+ * Redux Saga 연결:
+ * - Redux에서 재고 데이터를 가져옴
+ * - 로딩 상태를 Redux로 관리
+ * - API 호출은 Saga에서 자동 처리
+ */
 
 // 한글 ↔ 백엔드 ENUM 매핑
 const korToEnumCategory = {
@@ -11,6 +24,7 @@ const korToEnumCategory = {
   완제품: "Finished",
   소모품: "Supply",
 };
+
 const korToEnumStatus = {
   전체: undefined,
   정상: "Normal",
@@ -19,40 +33,26 @@ const korToEnumStatus = {
   "유통기한 만료": "Expired",
 };
 
-// 필요하면 창고명 → factoryId 매핑 채워 넣어
-const warehouseNameToId = {
-  // "의성자재창고": 1,
-  // "상주자재창고": 2,
-  // ...
-};
-
 export default function InventoryStatusList({ filters }) {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  // 초기 데이터 불러오기 (한 번만)
+  // Redux에서 데이터 가져오기
+  // - items: 재고 목록 데이터
+  // - loading: API 호출 로딩 상태
+  const items = useSelector(selectInventoryStatus) || [];
+  const loading = useSelector(selectInventoryStatusLoading);
+
   useEffect(() => {
-    const ac = new AbortController();
-    setLoading(true);
-    fetch(`${BASE}/inventories`, { credentials: "include", signal: ac.signal })
-      .then((r) => r.json())
-      .then((json) => {
-        if (ac.signal.aborted) return;
-        setItems(Array.isArray(json?.data) ? json.data : []);
-      })
-      .catch((err) => {
-        if (!ac.signal.aborted) {
-          console.error("재고 데이터 불러오기 실패:", err);
-          setItems([]);
-        }
-      })
-      .finally(() => {
-        if (!ac.signal.aborted) setLoading(false);
-      });
-    return () => ac.abort();
-  }, []);
+    // 재고 현황 조회 액션 디스패치
+    dispatch(fetchInventoryStatus.request());
+  }, [dispatch]);
 
-  // 받아온 데이터를 filters 기준으로 클라이언트 측 필터링
+  /**
+   * 클라이언트 측 필터링
+   *
+   * Redux에서 가져온 데이터를 filters prop으로 필터링
+   * useMemo로 성능 최적화 (items나 filters가 바뀔 때만 재계산)
+   */
   const filteredItems = useMemo(() => {
     if (!filters || items.length === 0) return items;
 
@@ -87,9 +87,9 @@ export default function InventoryStatusList({ filters }) {
         const itemName = (item?.item?.name || '').toLowerCase();
         const itemCode = (item?.item?.code || '').toLowerCase();
         const lotNumber = (item?.lotNumber || '').toLowerCase();
-        
-        if (!itemName.includes(search) && 
-            !itemCode.includes(search) && 
+
+        if (!itemName.includes(search) &&
+            !itemCode.includes(search) &&
             !lotNumber.includes(search)) {
           return false;
         }
@@ -127,6 +127,7 @@ export default function InventoryStatusList({ filters }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
+            {/* Redux loading 상태로 로딩 표시 */}
             {loading ? (
               <tr>
                 <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
@@ -136,8 +137,8 @@ export default function InventoryStatusList({ filters }) {
             ) : filteredItems.length === 0 ? (
               <tr>
                 <td className="px-4 py-6 text-center text-sm text-gray-500" colSpan={9}>
-                  {items.length === 0 
-                    ? '데이터가 없습니다.' 
+                  {items.length === 0
+                    ? '데이터가 없습니다.'
                     : '필터 조건에 맞는 재고가 없습니다.'}
                 </td>
               </tr>
