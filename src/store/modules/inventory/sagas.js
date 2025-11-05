@@ -6,6 +6,7 @@ import {
   FETCH_WAREHOUSE_UTILIZATION,
   FETCH_INVENTORY_ALERTS,
   UPDATE_TEMPERATURE,
+  DELETE_TEMPERATURE,
   FETCH_TEMPERATURE_HISTORY,
   fetchInventoryStatus,
   fetchInventoryMovements,
@@ -13,6 +14,7 @@ import {
   fetchInventoryAlerts,
   updateTemperature,
   fetchTemperatureHistory,
+  deleteTemperature,
 } from './actions';
 
 // ==================== 목데이터 ====================
@@ -256,8 +258,15 @@ function* updateTemperatureSaga(/* action */) {
 
     // 임시 목데이터 사용
     yield delay(500);
+
+    const newRecord = {
+      id: mockTemperatureHistory.length + 1,
+      ...actionChannel.payload,
+    };
+    mockTemperatureHistory = [newRecord, ...mockTemperatureHistory];
+
     yield put(updateTemperature.success({ message: '온도가 기록되었습니다.' }));
-    yield put(fetchTemperatureHistory.request());
+    yield put(fetchTemperatureHistory.success(mockTemperatureHistory));
   } catch (error) {
     yield put(updateTemperature.failure(error.response?.data?.message || '온도 기록 업데이트에 실패했습니다.'));
   }
@@ -277,6 +286,19 @@ function* fetchTemperatureHistorySaga(/* action */) {
   }
 }
 
+function* deleteTemperatureSaga(action) {
+  try {
+    yield delay(500);
+    mockTemperatureHistory = mockTemperatureHistory.filter(
+      (record) => record.id !== action.payload.id
+    );
+    yield put(deleteTemperature.success({ id: action.payload.id }));
+    yield put(fetchTemperatureHistory.success(mockTemperatureHistory));
+  } catch (error) {
+    yield put(deleteTemperature.failure('온도 기록 삭제 실패'));
+  }
+}
+
 export default function* inventorySaga() {
   yield takeLatest(FETCH_INVENTORY_STATUS.REQUEST, fetchInventoryStatusSaga);
   yield takeLatest(FETCH_INVENTORY_MOVEMENTS.REQUEST, fetchInventoryMovementsSaga);
@@ -284,4 +306,5 @@ export default function* inventorySaga() {
   yield takeLatest(FETCH_INVENTORY_ALERTS.REQUEST, fetchInventoryAlertsSaga);
   yield takeLatest(UPDATE_TEMPERATURE.REQUEST, updateTemperatureSaga);
   yield takeLatest(FETCH_TEMPERATURE_HISTORY.REQUEST, fetchTemperatureHistorySaga);
+  yield takeLatest(DELETE_TEMPERATURE.REQUEST, deleteTemperatureSaga);
 }

@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { fetchTemperatureHistory } from '../../store/modules/inventory/actions';
+import { fetchTemperatureHistory, deleteTemperature } from '../../store/modules/inventory/actions';
 import { selectTemperatureHistory, selectInventoryStatusLoading } from '../../store/modules/inventory/selectors';
 import { useDispatch, useSelector } from 'react-redux';
 
 const TemperatureList = ({ filters }) => {
   const dispatch = useDispatch();
-
   const items = useSelector(selectTemperatureHistory) || [];
   const loading = useSelector(selectInventoryStatusLoading);
 
@@ -34,8 +33,7 @@ const TemperatureList = ({ filters }) => {
     // 삭제 로직 (API 호출)
     console.log('삭제:', id);
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      // 실제로는 API 호출 후 데이터 새로고침
-      alert('삭제되었습니다.');
+      dispatch(deleteTemperature.request(id));
     }
   };
 
@@ -47,6 +45,8 @@ const TemperatureList = ({ filters }) => {
       return itemDate === currentDate;
     });
   }, [items, currentDate]);
+
+  if (loading) return <div>불러오는 중 ...</div>
 
   return (
     <div className='rounded-xl bg-white p-6 shadow-sm'>

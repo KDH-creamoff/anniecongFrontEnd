@@ -8,6 +8,7 @@ import {
   FETCH_TEMPERATURE_HISTORY,
   SET_INVENTORY_FILTER,
   CLEAR_INVENTORY_ERROR,
+  DELETE_TEMPERATURE,
 } from './actions';
 
 const initialState = {
@@ -68,6 +69,17 @@ const inventoryReducer = (state = initialState, action) => {
     case FETCH_TEMPERATURE_HISTORY.FAILURE:
       return { ...state, temperatureHistory: { ...state.temperatureHistory, loading: false, error: action.error } };
 
+    case DELETE_TEMPERATURE.REQUEST:
+      return { 
+        ...state, updateTemperatureStatus: { data: action.payload, loading: false, error: null },
+        temperatureHistory: {
+          ...state.temperatureHistory,
+          data: state.temperatureHistory.data.filter(item => item.id !== action.payload.id)
+        }
+      };
+    case DELETE_TEMPERATURE.FAILURE:
+      return { ...state, updateTemperatureStatus: { ...state.updateTemperatureStatus, loading: false, error: action.error }};
+    
     case SET_INVENTORY_FILTER:
       return { ...state, filter: { ...state.filter, ...action.payload } };
 

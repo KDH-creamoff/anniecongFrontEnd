@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Filter, ChevronDown } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { updateTemperature } from '../../store/modules/inventory/actions';
+
 
 const TemperatureInput = ({ onFilterChange }) => {
+  const dispatch = useDispatch();
   const [filters, setFilters] = useState({
     date: new Date().toISOString().split('T')[0],
     hour: '',
@@ -31,19 +35,15 @@ const TemperatureInput = ({ onFilterChange }) => {
     }
   };
 
-  const handleReset = () => {
-    const resetFilters = {
-      date: new Date().toISOString().split('T')[0],
-      hour: '',
-      minute: '',
-      storageType: '냉장고',
-      temperature: '',
-      inspector: '',
+  const handleRegister = () => {
+    const fullTime = `${filters.hour || '00'}:${filters.minute || '00'}`;
+    const data = {
+      ...filters,
+      time: fullTime,
+      date: filters.date,
     };
-    setFilters(resetFilters);
-    if (onFilterChange) {
-      onFilterChange(resetFilters);
-    }
+    dispatch(addTemperatureData.request(data));
+    alert('등록되었습니다!');
   };
 
   return (
@@ -159,7 +159,7 @@ const TemperatureInput = ({ onFilterChange }) => {
         {/* 초기화 버튼 */}
         <div className='flex items-end'>
           <button
-            onClick={handleReset}
+            onClick={handleRegister}
             className='w-full rounded-xl border border-gray-300 bg-white px-6 py-2.5 font-medium text-[#000] transition-colors hover:bg-gray-50'
           >
             등록

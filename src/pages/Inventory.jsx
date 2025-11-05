@@ -55,8 +55,8 @@ const Inventory = () => {
         case 'temperature':
           return (
             <>
-              <TemperatureInput />
-              <TemperatureList />
+              <TemperatureInput onFilterChange={setFilters}/>
+              <TemperatureList filters={filters}/>
             </>
           )
       default:
