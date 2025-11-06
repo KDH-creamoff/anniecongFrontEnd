@@ -2,10 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import BOMRegistration from './BOMRegistration';
 import BOMList from './BOMList';
+import { useDispatch, useSelector } from 'react-redux';
 
 const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
 const BOMManagement = () => {
+  const dispatch = useDispatch();
+
   const [bomList, setBomList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState('');

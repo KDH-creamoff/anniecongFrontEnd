@@ -9,7 +9,7 @@ const InventoryStatusFilter = ({ onFilterChange }) => {
     searchTerm: '',
   });
 
-  const categories = ['전체', '원재료', '완제품', '반제품', '소모품'];
+  const categories = ['전체', '원재료', '완제품', '반재료', '소모품'];
   const warehouses = [
     '전체',
     '의성자재창고',

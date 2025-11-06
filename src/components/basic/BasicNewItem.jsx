@@ -29,39 +29,11 @@ const BasicNewItem = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [factoryOptions, setFactoryOptions] = useState([]);
-
-  // 공장 목록은 별도 API로 가져오거나, 나중에 Redux로 통합 가능
-  useEffect(() => {
-    // TODO: 공장 목록도 Redux Saga로 관리하려면
-    // fetchFactories.request() 액션을 dispatch하고
-    // selector로 가져오면 됩니다
-
-    // 임시로 하드코딩된 옵션 사용
-    setFactoryOptions([
-      { id: 1, name: '의성공장', type: '생산' },
-      { id: 2, name: '상주공장', type: '생산' },
-    ]);
-  }, []);
-
-  // 등록 성공/실패 처리
-  useEffect(() => {
-    if (itemOperation && !itemOperationLoading) {
-      alert('품목이 성공적으로 등록되었습니다!');
-      // 폼 초기화
-      setFormData({
-        code: '',
-        name: '',
-        category: '',
-        factoryId: '',
-        storageConditionId: '',
-        shelfLife: '',
-        shortage: '',
-        unit: '',
-        wholesalePrice: '',
-      });
-    }
-  }, [itemOperation, itemOperationLoading]);
+  const factoryOptions = [
+    { id: 1, name: '1공장' },
+    { id: 2, name: '2공장' },
+  ];
+  const storageOptions = ['냉동', '냉장', '실온'];
 
   useEffect(() => {
     if (itemOperationError) {
@@ -77,10 +49,14 @@ const BasicNewItem = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.code) newErrors.code = '품목 코드를 입력해주세요';
+    else if (formData.code.length >= 10) newErrors.code = '품목 코드는 10자 미만이어야 합니다';
     if (!formData.name) newErrors.name = '품목명을 입력해주세요';
+    else if (formData.name.length > 50) newErrors.name = '품목명은 50자 이하여야 합니다';
     if (!formData.category) newErrors.category = '카테고리를 선택해주세요';
     if (!formData.factoryId) newErrors.factoryId = '담당공장을 선택해주세요';
     if (!formData.storageConditionId) newErrors.storageConditionId = '보관조건을 선택해주세요';
+    if (!formData.shelfLife) newErrors.shelfLife = '유통기한을 입력해주세요';
+    else if (formData.shelfLife > 999) newErrors.shelfLife = '유통기한은 3자리 이하여야 합니다';
     if (!formData.shortage) newErrors.shortage = '최소 보유 개수를 입력해주세요';
     if (!formData.unit) newErrors.unit = '단위를 선택해주세요';
     if (
@@ -93,19 +69,8 @@ const BasicNewItem = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const normCategory = (v) => {
-    const m = {
-      원재료: 'RawMaterial',
-      반재료: 'SemiFinished',
-      반제품: 'SemiFinished',
-      완제품: 'Finished',
-      소모품: 'Supply',
-    };
-    return m[v] || v;
-  };
-
   const normUnit = (v) => {
-    const m = { kg: 'kg', g: 'g', ea: 'EA', box: 'BOX', pcs: 'PCS', EA: 'EA', BOX: 'BOX', PCS: 'PCS' };
+    const m = { kg: 'kg', g: 'g', ea: 'ea', box: 'box', pallet: 'pallet' };
     return m[String(v).trim().toLowerCase()] || v;
   };
 
@@ -118,38 +83,58 @@ const BasicNewItem = () => {
       createItem.request({
         code: formData.code.trim(),
         name: formData.name.trim(),
-        category: normCategory(formData.category),
+        category: formData.category,
         factoryId: Number(formData.factoryId),
         storageConditionId: formData.storageConditionId,
+        shelfLife: Number(formData.shelfLife),
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
         wholesalePrice: Number(formData.wholesalePrice),
       })
     );
+
+    if (itemOperation && !itemOperationLoading) {
+      alert('품목이 성공적으로 등록되었습니다!');
+      // 폼 초기화
+      setFormData({
+        code: '',
+        name: '',
+        category: '',
+        factoryId: '',
+        storageConditionId: '',
+        shelfLife: '',
+        shortage: '',
+        unit: '',
+        wholesalePrice: '',
+      });
+    }
   };
 
   const factorySelect = useMemo(() => {
-    if (factoryOptions.length === 0) return <option value="">공장 없음</option>;
     return (
       <>
         <option value="">공장 선택</option>
         {factoryOptions.map((f) => (
           <option key={f.id} value={f.id}>
-            {f.name} {f.type ? `(${f.type})` : ''}
+            {f.name}
           </option>
         ))}
       </>
     );
   }, [factoryOptions]);
 
-  const storageSelect = (
-    <>
-      <option value="">보관조건 선택</option>
-      <option value="냉동">냉동</option>
-      <option value="냉장">냉장</option>
-      <option value="실온">실온</option>
-    </>
-  );
+  const storageSelect = useMemo(() => {
+    return (
+      <>
+        <option value="">보관조건 선택</option>
+        {storageOptions.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </>
+    );
+  }, [storageOptions]);
 
   return (
     <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
@@ -177,15 +162,15 @@ const BasicNewItem = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          {/* 코드 */}
+          {/* 코드 - 10자 미만 */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">품목코드</label>
             <input
               type="text"
               value={formData.code}
               onChange={(e) => handleInputChange('code', e.target.value)}
-              maxLength={10}
-              placeholder="RAW0001"
+              maxLength={9}
+              placeholder="예: RAW0001"
               className={`w-full rounded-xl border ${
                 errors.code ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
@@ -250,17 +235,24 @@ const BasicNewItem = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          {/* 유통기한(일) – 참고용 */}
+          {/* 유통기한(일) - 숫자 3글자 */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">유통기한 (일)</label>
             <input
               type="number"
+              min={0}
+              max={999}
               value={formData.shelfLife}
               onChange={(e) => handleInputChange('shelfLife', e.target.value)}
               placeholder="예: 7"
-              className="w-full rounded-xl border border-gray-100 bg-gray-100 px-4 py-2.5 text-sm"
+              className={`w-full rounded-xl border ${
+                errors.shelfLife ? 'border-red-300' : 'border-gray-100'
+              } bg-gray-100 px-4 py-2.5 text-sm`}
               disabled={itemOperationLoading}
             />
+            {errors.shelfLife && (
+              <p className='mt-1 text-xs text-red-500'>{errors.shelfLife}</p>
+            )}
           </div>
 
           {/* 최소 보유 개수 */}
@@ -291,11 +283,11 @@ const BasicNewItem = () => {
               disabled={itemOperationLoading}
             >
               <option value="">단위</option>
-              <option value="kg">kg</option>
-              <option value="g">g</option>
-              <option value="EA">EA</option>
-              <option value="BOX">BOX</option>
-              <option value="PCS">PCS</option>
+              <option value='kg'>kg</option>
+              <option value='g'>g</option>
+              <option value='ea'>ea</option>
+              <option value='box'>box</option>
+              <option value='pallet'>pallet</option>
             </select>
             {errors.unit && <p className="mt-1 text-xs text-red-500">{errors.unit}</p>}
           </div>

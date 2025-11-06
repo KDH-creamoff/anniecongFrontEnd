@@ -5,7 +5,7 @@ import Pagination from '../common/Pagination';
 const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch, onExpand }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm]   = useState('');
-  const [selectedBOM, setSelectedBOM] = useState(null); // {id, bomName, updatedDate, materials, _loading}
+  const [selectedBOM, setSelectedBOM] = useState(null); 
   const itemsPerPage = 10;
 
   useEffect(() => {

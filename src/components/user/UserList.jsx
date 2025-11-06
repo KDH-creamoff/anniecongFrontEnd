@@ -1,4 +1,4 @@
-import { Users, AlertTriangle, CheckCircle2, Edit, Trash2 } from 'lucide-react';
+import { Users, Trash2 } from 'lucide-react';
 
 const UserList = () => {
   const users = [
@@ -11,9 +11,6 @@ const UserList = () => {
       roleText: 'text-purple-700',
       department: '관리부',
       accessLevel: 'ALL',
-      status: '활성',
-      statusBg: 'bg-green-100',
-      statusText: 'text-green-700',
       isActive: false,
     },
     {
@@ -25,9 +22,6 @@ const UserList = () => {
       roleText: 'text-orange-700',
       department: '품질관리',
       accessLevel: 'P1',
-      status: '활성',
-      statusBg: 'bg-green-100',
-      statusText: 'text-green-700',
       isActive: false,
     },
     {
@@ -39,9 +33,6 @@ const UserList = () => {
       roleText: 'text-green-700',
       department: '전처리',
       accessLevel: 'P1',
-      status: '활성',
-      statusBg: 'bg-green-100',
-      statusText: 'text-green-700',
       isActive: false,
     },
     {
@@ -53,9 +44,6 @@ const UserList = () => {
       roleText: 'text-green-700',
       department: '제조',
       accessLevel: 'P2',
-      status: '활성',
-      statusBg: 'bg-green-100',
-      statusText: 'text-green-700',
       isActive: false,
     },
     {
@@ -67,9 +55,6 @@ const UserList = () => {
       roleText: 'text-orange-700',
       department: '품질관리',
       accessLevel: 'P2',
-      status: '비활성',
-      statusBg: 'bg-gray-100',
-      statusText: 'text-gray-700',
       isActive: true,
     },
   ];
@@ -108,9 +93,6 @@ const UserList = () => {
                 공장
               </th>
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
-                상태
-              </th>
-              <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 작업
               </th>
             </tr>
@@ -137,22 +119,7 @@ const UserList = () => {
                   {user.accessLevel}
                 </td>
                 <td className='px-4 py-3'>
-                  <span
-                    className={`inline-block rounded px-2 py-1 text-xs font-medium ${user.statusBg} ${user.statusText}`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className='px-4 py-3'>
                   <div className='flex items-center space-x-2'>
-                    {user.isActive ? (
-                      <CheckCircle2 className='h-5 w-5 text-[#86A956]' />
-                    ) : (
-                      <AlertTriangle className='h-5 w-5 text-orange-500' />
-                    )}
-                    <button className='text-gray-900 hover:text-[#674529]'>
-                      <Edit className='h-4 w-4' />
-                    </button>
                     <button className='text-red-600'>
                       <Trash2 className='h-4 w-4' />
                     </button>

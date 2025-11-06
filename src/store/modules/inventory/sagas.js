@@ -179,7 +179,7 @@ const mockInventoryStatus = [
     id: 5,
     code: 'SEMI-001',
     item: '반죽',
-    category: '반제품',
+    category: '반재료',
     quantity: 150,
     unit: 'kg',
     factory: '상주생산창고',
