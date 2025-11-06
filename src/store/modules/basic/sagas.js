@@ -59,7 +59,7 @@ let mockItems = [
   },
 ];
 
-function* fetchItemsSaga(/* action */) {
+function* fetchItemsSaga(action) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(itemsAPI.getItems, action.payload);

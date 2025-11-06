@@ -1,64 +1,27 @@
-   import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Package, Edit, Trash2, Factory, Save, X } from 'lucide-react';
 import Pagination from '../common/Pagination';
+import { selectItemDetail, selectItemDetailLoading } from '../../store/modules/basic/selectors';
+import { deleteItem, fetchItems } from '../../store/modules/basic/actions';
 
 const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
-// fallback/mock data for items
-const mockRows = [
-  {
-    id: 1,
-    code: "MOCK-001",
-    name: "모의 품목1",
-    category: "원재료",
-    unit: "kg",
-    wholesale_price: 1000,
-    Factory: { name: "A팩토리" },
-    StorageCondition: { name: "실온" },
-    total_quantity: 300,
-  },
-  {
-    id: 2,
-    code: "MOCK-002",
-    name: "모의 품목2",
-    category: "완제품",
-    unit: "EA",
-    wholesale_price: 5500,
-    Factory: { name: "B팩토리" },
-    StorageCondition: { name: "냉장" },
-    total_quantity: 22,
-  },
-];
-
 const BasicItemList = () => {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const dispatch = useDispatch();
+  const items = useSelector(selectItemDetail) || [];
+  const loading = useSelector(selectItemDetailLoading);
 
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingItemId, setEditingItemId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [editLoading, setEditLoading] = useState(false);
 
+  const itemsPerPage = 20;
+
   useEffect(() => {
-    let ignore = false;
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${API}/items`, { credentials: 'include' });
-        if (!res.ok) throw new Error('Fetch error');
-        const data = await res.json();
-        const rows = Array.isArray(data?.data) ? data.data : [];
-        if (!ignore) setItems(rows.length > 0 ? rows : mockRows);
-      } catch (e) {
-        if (!ignore) setItems(mockRows);
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    };
-    fetchItems();
-    return () => { ignore = true; };
-  }, []);
+    dispatch(fetchItems.request());
+  }, [dispatch]);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const pageData = useMemo(() => {
@@ -68,21 +31,7 @@ const BasicItemList = () => {
 
   const handleDelete = async (itemId) => {
     if (!window.confirm('정말로 이 품목을 삭제하시겠습니까?')) return;
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
-    if ((currentPage - 1) * itemsPerPage >= items.length - 1) {
-      setCurrentPage((p) => Math.max(1, p - 1));
-    }
-    /*
-    try {
-      await axios.delete(`${API}/items/${itemId}`);
-      setItems((prev) => prev.filter((i) => i.id !== itemId));
-      if ((currentPage - 1) * itemsPerPage >= items.length - 1) {
-        setCurrentPage((p) => Math.max(1, p - 1));
-      }
-    } catch (err) {
-      alert(err?.response?.data?.message || '삭제에 실패했습니다.');
-    }
-    */
+    dispatch(deleteItem.request(itemId));
   };
 
   const handleEditStart = (item) => {
