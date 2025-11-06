@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// API 기본 설정 (Vite 환경 변수 사용)
+// API 기본 설정
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 // Axios 인스턴스 생성
@@ -10,20 +10,13 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
-// 요청 인터셉터 (토큰 자동 추가)
+// 요청 인터셉터
 apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (config) => config,
+  (error) => Promise.reject(error)
 );
 
 // 응답 인터셉터 (에러 처리)
@@ -32,7 +25,6 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // 인증 만료 처리
-      localStorage.removeItem('accessToken');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -44,7 +36,7 @@ export const authAPI = {
   login: (credentials) => apiClient.post('/auth/login', credentials), //로그인
   logout: () => apiClient.post('/auth/logout'), //로그아웃
   signup: (userData) => apiClient.post('/auth/join', userData), //회원가입
-  
+  getMe: () => apiClient.get('/auth/me'),
 };
 
 // ==================== 사용자 관리 API ====================

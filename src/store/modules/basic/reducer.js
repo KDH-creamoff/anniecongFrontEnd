@@ -76,7 +76,14 @@ const basicReducer = (state = initialState, action) => {
     case UPDATE_ITEM.REQUEST:
       return { ...state, itemOperation: { ...state.itemOperation, loading: true, error: null } };
     case UPDATE_ITEM.SUCCESS:
-      return { ...state, itemOperation: { data: action.payload, loading: false, error: null } };
+      return { ...state, 
+        items: { 
+          ...state.items,
+          data: state.items.data.map((item) =>
+            item.id === action.payload.id ? action.payload : item
+            ),
+          }, 
+        itemOperation: { data: action.payload, loading: false, error: null } };
     case UPDATE_ITEM.FAILURE:
       return { ...state, itemOperation: { ...state.itemOperation, loading: false, error: action.error } };
 
