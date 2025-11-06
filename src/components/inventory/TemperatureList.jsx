@@ -33,7 +33,7 @@ const TemperatureList = ({ filters }) => {
     // 삭제 로직 (API 호출)
     console.log('삭제:', id);
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      dispatch(deleteTemperature.request(id));
+      dispatch(deleteTemperature.request({ id }));
     }
   };
 
@@ -106,7 +106,7 @@ const TemperatureList = ({ filters }) => {
                     {item.storageType}
                   </td>
                   <td className='px-6 py-4 text-center text-sm text-[#000]'>
-                    {item.temperature}
+                    {item.temperature}°C
                   </td>
                   <td className='px-6 py-4 text-center text-sm text-[#000]'>
                     {item.inspector}

@@ -4,11 +4,11 @@ import { all } from 'redux-saga/effects';
 import authSaga from './modules/auth/sagas';
 import userSaga from './modules/user/sagas';
 import inventorySaga from './modules/inventory/sagas';
+import basicSaga from './modules/basic/sagas';
 // import manufacturingSaga from './modules/manufacturing/sagas';
 // import shippingSaga from './modules/shipping/sagas';
 // import receivingSaga from './modules/receiving/sagas';
 // import approvalSaga from './modules/approval/sagas';
-// import basicSaga from './modules/basic/sagas';
 // import dashboardSaga from './modules/dashboard/sagas';
 
 /**
@@ -20,12 +20,12 @@ export default function* rootSaga() {
     authSaga(),
     userSaga(),
     inventorySaga(),
+    basicSaga(),
     // 나머지 모듈은 필요에 따라 추가
     // manufacturingSaga(),
     // shippingSaga(),
     // receivingSaga(),
     // approvalSaga(),
-    // basicSaga(),
     // dashboardSaga(),
   ]);
 }

@@ -1,31 +1,21 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 import { Plus } from 'lucide-react';
-
-const API =
-  import.meta.env.VITE_API_URL ||
-  process.env.REACT_APP_API_URL ||
-  'http://localhost:4000/api';
-
-// 안전 파서: 응답이 배열이든 {data: []}든 배열을 뽑아줌
-const pickRows = (res) => {
-  if (!res) return [];
-  if (Array.isArray(res)) return res;
-  if (Array.isArray(res?.data)) return res.data;
-  if (Array.isArray(res?.data?.data)) return res.data.data;
-  // { ok:true, data:{ rows:[...] } } 같은 형태도 대비
-  if (Array.isArray(res?.data?.rows)) return res.data.rows;
-  return [];
-};
-
-// 공장/보관조건 레코드를 표준화
-const toFactoryOption = (raw) => ({
-  id: raw?.id ?? raw?.factory_id ?? raw?.FactoryId ?? raw?.ID,
-  name: raw?.name ?? raw?.title ?? raw?.factory_name ?? '-',
-  type: raw?.type ?? raw?.FactoryType ?? raw?.category ?? '',
-});
+import { createItem } from '../../store/modules/basic/actions';
+import {
+  selectItemOperation,
+  selectItemOperationLoading,
+  selectItemOperationError,
+} from '../../store/modules/basic/selectors';
 
 const BasicNewItem = () => {
+  const dispatch = useDispatch();
+
+  // Redux 상태 조회
+  const itemOperation = useSelector(selectItemOperation);
+  const itemOperationLoading = useSelector(selectItemOperationLoading);
+  const itemOperationError = useSelector(selectItemOperationError);
+
   const [formData, setFormData] = useState({
     code: '',
     name: '',
@@ -35,46 +25,49 @@ const BasicNewItem = () => {
     shelfLife: '',
     shortage: '',
     unit: '',
-    wholesalePrice: '', // 도매가(원)
+    wholesalePrice: '',
   });
 
   const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
-
   const [factoryOptions, setFactoryOptions] = useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
+  // 공장 목록은 별도 API로 가져오거나, 나중에 Redux로 통합 가능
+  useEffect(() => {
+    // TODO: 공장 목록도 Redux Saga로 관리하려면
+    // fetchFactories.request() 액션을 dispatch하고
+    // selector로 가져오면 됩니다
+
+    // 임시로 하드코딩된 옵션 사용
+    setFactoryOptions([
+      { id: 1, name: '의성공장', type: '생산' },
+      { id: 2, name: '상주공장', type: '생산' },
+    ]);
+  }, []);
+
+  // 등록 성공/실패 처리
+  useEffect(() => {
+    if (itemOperation && !itemOperationLoading) {
+      alert('품목이 성공적으로 등록되었습니다!');
+      // 폼 초기화
+      setFormData({
+        code: '',
+        name: '',
+        category: '',
+        factoryId: '',
+        storageConditionId: '',
+        shelfLife: '',
+        shortage: '',
+        unit: '',
+        wholesalePrice: '',
+      });
+    }
+  }, [itemOperation, itemOperationLoading]);
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      setLoadError('');
-      try {
-        const [fRes] = await Promise.all([
-          axios.get(`${API}/factories`),
-        ]);
-
-        const factories = pickRows(fRes).map(toFactoryOption).filter((x) => x.id);
-
-        setFactoryOptions(factories);
-
-        // 옵션이 하나뿐이면 자동 선택
-        if (factories.length === 1) {
-          setFormData((prev) => ({ ...prev, factoryId: String(factories[0].id) }));
-        }
-      } catch (e) {
-        console.error('초기 데이터 조회 실패', e);
-        setLoadError(
-          e?.response?.data?.message ||
-            '공장/보관조건을 불러오지 못했습니다. API 경로나 CORS 설정을 확인하세요.'
-        );
-        setFactoryOptions([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    if (itemOperationError) {
+      alert(itemOperationError || '등록 중 오류가 발생했습니다.');
+    }
+  }, [itemOperationError]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -116,13 +109,13 @@ const BasicNewItem = () => {
     return m[String(v).trim().toLowerCase()] || v;
   };
 
-  const handleSubmit = async () => {
-    if (submitting) return;
+  const handleSubmit = () => {
+    if (itemOperationLoading) return;
     if (!validateForm()) return;
 
-    try {
-      setSubmitting(true);
-      await axios.post(`${API}/items`, {
+    // Redux Saga를 통해 품목 등록 요청
+    dispatch(
+      createItem.request({
         code: formData.code.trim(),
         name: formData.name.trim(),
         category: normCategory(formData.category),
@@ -131,30 +124,11 @@ const BasicNewItem = () => {
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
         wholesalePrice: Number(formData.wholesalePrice),
-      });
-      alert('품목이 성공적으로 등록되었습니다!');
-      setFormData({
-        code: '',
-        name: '',
-        category: '',
-        factoryId: '',
-        storageConditionId: '',
-        shelfLife: '',
-        shortage: '',
-        unit: '',
-        wholesalePrice: '',
-      });
-    } catch (e) {
-      console.error('품목 등록 실패', e);
-      alert(e?.response?.data?.message || '등록 중 오류가 발생했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
+      })
+    );
   };
 
   const factorySelect = useMemo(() => {
-    if (loading) return <option value="">불러오는 중…</option>;
-    if (loadError) return <option value="">{loadError}</option>;
     if (factoryOptions.length === 0) return <option value="">공장 없음</option>;
     return (
       <>
@@ -166,7 +140,7 @@ const BasicNewItem = () => {
         ))}
       </>
     );
-  }, [loading, loadError, factoryOptions]);
+  }, [factoryOptions]);
 
   const storageSelect = (
     <>
@@ -197,7 +171,7 @@ const BasicNewItem = () => {
             className={`w-full rounded-xl border ${
               errors.name ? 'border-red-300' : 'border-gray-100'
             } bg-gray-100 px-4 py-2.5 text-sm`}
-            disabled={submitting}
+            disabled={itemOperationLoading}
           />
           {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
         </div>
@@ -215,7 +189,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.code ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             />
             {errors.code && <p className="mt-1 text-xs text-red-500">{errors.code}</p>}
           </div>
@@ -229,7 +203,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.category ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             >
               <option value="">카테고리 선택</option>
               <option value="원재료">원재료</option>
@@ -249,7 +223,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.factoryId ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             >
               {factorySelect}
             </select>
@@ -265,7 +239,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.storageConditionId ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             >
               {storageSelect}
             </select>
@@ -285,7 +259,7 @@ const BasicNewItem = () => {
               onChange={(e) => handleInputChange('shelfLife', e.target.value)}
               placeholder="예: 7"
               className="w-full rounded-xl border border-gray-100 bg-gray-100 px-4 py-2.5 text-sm"
-              disabled={submitting}
+              disabled={itemOperationLoading}
             />
           </div>
 
@@ -300,7 +274,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.shortage ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             />
             {errors.shortage && <p className="mt-1 text-xs text-red-500">{errors.shortage}</p>}
           </div>
@@ -314,7 +288,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.unit ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             >
               <option value="">단위</option>
               <option value="kg">kg</option>
@@ -337,7 +311,7 @@ const BasicNewItem = () => {
               className={`w-full rounded-xl border ${
                 errors.wholesalePrice ? 'border-red-300' : 'border-gray-100'
               } bg-gray-100 px-4 py-2.5 text-sm`}
-              disabled={submitting}
+              disabled={itemOperationLoading}
             />
             {errors.wholesalePrice && (
               <p className="mt-1 text-xs text-red-500">{errors.wholesalePrice}</p>
@@ -354,11 +328,11 @@ const BasicNewItem = () => {
             <label className="mb-2 block text-sm font-medium text-gray-700">&nbsp;</label>
             <button
               type="button"
-              disabled={submitting}
+              disabled={itemOperationLoading}
               onClick={handleSubmit}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#674529] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95 disabled:opacity-60"
             >
-              <span>{submitting ? '등록중…' : '등록'}</span>
+              <span>{itemOperationLoading ? '등록중…' : '등록'}</span>
             </button>
           </div>
         </div>

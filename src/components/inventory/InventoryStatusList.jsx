@@ -7,23 +7,6 @@ import {
   selectInventoryStatusLoading,
 } from "../../store/modules/inventory/selectors";
 
-// 한글 ↔ 백엔드 ENUM 매핑
-const korToEnumCategory = {
-  전체: undefined,
-  원재료: "RawMaterial",
-  반제품: "SemiFinished",
-  완제품: "Finished",
-  소모품: "Supply",
-};
-
-const korToEnumStatus = {
-  전체: undefined,
-  정상: "Normal",
-  재고부족: "LowStock",
-  "유통기한 임박": "Expiring",
-  "유통기한 만료": "Expired",
-};
-
 export default function InventoryStatusList({ filters }) {
   const dispatch = useDispatch();
 
@@ -50,23 +33,21 @@ export default function InventoryStatusList({ filters }) {
     return items.filter((item) => {
       // 1. 카테고리 필터
       if (filters.category && filters.category !== '전체') {
-        const categoryEnum = korToEnumCategory[filters.category];
-        if (categoryEnum && item?.item?.category !== categoryEnum) {
+        if (item?.category !== filters.category) {
           return false;
         }
       }
 
       // 2. 상태 필터
       if (filters.status && filters.status !== '전체') {
-        const statusEnum = korToEnumStatus[filters.status];
-        if (statusEnum && item?.status !== statusEnum) {
+        if (item?.status !== filters.status) {
           return false;
         }
       }
 
       // 3. 창고 필터
       if (filters.warehouse && filters.warehouse !== '전체') {
-        const factoryName = item?.factory?.name || '';
+        const factoryName = item?.factory || '';
         if (!factoryName.includes(filters.warehouse)) {
           return false;
         }
@@ -75,8 +56,8 @@ export default function InventoryStatusList({ filters }) {
       // 4. 검색어 필터 (품목명, 품목코드, 바코드번호)
       if (filters.searchTerm && filters.searchTerm.trim()) {
         const search = filters.searchTerm.toLowerCase().trim();
-        const itemName = (item?.item?.name || '').toLowerCase();
-        const itemCode = (item?.item?.code || '').toLowerCase();
+        const itemName = (item?.item || '').toLowerCase();
+        const itemCode = (item?.code || '').toLowerCase();
         const lotNumber = (item?.lotNumber || '').toLowerCase();
 
         if (!itemName.includes(search) &&

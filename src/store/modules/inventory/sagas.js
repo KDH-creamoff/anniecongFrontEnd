@@ -98,7 +98,7 @@ const mockInventoryAlerts = {
   lowStock: 8,
   expiringSoon: 12,
   expired: 2,
-  warehouseCount: 3
+  warehouseCount: 4  // 의성자재창고, 상주자재창고, 상주생산창고, 의성생산창고
 };
 
 const mockWarehouseUtilization = [
@@ -125,43 +125,72 @@ const mockWarehouseUtilization = [
 const mockInventoryStatus = [
   {
     id: 1,
-    category: '소모품',
-    item: '연필',
     code: 'FEED-001',
-    lotNumber: 'ANC20251105001',
+    item: '연필',
+    category: '소모품',
     quantity: 1500,
     unit: 'kg',
     factory: '의성자재창고',
-    expiryDate: '2025-12-31',
+    lotNumber: 'ANC20251105001',
+    expirationDate: '2025-12-31',
+    daysLeft: 55,
     status: '정상'
   },
   {
     id: 2,
-    category: '원재료',
-    item: '닭가슴살',
     code: 'FEED-002',
-    lotNumber: 'ANC20251104002',
+    item: '닭가슴살',
+    category: '원재료',
     quantity: 850,
     unit: 'kg',
     factory: '상주자재창고',
-    expiryDate: '2025-11-20',
+    lotNumber: 'ANC20251104002',
+    expirationDate: '2025-11-20',
+    daysLeft: 14,
     status: '임박'
   },
   {
     id: 3,
-    category: '완제품',
-    item: '콩부장쿠키',
     code: 'PROD-001',
-    lotNumber: 'ANC0251105003',
+    item: '콩부장쿠키',
+    category: '완제품',
     quantity: 2200,
     unit: 'kg',
     factory: '상주생산창고',
-    expiryDate: '2026-03-15',
+    lotNumber: 'ANC0251105003',
+    expirationDate: '2026-03-15',
+    daysLeft: 494,
     status: '정상'
+  },
+  {
+    id: 4,
+    code: 'RAW-001',
+    item: '밀가루',
+    category: '원재료',
+    quantity: 3000,
+    unit: 'kg',
+    factory: '의성생산창고',
+    lotNumber: 'ANC20251101004',
+    expirationDate: '2025-12-15',
+    daysLeft: 39,
+    status: '정상'
+  },
+  {
+    id: 5,
+    code: 'SEMI-001',
+    item: '반죽',
+    category: '반제품',
+    quantity: 150,
+    unit: 'kg',
+    factory: '상주생산창고',
+    lotNumber: 'ANC20251105005',
+    expirationDate: '2025-11-10',
+    daysLeft: 4,
+    status: '재고부족'
   }
 ];
 
-const mockTemperatureHistory = [
+let mockTemperatureHistory = [
   {
     id: 1,
     date: '2025-11-05 00:20',
@@ -250,7 +279,7 @@ function* fetchInventoryAlertsSaga() {
   }
 }
 
-function* updateTemperatureSaga(/* action */) {
+function* updateTemperatureSaga(action) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.updateTemperature, action.payload);
@@ -261,7 +290,7 @@ function* updateTemperatureSaga(/* action */) {
 
     const newRecord = {
       id: mockTemperatureHistory.length + 1,
-      ...actionChannel.payload,
+      ...action.payload,
     };
     mockTemperatureHistory = [newRecord, ...mockTemperatureHistory];
 

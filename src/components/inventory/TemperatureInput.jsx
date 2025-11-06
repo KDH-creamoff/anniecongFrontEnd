@@ -36,14 +36,36 @@ const TemperatureInput = ({ onFilterChange }) => {
   };
 
   const handleRegister = () => {
-    const fullTime = `${filters.hour || '00'}:${filters.minute || '00'}`;
+    // 필수 값 검증
+    if (!filters.temperature || !filters.inspector) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    const now = new Date();
+
+    const registeredAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const measurementTime = `${filters.hour}:${filters.minute}`;
+
     const data = {
-      ...filters,
-      time: fullTime,
-      date: filters.date,
+      storageType: filters.storageType,
+      temperature: filters.temperature,
+      inspector: filters.inspector,
+      time: measurementTime,
+      date: registeredAt,
     };
-    dispatch(addTemperatureData.request(data));
-    alert('등록되었습니다!');
+
+    dispatch(updateTemperature.request(data));
+
+    setFilters({
+      date: new Date().toISOString().split('T')[0],
+      hour: '',
+      minute: '',
+      storageType: filters.storageType,
+      temperature: '',
+      inspector: '',
+    });
   };
 
   return (
@@ -134,7 +156,7 @@ const TemperatureInput = ({ onFilterChange }) => {
             온도
           </label>
           <input
-            type='text'
+            type='number'
             value={filters.temperature}
             onChange={(e) => handleFilterChange('temperature', e.target.value)}
             placeholder='온도 입력'

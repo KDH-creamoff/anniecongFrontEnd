@@ -30,7 +30,7 @@ export default function InventoryStatusSummary() {
   return (
     <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
       {summaryCards.map((c) => (
-        <div key={c.id} className="rounded-xl bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+        <div key={c.id} className="rounded-xl bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="mb-1 text-sm text-gray-600">{c.title}</p>
