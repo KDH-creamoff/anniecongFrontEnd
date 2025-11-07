@@ -47,7 +47,6 @@ export default function InventoryMovementList() {
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">출발지</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">도착지</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">담당자</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">비고</th>
             </tr>
           </thead>
           <tbody>
@@ -61,14 +60,12 @@ export default function InventoryMovementList() {
                 </td>
                 <td className="px-4 py-4">
                   <div className="text-sm text-gray-900">{m.category}</div>
-                  <div className="text-xs text-gray-500">{m.code}</div>
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.lotNumber}</td>
                 <td className="px-4 py-4"><span className={`text-sm font-semibold ${qtyColor(m.quantity)}`}>{m.quantity}</span></td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.fromLocation}</td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.toLocation}</td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.manager}</td>
-                <td className="px-4 py-4 text-sm text-gray-500">{m.note}</td>
               </tr>
             ))}
             {!loading && rows.length === 0 && (

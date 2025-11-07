@@ -1,58 +1,77 @@
-import { useState } from 'react';
-import { Truck, Package, Box } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTransfers } from '../../store/modules/manufacturing/action';
+import { selectTransfers, selectTransfersLoading } from '../../store/modules/manufacturing/selectors';
 
 const TransferStatus = () => {
+  const dispatch = useDispatch();
+  const transfers = useSelector(selectTransfers) || [];
+  const loading = useSelector(selectTransfersLoading);
   const [selectedTransport, setSelectedTransport] = useState('전체');
-  const [transfers] = useState([
-    {
-      route: '1공장 → 2공장',
-      status: '이동완료',
-      departureDate: '2025-10-25',
-      quantity: '100 Kg',
-      item: '당근',
-      transport: '트럭'
-    },
-    {
-      route: '1창고 → 2창고',
-      status: '이동중',
-      departureDate: '2025-10-30',
-      quantity: '50 Kg',
-      item: '고구마',
-      transport: '팔레트'
-    },
-    {
-      route: '2공장 → 1창고',
-      status: '이동대기',
-      departureDate: '2025-10-31',
-      quantity: '75 Kg',
-      item: '닭고기 (가슴살)',
-      transport: '박스'
-    }
-  ]);
+
+  useEffect(() => {
+    dispatch(fetchTransfers.request());
+  }, [dispatch]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case '이동완료':
+      case 'completed':
         return 'bg-green-100 text-green-700';
-      case '이동대기':
+      case 'pending':
         return 'bg-blue-100 text-blue-700';
-      case '이동중':
+      case 'in_transit':
         return 'bg-yellow-100 text-yellow-700';
+      case 'cancelled':
+        return 'bg-red-100 text-red-700';
       default:
         return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'completed':
+        return '이동완료';
+      case 'pending':
+        return '이동대기';
+      case 'in_transit':
+        return '이동중';
+      default:
+        return status;
     }
   };
 
   const filteredTransfers =
     selectedTransport === '전체'
       ? transfers
-      : transfers.filter((t) => t.transport === selectedTransport);
+      : transfers.filter((t) => t.transportMethod === selectedTransport);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-sm text-gray-500">데이터를 불러오는 중...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold text-[#674529]">이송 현황</h3>
+        <select
+          value={selectedTransport}
+          onChange={(e) => setSelectedTransport(e.target.value)}
+          className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+        >
+          <option value="전체">전체</option>
+          <option value="트럭">트럭</option>
+          <option value="팔레트">팔레트</option>
+          <option value="박스">박스</option>
+          <option value="컨테이너">컨테이너</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -69,8 +88,8 @@ const TransferStatus = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTransfers.map((transfer, index) => (
-              <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+            {filteredTransfers.map((transfer) => (
+              <tr key={transfer.id} className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-3 px-4 text-sm text-gray-700">{transfer.route}</td>
                 <td className="py-3 px-4 text-sm">
                   <span
@@ -78,12 +97,12 @@ const TransferStatus = () => {
                       transfer.status
                     )}`}
                   >
-                    {transfer.status}
+                    {getStatusText(transfer.status)}
                   </span>
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex items-center">
-                    {transfer.transport}
+                    {transfer.transportMethod}
                   </div>
                 </td>
                 <td className="py-3 px-4 text-sm text-gray-700">{transfer.departureDate}</td>

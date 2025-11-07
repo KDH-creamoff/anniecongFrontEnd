@@ -109,10 +109,12 @@ export const shippingAPI = {
 
 // ==================== 입고 관리 API ====================
 export const receivingAPI = {
-  getReceivingList: (params) => apiClient.get('/receiving', { params }),
-  createReceiving: (data) => apiClient.post('/receiving', data),
-  confirmReceiving: (id) => apiClient.post(`/receiving/${id}/confirm`),
-  printLabel: (id) => apiClient.get(`/receiving/${id}/label`),
+  getReceivingList: (params) => apiClient.get('/receiving', { params }), // 입고 목록 조회
+  createReceiving: (data) => apiClient.post('/receiving', data), // 입고 생성
+  updateReceiving: (id, data) => apiClient.put(`/receiving/${id}`, data), // 입고 수정
+  deleteReceiving: (id) => apiClient.delete(`/receiving/${id}`), // 입고 삭제
+  confirmReceiving: (id) => apiClient.post(`/receiving/${id}/confirm`), // 입고 확정
+  printLabel: (id) => apiClient.get(`/receiving/${id}/label`), // 라벨 출력
 };
 
 // ==================== 라벨 관리 API ====================

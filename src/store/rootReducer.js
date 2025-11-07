@@ -5,9 +5,10 @@ import authReducer from './modules/auth/reducer';
 import userReducer from './modules/user/reducer';
 import inventoryReducer from './modules/inventory/reducer';
 import basicReducer from './modules/basic/reducer';
+import receivingReducer from './modules/receiving/reducer';
 import manufacturingReducer from './modules/manufacturing/reducer';
+import labelReducer from './modules/label/reducer';
 // import shippingReducer from './modules/shipping/reducer';
-// import receivingReducer from './modules/receiving/reducer';
 // import approvalReducer from './modules/approval/reducer';
 // import dashboardReducer from './modules/dashboard/reducer';
 
@@ -17,9 +18,10 @@ const rootReducer = combineReducers({
   user: userReducer,
   inventory: inventoryReducer,
   basic: basicReducer,
+  receiving: receivingReducer,
   manufacturing: manufacturingReducer,
+  label: labelReducer,
   // shipping: shippingReducer,
-  // receiving: receivingReducer,
   // approval: approvalReducer,
   // dashboard: dashboardReducer,
 });

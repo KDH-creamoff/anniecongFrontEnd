@@ -23,25 +23,22 @@ const mockInventoryMovements = [
     time: '2025-11-05 14:30',
     type: '입고',
     category: '사료A',
-    code: 'FEED-001',
     lotNumber: 'LOT20251105001',
     quantity: '+500kg',
     fromLocation: '외부 공급사',
     toLocation: '1공장 창고A',
     manager: '김철수',
-    note: '정상 입고'
   },
   {
     time: '2025-11-05 13:15',
     type: '소모',
     category: '사료B',
-    code: 'FEED-002',
     lotNumber: 'LOT20251104002',
     quantity: '-200kg',
     fromLocation: '1공장 창고A',
     toLocation: '생산라인1',
     manager: '이영희',
-    note: '생산 사용'
+    note: '생산 사용',
   },
   {
     time: '2025-11-05 11:20',
@@ -53,19 +50,18 @@ const mockInventoryMovements = [
     fromLocation: '생산라인1',
     toLocation: '1공장 창고B',
     manager: '박민수',
-    note: '정상 생산'
+    note: '정상 생산',
   },
   {
     time: '2025-11-05 10:00',
     type: '이동',
     category: '사료C',
-    code: 'FEED-003',
     lotNumber: 'LOT20251103004',
     quantity: '+150kg',
     fromLocation: '1공장 창고A',
     toLocation: '2공장 창고',
     manager: '최동욱',
-    note: '공장 간 이동'
+    note: '공장 간 이동',
   },
   {
     time: '2025-11-04 16:45',
@@ -77,19 +73,18 @@ const mockInventoryMovements = [
     fromLocation: '외부 공급사',
     toLocation: '1공장 창고A',
     manager: '김철수',
-    note: '긴급 입고'
+    note: '긴급 입고',
   },
   {
     time: '2025-11-04 14:30',
     type: '소모',
     category: '사료A',
-    code: 'FEED-001',
     lotNumber: 'LOT20251102006',
     quantity: '-350kg',
     fromLocation: '1공장 창고A',
     toLocation: '생산라인2',
     manager: '이영희',
-    note: '생산 사용'
+    note: '생산 사용',
   }
 ];
 
@@ -125,7 +120,6 @@ const mockWarehouseUtilization = [
 const mockInventoryStatus = [
   {
     id: 1,
-    code: 'FEED-001',
     item: '연필',
     category: '소모품',
     quantity: 1500,
@@ -138,7 +132,6 @@ const mockInventoryStatus = [
   },
   {
     id: 2,
-    code: 'FEED-002',
     item: '닭가슴살',
     category: '원재료',
     quantity: 850,
