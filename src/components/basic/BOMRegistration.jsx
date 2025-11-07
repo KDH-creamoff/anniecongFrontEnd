@@ -1,40 +1,8 @@
 import { useState } from 'react';
 import { Package, Trash2, Plus, X, Check } from 'lucide-react';
+import { rawMaterialMaster } from '../../data/rawMaterialMaster';
 
 const BOMRegistration = ({ onSave }) => {
-  // 원재료 마스터 데이터 (품목 등록에서 가져온 것)
-  const rawMaterialMaster = [
-    { code: 'RAW001', name: '닭고기(가슴살)' },
-    { code: 'RAW002', name: '당근' },
-    { code: 'RAW003', name: '양파' },
-    { code: 'RAW004', name: '감자' },
-    { code: 'RAW005', name: '대파' },
-    { code: 'RAW006', name: '마늘' },
-    { code: 'RAW007', name: '생강' },
-    { code: 'RAW008', name: '간장' },
-    { code: 'RAW009', name: '설탕' },
-    { code: 'RAW010', name: '참기름' },
-    { code: 'RAW011', name: '소금' },
-    { code: 'RAW012', name: '후추' },
-    { code: 'RAW013', name: '고춧가루' },
-    { code: 'RAW014', name: '식용유' },
-    { code: 'RAW015', name: '돼지고기(삼겹살)' },
-    { code: 'RAW016', name: '소고기(불고기용)' },
-    { code: 'RAW017', name: '두부' },
-    { code: 'RAW018', name: '배추' },
-    { code: 'RAW019', name: '무' },
-    { code: 'RAW020', name: '애호박' },
-    { code: 'RAW021', name: '버섯(표고)' },
-    { code: 'RAW022', name: '버섯(양송이)' },
-    { code: 'RAW023', name: '파프리카(빨강)' },
-    { code: 'RAW024', name: '파프리카(노랑)' },
-    { code: 'RAW025', name: '브로콜리' },
-    { code: 'RAW026', name: '양배추' },
-    { code: 'RAW027', name: '청경채' },
-    { code: 'RAW028', name: '시금치' },
-    { code: 'RAW029', name: '숙주' },
-    { code: 'RAW030', name: '콩나물' },
-  ];
 
   // BOM 등록용 상태
   const [currentBOMName, setCurrentBOMName] = useState('');

@@ -1,16 +1,8 @@
 import PropTypes from "prop-types";
 
 const ManufacturingHistoryList = ({ selectedDate, historyData }) => {
-    // 날짜에 해당하는 제조이력 필터링
-    const getHistoryForDate = () => {
-        if (!historyData || !selectedDate) return { pending: [], completed: [] };
-
-        const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-
-        return historyData[dateKey] || { pending: [], completed: [] };
-    };
-
-    const { pending = [], completed = [] } = getHistoryForDate();
+    // historyData는 이미 선택된 날짜의 데이터 (pending, completed 배열을 가진 객체)
+    const { pending = [], completed = [] } = historyData || { pending: [], completed: [] };
 
     return (
         <div className="flex-col">

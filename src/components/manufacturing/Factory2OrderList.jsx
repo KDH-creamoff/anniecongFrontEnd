@@ -1,34 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFactory2Orders } from "../../store/modules/manufacturing/action";
+import { selectFactory2Orders, selectFactory2OrdersLoading } from "../../store/modules/manufacturing/selectors";
 
 const Factory2OrderList = () => {
+    const dispatch = useDispatch();
     const [filterType, setFilterType] = useState('전체');
 
-    const workOrders = [
-    {
-        id: 'WIP001',
-        title: '애니콩 펫베이커리',
-        product: '애니콩 펫베이커리 - 10개',
-        material: '닭고기 (가슴살)',
-        quantity: '50 kg',
-        deadlineTime: '60분',
-        manager: '김전처리',
-    },
-    {
-        id: 'WIP002',
-        title: '콩부장 쿠키',
-        product: '콩부장 쿠키 - 150개',
-        material: '콩',
-        quantity: '100 kg',
-        deadlineTime: '90분',
-        manager: '나작업',
-    },
-    ];
+    // Redux에서 2공장 주문 목록 가져오기
+    const factory2OrdersFromRedux = useSelector(selectFactory2Orders);
+    const loading = useSelector(selectFactory2OrdersLoading);
+
+    // 컴포넌트 마운트 시 2공장 주문 목록 조회
+    useEffect(() => {
+        dispatch(fetchFactory2Orders.request());
+    }, [dispatch]);
+
+    const workOrders = factory2OrdersFromRedux || [];
 
     return (
     <div>
         <div className="mx-auto">
         <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl text-[#674529]">제조 지시서 목록</h3>
+            {loading && (
+                <span className="text-sm text-gray-500">로딩 중...</span>
+            )}
         </div>
 
         <div className="mb-6">
@@ -43,38 +40,44 @@ const Factory2OrderList = () => {
         </div>
 
         <div className="space-y-6">
-            {workOrders.map((order) => (
-            <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start mb-4">
-                <div>
-                    <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
-                    <p className="text-sm text-gray-600">{order.product}</p>
+            {workOrders.length === 0 && !loading ? (
+                <div className="text-center py-8 text-gray-500">
+                    제조 지시서가 없습니다.
                 </div>
-                <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-1">작업자: {order.manager}</p>
-                </div>
-                </div>
+            ) : (
+                workOrders.map((order) => (
+                <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
+                    <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 className="text-base font-semibold text-gray-900 mb-1">{order.product}</h4>
+                        <p className="text-sm text-gray-600">주문코드: {order.orderCode}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-xs text-gray-500 mb-1">상태: {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}</p>
+                    </div>
+                    </div>
 
-                <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
-                <div className="justify-between">
-                    <span className="text-gray-600">원재료코드</span>
-                    <p className="text-gray-900 font-medium">{order.id}</p>
+                    <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
+                    <div className="justify-between">
+                        <span className="text-gray-600">제품명</span>
+                        <p className="text-gray-900 font-medium">{order.product}</p>
+                    </div>
+                    <div className="justify-between">
+                        <span className="text-gray-600">수량</span>
+                        <p className="text-gray-900 font-medium">{order.quantity}</p>
+                    </div>
+                    <div className="justify-between">
+                        <span className="text-gray-600">주문일</span>
+                        <p className="text-gray-900 font-medium">{order.orderDate}</p>
+                    </div>
+                    <div className="justify-between">
+                        <span className="text-gray-600">마감일</span>
+                        <p className="text-gray-900 font-medium">{order.deadline}</p>
+                    </div>
+                    </div>
                 </div>
-                <div className="justify-between">
-                    <span className="text-gray-600">원재료명</span>
-                    <p className="text-gray-900 font-medium">{order.material}</p>
-                </div>
-                <div className="justify-between">
-                    <span className="text-gray-600">필요량</span>
-                    <p className="text-gray-900 font-medium">{order.quantity}</p>
-                </div>              
-                <div className="justify-between">
-                    <span className="text-gray-600">작업예정일</span>
-                    <p className="text-gray-900 font-medium">{order.deadlineTime}</p>
-                </div>
-                </div>
-            </div>
-            ))}
+                ))
+            )}
         </div>
     </div>
     </div>

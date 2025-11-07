@@ -163,7 +163,16 @@ const basicReducer = (state = initialState, action) => {
     case UPDATE_STORAGE_CONDITION.REQUEST:
       return { ...state, storageOperation: { ...state.storageOperation, loading: true, error: null } };
     case UPDATE_STORAGE_CONDITION.SUCCESS:
-      return { ...state, storageOperation: { data: action.payload, loading: false, error: null } };
+      return {
+        ...state,
+        storageConditions: {
+          ...state.storageConditions,
+          data: state.storageConditions.data.map((storage) =>
+            storage.id === action.payload.id ? action.payload : storage
+          ),
+        },
+        storageOperation: { data: action.payload, loading: false, error: null }
+      };
     case UPDATE_STORAGE_CONDITION.FAILURE:
       return { ...state, storageOperation: { ...state.storageOperation, loading: false, error: action.error } };
 

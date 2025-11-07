@@ -5,7 +5,7 @@ import authReducer from './modules/auth/reducer';
 import userReducer from './modules/user/reducer';
 import inventoryReducer from './modules/inventory/reducer';
 import basicReducer from './modules/basic/reducer';
-// import manufacturingReducer from './modules/manufacturing/reducer';
+import manufacturingReducer from './modules/manufacturing/reducer';
 // import shippingReducer from './modules/shipping/reducer';
 // import receivingReducer from './modules/receiving/reducer';
 // import approvalReducer from './modules/approval/reducer';
@@ -17,8 +17,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   inventory: inventoryReducer,
   basic: basicReducer,
-  // 나머지 모듈은 필요에 따라 추가
-  // manufacturing: manufacturingReducer,
+  manufacturing: manufacturingReducer,
   // shipping: shippingReducer,
   // receiving: receivingReducer,
   // approval: approvalReducer,

@@ -1,30 +1,26 @@
 import { Thermometer, X, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStorageConditions, updateStorageCondition } from '../../store/modules/basic/actions';
 
 const StorageTemperature = () => {
-  const [storageConditions, setStorageConditions] = useState([
-    {
-      id: 1,
-      title: '상온 보관',
-      temperature: '15°C - 25°C',
-      humidity: '40% - 60%',
-      items: ['건조 식료', '포장재'],
-    },
-    {
-      id: 2,
-      title: '냉장 보관',
-      temperature: '0°C - 4°C',
-      humidity: '85% - 95%',
-      items: ['신선 육류', '야채류', '반제품'],
-    },
-    {
-      id: 3,
-      title: '냉동 보관',
-      temperature: '-18°C 이하',
-      humidity: 'N/A',
-      items: ['완제품', '냉동 육류'],
-    },
-  ]);
+  const dispatch = useDispatch();
+
+  // 리덕스 스토어에서 보관 조건 데이터 가져오기
+  const { data: storageConditions, loading } = useSelector((state) => state.basic.storageConditions);
+  const { data: storageOperation } = useSelector((state) => state.basic.storageOperation);
+
+  // 컴포넌트 마운트 시 보관 조건 목록 조회
+  useEffect(() => {
+    dispatch(fetchStorageConditions.request());
+  }, [dispatch]);
+
+  // 보관 조건 업데이트 성공 시 목록 다시 조회
+  useEffect(() => {
+    if (storageOperation) {
+      dispatch(fetchStorageConditions.request());
+    }
+  }, [storageOperation, dispatch]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStorageId, setCurrentStorageId] = useState(null);
@@ -51,29 +47,49 @@ const StorageTemperature = () => {
       return;
     }
 
-    setStorageConditions((prev) =>
-      prev.map((storage) =>
-        storage.id === currentStorageId
-          ? { ...storage, items: [...storage.items, newItem.trim()] }
-          : storage
-      )
-    );
+    // 현재 보관 조건 찾기
+    const currentStorage = storageConditions.find((s) => s.id === currentStorageId);
+    if (currentStorage) {
+      const updatedStorage = {
+        ...currentStorage,
+        items: [...currentStorage.items, newItem.trim()],
+      };
+
+      // 리덕스 액션 dispatch
+      dispatch(updateStorageCondition.request({
+        id: currentStorageId,
+        data: updatedStorage,
+      }));
+    }
 
     handleCloseModal();
   };
 
   const handleRemoveItem = (storageId, itemIndex) => {
-    setStorageConditions((prev) =>
-      prev.map((storage) =>
-        storage.id === storageId
-          ? {
-              ...storage,
-              items: storage.items.filter((_, index) => index !== itemIndex),
-            }
-          : storage
-      )
-    );
+    // 해당 보관 조건 찾기
+    const currentStorage = storageConditions.find((s) => s.id === storageId);
+    if (currentStorage) {
+      const updatedStorage = {
+        ...currentStorage,
+        items: currentStorage.items.filter((_, index) => index !== itemIndex),
+      };
+
+      // 리덕스 액션 dispatch
+      dispatch(updateStorageCondition.request({
+        id: storageId,
+        data: updatedStorage,
+      }));
+    }
   };
+
+  // 로딩 중일 때
+  if (loading) {
+    return (
+      <div className='rounded-xl bg-white p-6 shadow-sm'>
+        <div className='p-4 text-center text-sm text-gray-600'>불러오는 중...</div>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { BarChart3, Clock, CheckCircle, Users } from "lucide-react";
+import { BarChart3, Clock, CheckCircle, Users, Factory } from "lucide-react";
 
 const Factory2WorkList = () => {
  const statusCards = [
@@ -33,7 +33,13 @@ const Factory2WorkList = () => {
   ];
 
   return (
-    <div className="p-5 mb-6">
+    <div className="mb-6">
+      <div className="items-center mb-5">
+        <div className='mb-3 flex items-center space-x-2'>
+          <Factory className='h-5 w-5 text-[#674529]'/>
+          <h2 className="text-lg font-semibold text-[#674529]">2공장 제조</h2>
+        </div>
+      </div>
       <div className="grid grid-cols-4 gap-4">
         {statusCards.map((card, index) => (
           <div

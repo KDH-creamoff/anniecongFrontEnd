@@ -41,9 +41,6 @@ const StatusSummaryBar = () => {
             1공장 전처리 공정
           </h2>
         </div>
-          <p className="text-sm text-gray-500">
-            공정시작 스캔, 투입 바코드 스캔, 전처리 산출 라벨 생성
-        </p>
       </div>
 
       <div className="grid grid-cols-4 gap-4">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MapPin, Clock, Search, Package } from "lucide-react";
+import { MapPin, Clock, Package } from "lucide-react";
 import { fetchInventoryStatus } from "../../store/modules/inventory/actions";
 import {
   selectInventoryStatus,

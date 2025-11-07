@@ -1,34 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchWorkOrders } from '../../store/modules/manufacturing/action';
+import { selectWorkOrders, selectWorkOrdersLoading } from '../../store/modules/manufacturing/selectors';
 
 const WorkOrderList = () => {
+  const dispatch = useDispatch();
   const [filterType, setFilterType] = useState('전체');
 
-  const workOrders = [
-    {
-      id: 'RAW001',
-      title: 'Title',
-      product: '전처리 믹스 A - 10개',
-      material: '닭고기 (가슴살)',
-      quantity: '50 kg',
-      deadlineDate: '2025-10-22',
-      manager: '김전처리',
-    },
-    {
-      id: 'RAW002',
-      title: 'Title',
-      product: '세척',
-      material: '당근',
-      quantity: '100 kg',
-      deadlineDate: '2025-10-23',
-      manager: '나작업',
-    },
-  ];
+  // Redux에서 작업 지시서 목록 가져오기
+  const workOrdersFromRedux = useSelector(selectWorkOrders);
+  const loading = useSelector(selectWorkOrdersLoading);
+
+  // 컴포넌트 마운트 시 작업 지시서 목록 조회
+  useEffect(() => {
+    dispatch(fetchWorkOrders.request());
+  }, [dispatch]);
+
+  const workOrders = workOrdersFromRedux || [];
 
   return (
     <div>
       <div className="mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl text-[#674529]">작업 지시서 목록</h3>
+          {loading && (
+            <span className="text-sm text-gray-500">로딩 중...</span>
+          )}
         </div>
 
         <div className="mb-6">
@@ -43,38 +40,44 @@ const WorkOrderList = () => {
         </div>
 
         <div className="space-y-6">
-          {workOrders.map((order) => (
-            <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
-                  <p className="text-sm text-gray-600">{order.product}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500 mb-1">작업자: {order.manager}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
-                <div className="justify-between">
-                  <span className="text-gray-600">원재료코드</span>
-                  <p className="text-gray-900 font-medium">{order.id}</p>
-                </div>
-                <div className="justify-between">
-                  <span className="text-gray-600">원재료명</span>
-                  <p className="text-gray-900 font-medium">{order.material}</p>
-                </div>
-                <div className="justify-between">
-                  <span className="text-gray-600">필요량</span>
-                  <p className="text-gray-900 font-medium">{order.quantity}</p>
-                </div>              
-                <div className="justify-between">
-                  <span className="text-gray-600">작업예정일</span>
-                  <p className="text-gray-900 font-medium">{order.deadlineDate}</p>
-                </div>
-              </div>
+          {workOrders.length === 0 && !loading ? (
+            <div className="text-center py-8 text-gray-500">
+              작업 지시서가 없습니다.
             </div>
-          ))}
+          ) : (
+            workOrders.map((order) => (
+              <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
+                    <p className="text-sm text-gray-600">{order.product}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 mb-1">작업자: {order.manager}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
+                  <div className="justify-between">
+                    <span className="text-gray-600">원재료코드</span>
+                    <p className="text-gray-900 font-medium">{order.materialCode}</p>
+                  </div>
+                  <div className="justify-between">
+                    <span className="text-gray-600">원재료명</span>
+                    <p className="text-gray-900 font-medium">{order.material}</p>
+                  </div>
+                  <div className="justify-between">
+                    <span className="text-gray-600">필요량</span>
+                    <p className="text-gray-900 font-medium">{order.quantity}</p>
+                  </div>
+                  <div className="justify-between">
+                    <span className="text-gray-600">작업예정일</span>
+                    <p className="text-gray-900 font-medium">{order.deadlineDate}</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

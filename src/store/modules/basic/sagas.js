@@ -1,5 +1,7 @@
 import { put, takeLatest, delay } from 'redux-saga/effects';
-// import { itemsAPI, bomsAPI, storageAPI } from '../../../api'; // TODO: 백엔드 준비 시 주석 해제
+// ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+// import { itemsAPI, bomsAPI, storageAPI } from '../../../api';
+// ===========================================================================
 import {
   FETCH_ITEMS,
   FETCH_ITEM_BY_ID,
@@ -34,6 +36,41 @@ import {
 } from './actions';
 
 // ==================== 목데이터 ====================
+// 원재료 마스터 데이터 (필요 시 사용)
+// eslint-disable-next-line no-unused-vars
+const rawMaterialMaster = [
+  { code: 'RAW001', name: '닭고기(가슴살)' },
+  { code: 'RAW002', name: '당근' },
+  { code: 'RAW003', name: '양파' },
+  { code: 'RAW004', name: '감자' },
+  { code: 'RAW005', name: '대파' },
+  { code: 'RAW006', name: '마늘' },
+  { code: 'RAW007', name: '생강' },
+  { code: 'RAW008', name: '간장' },
+  { code: 'RAW009', name: '설탕' },
+  { code: 'RAW010', name: '참기름' },
+  { code: 'RAW011', name: '소금' },
+  { code: 'RAW012', name: '후추' },
+  { code: 'RAW013', name: '고춧가루' },
+  { code: 'RAW014', name: '식용유' },
+  { code: 'RAW015', name: '돼지고기(삼겹살)' },
+  { code: 'RAW016', name: '소고기(불고기용)' },
+  { code: 'RAW017', name: '두부' },
+  { code: 'RAW018', name: '배추' },
+  { code: 'RAW019', name: '무' },
+  { code: 'RAW020', name: '애호박' },
+  { code: 'RAW021', name: '버섯(표고)' },
+  { code: 'RAW022', name: '버섯(양송이)' },
+  { code: 'RAW023', name: '파프리카(빨강)' },
+  { code: 'RAW024', name: '파프리카(노랑)' },
+  { code: 'RAW025', name: '브로콜리' },
+  { code: 'RAW026', name: '양배추' },
+  { code: 'RAW027', name: '청경채' },
+  { code: 'RAW028', name: '시금치' },
+  { code: 'RAW029', name: '숙주' },
+  { code: 'RAW030', name: '콩나물' },
+];
+
 let mockItems = [
   {
     id: 1,
@@ -206,13 +243,95 @@ function* deleteItemSaga(action) {
 }
 
 // BOM 목데이터
-let mockBoms = [];
+let mockBoms = [
+  {
+    id: 1,
+    name: '애니콩 펫디너 비프',
+    bomName: '애니콩 펫디너 비프',
+    description: '비프 펫디너 제조용 BOM',
+    updatedAt: '2025-10-13',
+    updated_at: '2025-10-13',
+    materials: [
+      { id: 1, code: 'RAW016', name: '소고기(불고기용)', amount: 180, unit: 'g' },
+      { id: 2, code: 'RAW003', name: '양파', amount: 80, unit: 'g' },
+      { id: 3, code: 'RAW006', name: '마늘', amount: 20, unit: 'g' },
+    ],
+    components: [
+      { id: 1, itemCode: 'RAW016', item: { code: 'RAW016', name: '소고기(불고기용)', unit: 'g' }, quantity: 180, unit: 'g' },
+      { id: 2, itemCode: 'RAW003', item: { code: 'RAW003', name: '양파', unit: 'g' }, quantity: 80, unit: 'g' },
+      { id: 3, itemCode: 'RAW006', item: { code: 'RAW006', name: '마늘', unit: 'g' }, quantity: 20, unit: 'g' },
+    ],
+  },
+  {
+    id: 2,
+    name: '애니콩 펫디너 치킨',
+    bomName: '애니콩 펫디너 치킨',
+    description: '치킨 펫디너 제조용 BOM',
+    updatedAt: '2025-10-10',
+    updated_at: '2025-10-10',
+    materials: [
+      { id: 4, code: 'RAW001', name: '닭가슴살', amount: 200, unit: 'g' },
+      { id: 5, code: 'RAW002', name: '밀가루', amount: 50, unit: 'g' },
+      { id: 6, code: 'RAW003', name: '양파', amount: 30, unit: 'g' },
+    ],
+    components: [
+      { id: 4, itemCode: 'RAW001', item: { code: 'RAW001', name: '닭가슴살', unit: 'g' }, quantity: 200, unit: 'g' },
+      { id: 5, itemCode: 'RAW002', item: { code: 'RAW002', name: '밀가루', unit: 'g' }, quantity: 50, unit: 'g' },
+      { id: 6, itemCode: 'RAW003', item: { code: 'RAW003', name: '양파', unit: 'g' }, quantity: 30, unit: 'g' },
+    ],
+  },
+  {
+    id: 3,
+    name: '콩부장쿠키',
+    bomName: '콩부장쿠키',
+    description: '콩부장쿠키 제조용 BOM',
+    updatedAt: '2025-09-28',
+    updated_at: '2025-09-28',
+    materials: [
+      { id: 7, code: 'RAW002', name: '밀가루', amount: 2, unit: 'kg' },
+      { id: 8, code: 'RAW001', name: '닭가슴살', amount: 0.5, unit: 'kg' },
+      { id: 9, code: 'CONS001', name: '포장박스', amount: 1, unit: 'ea' },
+    ],
+    components: [
+      { id: 7, itemCode: 'RAW002', item: { code: 'RAW002', name: '밀가루', unit: 'kg' }, quantity: 2, unit: 'kg' },
+      { id: 8, itemCode: 'RAW001', item: { code: 'RAW001', name: '닭가슴살', unit: 'kg' }, quantity: 0.5, unit: 'kg' },
+      { id: 9, itemCode: 'CONS001', item: { code: 'CONS001', name: '포장박스', unit: 'ea' }, quantity: 1, unit: 'ea' },
+    ],
+  },
+];
 
-// 보관 조건 목데이터
+// 보관 조건 목데이터 (StorageTemperature 컴포넌트 데이터)
 let mockStorageConditions = [
-  { id: 1, name: '냉동', minTemp: -18, maxTemp: -10 },
-  { id: 2, name: '냉장', minTemp: 0, maxTemp: 10 },
-  { id: 3, name: '실온', minTemp: 15, maxTemp: 25 },
+  {
+    id: 1,
+    name: '상온',
+    title: '상온 보관',
+    temperature: '15°C - 25°C',
+    minTemp: 15,
+    maxTemp: 25,
+    humidity: '40% - 60%',
+    items: ['건조 식료', '포장재'],
+  },
+  {
+    id: 2,
+    name: '냉장',
+    title: '냉장 보관',
+    temperature: '0°C ~ 5°C',
+    minTemp: 0,
+    maxTemp: 5,
+    humidity: '85% - 95%',
+    items: ['신선 육류', '야채류', '반제품'],
+  },
+  {
+    id: 3,
+    name: '냉동',
+    title: '냉동 보관',
+    temperature: '-18°C 이하',
+    minTemp: -18,
+    maxTemp: -18,
+    humidity: 'N/A',
+    items: ['완제품', '냉동 육류'],
+  },
 ];
 
 function* fetchBomsSaga(/* action */) {
@@ -253,9 +372,12 @@ function* createBomSaga(action) {
     // yield put(createBom.success(response.data));
 
     yield delay(500);
+    const currentDate = new Date().toISOString().split('T')[0];
     const newBom = {
       id: mockBoms.length + 1,
       ...action.payload,
+      updatedAt: currentDate,
+      updated_at: currentDate,
     };
     mockBoms = [...mockBoms, newBom];
     yield put(createBom.success(newBom));
@@ -275,7 +397,14 @@ function* updateBomSaga(action) {
     const { id, data } = action.payload;
     const index = mockBoms.findIndex((b) => b.id === id);
     if (index !== -1) {
-      mockBoms[index] = { ...mockBoms[index], ...data };
+      // 업데이트 날짜 자동 갱신
+      const currentDate = new Date().toISOString().split('T')[0];
+      mockBoms[index] = {
+        ...mockBoms[index],
+        ...data,
+        updatedAt: currentDate,
+        updated_at: currentDate,
+      };
       yield put(updateBom.success(mockBoms[index]));
     } else {
       yield put(updateBom.failure('BOM을 찾을 수 없습니다.'));
@@ -299,12 +428,15 @@ function* deleteBomSaga(action) {
   }
 }
 
+// ==================== 보관 조건(Storage) Saga ====================
 function* fetchStorageConditionsSaga(/* action */) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
     // const response = yield call(storageAPI.getStorage, action.payload);
     // yield put(fetchStorageConditions.success(response.data));
+    // ===========================================================================
 
+    // 임시 목데이터 사용
     yield delay(500);
     yield put(fetchStorageConditions.success(mockStorageConditions));
   } catch (error) {
@@ -314,10 +446,12 @@ function* fetchStorageConditionsSaga(/* action */) {
 
 function* fetchStorageConditionSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
     // const response = yield call(storageAPI.getStorage, action.payload);
     // yield put(fetchStorageCondition.success(response.data));
+    // ===========================================================================
 
+    // 임시 목데이터 사용
     yield delay(500);
     const storage = mockStorageConditions.find((s) => s.id === action.payload);
     if (storage) {
@@ -332,10 +466,12 @@ function* fetchStorageConditionSaga(action) {
 
 function* createStorageConditionSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
     // const response = yield call(storageAPI.createStorage, action.payload);
     // yield put(createStorageCondition.success(response.data));
+    // ===========================================================================
 
+    // 임시 목데이터 사용
     yield delay(500);
     const newStorage = {
       id: mockStorageConditions.length + 1,
@@ -350,11 +486,13 @@ function* createStorageConditionSaga(action) {
 
 function* updateStorageConditionSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
     // const { id, data } = action.payload;
     // const response = yield call(storageAPI.updateStorage, id, data);
     // yield put(updateStorageCondition.success(response.data));
+    // ===========================================================================
 
+    // 임시 목데이터 사용
     yield delay(500);
     const { id, data } = action.payload;
     const index = mockStorageConditions.findIndex((s) => s.id === id);
