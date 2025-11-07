@@ -95,7 +95,6 @@ export default function InventoryStatusList({ filters }) {
               <th className="px-4 py-3 text-left text-sm font-medium">바코드번호</th>
               <th className="px-4 py-3 text-left text-sm font-medium">유통기한</th>
               <th className="px-4 py-3 text-left text-sm font-medium">상태</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">이력</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -148,11 +147,6 @@ export default function InventoryStatusList({ filters }) {
                     </td>
                     <td className="px-4 py-4">
                       <span className={`inline-flex rounded px-3 py-1 text-xs font-medium ${badge}`}>{d?.status}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <button className="text-gray-500 transition-colors hover:text-[#674529]">
-                        <Search className="h-5 w-5 text-[#674529]" />
-                      </button>
                     </td>
                   </tr>
                 );

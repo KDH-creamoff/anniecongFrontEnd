@@ -76,7 +76,7 @@ const LabelPrintModal = ({ isOpen, onClose, onPrintComplete, itemData }) => {
                   onChange={(e) => setLabelSize(e.target.value)}
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
                 >
-                  <option value='템플릿 양식 선택'>템플릿 양식 선택</option>
+                  <option value='템플릿 양식 선택' disabled hidden>템플릿 양식 선택</option>
                   <option value='100X100'>100X100</option>
                   <option value='80X60'>80X60</option>
                   <option value='40X20'>40X20</option>
@@ -94,7 +94,7 @@ const LabelPrintModal = ({ isOpen, onClose, onPrintComplete, itemData }) => {
                   onChange={(e) => setCategory(e.target.value)}
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
                 >
-                  <option value='제품명 선택'>제품명 선택</option>
+                  <option value='제품명 선택' disabled hidden>제품명 선택</option>
                   <option value='당근'>당근</option>
                   <option value='닭고기 (가슴살)'>닭고기 (가슴살)</option>
                   <option value='소고기(등심)'>소고기(등심)</option>

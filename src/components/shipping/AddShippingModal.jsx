@@ -87,7 +87,7 @@ const AddShippingModal = ({ isOpen, onClose, onSubmit }) => {
                   required
                   className='w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
                 >
-                  <option value=''>품목을 선택하세요</option>
+                  <option value='' disabled hidden>품목을 선택하세요</option>
                   {items.map((item) => (
                     <option key={item.code} value={item.name}>
                       {item.name}

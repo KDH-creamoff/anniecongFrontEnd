@@ -8,8 +8,8 @@ const TemperatureInput = ({ onFilterChange }) => {
   const dispatch = useDispatch();
   const [filters, setFilters] = useState({
     date: new Date().toISOString().split('T')[0],
-    hour: '',
-    minute: '',
+    hour: '00',
+    minute: '00',
     storageType: '냉장고',
     temperature: '',
     inspector: '',
@@ -17,14 +17,14 @@ const TemperatureInput = ({ onFilterChange }) => {
 
   const storageTypes = ['냉장고', '냉동고', '상온'];
 
-  // 시간 옵션 (00-23)
+  // 시간 옵션
   const hours = Array.from({ length: 24 }, (_, i) =>
     String(i).padStart(2, '0')
   );
 
-  // 분 옵션 (00-59)
-  const minutes = Array.from({ length: 60 }, (_, i) =>
-    String(i).padStart(2, '0')
+  // 분 옵션
+  const minutes = Array.from({ length: 12 }, (_, i) =>
+    String(i * 5).padStart(2, '0')
   );
 
   const handleFilterChange = (key, value) => {
@@ -60,8 +60,8 @@ const TemperatureInput = ({ onFilterChange }) => {
 
     setFilters({
       date: new Date().toISOString().split('T')[0],
-      hour: '',
-      minute: '',
+      hour: '00',
+      minute: '00',
       storageType: filters.storageType,
       temperature: '',
       inspector: '',
@@ -101,14 +101,13 @@ const TemperatureInput = ({ onFilterChange }) => {
                 onChange={(e) => handleFilterChange('hour', e.target.value)}
                 className='w-full cursor-pointer appearance-none rounded-xl border-0 bg-[#f3f3f5] px-4 py-2.5 text-[#000] outline-none transition-all'
               >
-                <option value=''>00</option>
                 {hours.map((h) => (
                   <option key={h} value={h}>
                     {h}
                   </option>
                 ))}
               </select>
-              <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-[#674529]' />
+              <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform' />
             </div>
             <span className='text-[#000]'>:</span>
             <div className='relative flex-1'>
@@ -117,14 +116,13 @@ const TemperatureInput = ({ onFilterChange }) => {
                 onChange={(e) => handleFilterChange('minute', e.target.value)}
                 className='w-full cursor-pointer appearance-none rounded-xl border-0 bg-[#f3f3f5] px-4 py-2.5 text-[#000] outline-none transition-all'
               >
-                <option value=''>00</option>
                 {minutes.map((m) => (
                   <option key={m} value={m}>
                     {m}
                   </option>
                 ))}
               </select>
-              <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-[#674529]' />
+              <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform' />
             </div>
           </div>
         </div>
@@ -146,7 +144,7 @@ const TemperatureInput = ({ onFilterChange }) => {
                 </option>
               ))}
             </select>
-            <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-[#674529]' />
+            <ChevronDown className='pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 transform' />
           </div>
         </div>
 

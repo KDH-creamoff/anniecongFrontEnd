@@ -82,7 +82,7 @@ const WorkOrderForm = () => {
                 onChange={(e) => setSelectedManager(e.target.value)}
                 className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
               >
-                <option value="">담당자 선택</option>
+                <option value="" disabled hidden>담당자 선택</option>
                 {managerOptions.map((manager) => (
                   <option key={manager} value={manager}>
                     {manager}
@@ -95,7 +95,7 @@ const WorkOrderForm = () => {
               <div className="flex items-center gap-4">
                 <label className="w-24 text-sm text-gray-700">이름</label>
                 <select className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400">
-                  <option value="">이름 선택</option>
+                  <option value="" disabled hidden>이름 선택</option>
                   {namesByManager[selectedManager]?.map((name) => (
                     <option key={name} value={name}>
                       {name}
@@ -130,7 +130,7 @@ const WorkOrderForm = () => {
             <div className="flex items-center gap-4">
               <label className="w-24 text-sm text-gray-700">BOM</label>
               <select className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400">
-                <option value="">BOM 선택</option>
+                <option value="" disabled hidden>BOM 선택</option>
                 {bomOptions.map((bom) => (
                   <option key={bom} value={bom}>
                     {bom}
@@ -164,7 +164,7 @@ const WorkOrderForm = () => {
                 onChange={(e) => setSelectedManagerBom(e.target.value)}
                 className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
               >
-                <option value="">담당자 선택</option>
+                <option value="" disabled hidden>담당자 선택</option>
                 {managerOptions.map((manager) => (
                   <option key={manager} value={manager}>
                     {manager}
@@ -177,7 +177,7 @@ const WorkOrderForm = () => {
               <div className="flex items-center gap-4">
                 <label className="w-24 text-sm text-gray-700">이름</label>
                 <select className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400">
-                  <option value="">이름 선택</option>
+                  <option value="" disabled hidden>이름 선택</option>
                   {namesByManager[selectedManagerBom]?.map((name) => (
                     <option key={name} value={name}>
                       {name}

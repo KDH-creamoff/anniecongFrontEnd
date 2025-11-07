@@ -113,7 +113,7 @@ const BasicNewItem = () => {
   const factorySelect = useMemo(() => {
     return (
       <>
-        <option value="">공장 선택</option>
+        <option value="" disabled hidden>공장 선택</option>
         {factoryOptions.map((f) => (
           <option key={f.id} value={f.id}>
             {f.name}
@@ -126,7 +126,7 @@ const BasicNewItem = () => {
   const storageSelect = useMemo(() => {
     return (
       <>
-        <option value="">보관조건 선택</option>
+        <option value="" disabled hidden>보관조건 선택</option>
         {storageOptions.map((opt) => (
           <option key={opt} value={opt}>
             {opt}
@@ -190,7 +190,7 @@ const BasicNewItem = () => {
               } bg-gray-100 px-4 py-2.5 text-sm`}
               disabled={itemOperationLoading}
             >
-              <option value="">카테고리 선택</option>
+              <option value="" disabled hidden>카테고리 선택</option>
               <option value="원재료">원재료</option>
               <option value="반재료">반재료</option>
               <option value="완제품">완제품</option>
@@ -282,7 +282,7 @@ const BasicNewItem = () => {
               } bg-gray-100 px-4 py-2.5 text-sm`}
               disabled={itemOperationLoading}
             >
-              <option value="">단위</option>
+              <option value="" disabled hidden>단위</option>
               <option value='kg'>kg</option>
               <option value='g'>g</option>
               <option value='ea'>ea</option>

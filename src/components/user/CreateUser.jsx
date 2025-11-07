@@ -185,7 +185,7 @@ const CreateUser = () => {
             onChange={handleInputChange}
             className='w-full rounded bg-gray-100 py-2 pl-3 pr-8 text-sm text-gray-500 focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
           >
-            <option value=''>부서 선택</option>
+            <option value='' disabled hidden>부서 선택</option>
             <option value='관리부'>관리</option>
             <option value='생산부'>생산</option>
             <option value='품질부'>경영지원</option>
@@ -221,7 +221,7 @@ const CreateUser = () => {
             onChange={handleInputChange}
             className='w-full rounded bg-gray-100 py-2 pl-3 pr-8 text-sm text-gray-500 focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]'
           >
-            <option value=''>공장 선택</option>
+            <option value='' disabled hidden>공장 선택</option>
             <option value='ALL'>ALL</option>
             <option value='P1'>P1</option>
             <option value='P2'>P2</option>

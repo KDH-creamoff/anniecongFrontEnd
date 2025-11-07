@@ -396,7 +396,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                   onChange={(e) => handleSettingsChange('ceo', e.target.value)}
                   className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
                 >
-                  <option value=''>대표 선택</option>
+                  <option value='' disabled hidden>대표 선택</option>
                   <option value='김대표'>김대표</option>
                   <option value='이대표'>이대표</option>
                   <option value='박대표'>박대표</option>
@@ -413,7 +413,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                   onChange={(e) => handleSettingsChange('director', e.target.value)}
                   className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
                 >
-                  <option value=''>이사 선택</option>
+                  <option value='' disabled hidden>이사 선택</option>
                   <option value='김이사'>김이사</option>
                   <option value='이이사'>이이사</option>
                   <option value='박이사'>박이사</option>
@@ -430,7 +430,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                   onChange={(e) => handleSettingsChange('teamLeader', e.target.value)}
                   className='w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#724323] focus:border-transparent transition-all bg-white'
                 >
-                  <option value=''>팀장 선택</option>
+                  <option value='' disabled hidden>팀장 선택</option>
                   <option value='김팀장'>김팀장</option>
                   <option value='이팀장'>이팀장</option>
                   <option value='박팀장'>박팀장</option>

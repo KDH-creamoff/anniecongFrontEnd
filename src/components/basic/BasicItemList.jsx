@@ -209,7 +209,7 @@ const BasicItemList = () => {
                           className="w-full rounded border border-gray-200 px-2 py-1 text-xs"
                           disabled={itemOperationLoading}
                         >
-                          <option value="">선택</option>
+                          <option value="" disabled hidden>선택</option>
                           {factoryOptions.map((opt, idx) => (
                             <option key={opt} value={idx + 1}>{opt}</option>
                           ))}
@@ -230,7 +230,7 @@ const BasicItemList = () => {
                           className="w-full rounded border border-gray-200 px-2 py-1 text-xs"
                           disabled={itemOperationLoading}
                         >
-                          <option value="">선택</option>
+                          <option value="" disabled hidden>선택</option>
                           {storageOptions.map(opt => (
                             <option key={opt} value={opt}>{opt}</option>
                           ))}

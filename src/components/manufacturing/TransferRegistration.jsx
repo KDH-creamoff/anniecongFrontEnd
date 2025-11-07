@@ -124,7 +124,7 @@ const TransferRegistration = () => {
                   onChange={(e) => handleRawMaterialChange(index, 'name', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#674529] text-sm"
                 >
-                  <option value="">품목명 선택</option>
+                  <option value="" disabled hidden>품목명 선택</option>
                   {items.map((item) => (
                     <option key={item.code} value={item.name}>
                       {item.name}
