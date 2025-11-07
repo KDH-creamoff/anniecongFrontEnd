@@ -7,7 +7,7 @@ const TransferStatus = () => {
   const dispatch = useDispatch();
   const transfers = useSelector(selectTransfers) || [];
   const loading = useSelector(selectTransfersLoading);
-  const [selectedTransport, setSelectedTransport] = useState('전체');
+  const [selectedStatus, setSelectedStatus] = useState('전체');
 
   useEffect(() => {
     dispatch(fetchTransfers.request());
@@ -42,9 +42,9 @@ const TransferStatus = () => {
   };
 
   const filteredTransfers =
-    selectedTransport === '전체'
+    selectedStatus === '전체'
       ? transfers
-      : transfers.filter((t) => t.transportMethod === selectedTransport);
+      : transfers.filter((t) => t.status === selectedStatus);
 
   if (loading) {
     return (
@@ -62,15 +62,14 @@ const TransferStatus = () => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold text-[#674529]">이송 현황</h3>
         <select
-          value={selectedTransport}
-          onChange={(e) => setSelectedTransport(e.target.value)}
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
         >
           <option value="전체">전체</option>
-          <option value="트럭">트럭</option>
-          <option value="팔레트">팔레트</option>
-          <option value="박스">박스</option>
-          <option value="컨테이너">컨테이너</option>
+          <option value="pending">이동대기</option>
+          <option value="in_transit">이동중</option>
+          <option value="completed">이동완료</option>
         </select>
       </div>
 
