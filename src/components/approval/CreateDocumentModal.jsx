@@ -40,6 +40,11 @@ import ImageTemplate36 from '../template/ImageTemplate/36_ImageTemplate';
 import ImageTemplate37 from '../template/ImageTemplate/37_ImageTemplate';
 import OverseasBusinessTripRequest from '../template/38_OverseasBusinessTripRequest';
 import ToiletCleaningChecklist from '../template/39_ToiletCleaningChecklist';
+import AnnualApplication from '../template/LeaveApplications/40_AnnualApplication';
+import EarlyDepartureApplication from '../template/LeaveApplications/41_EarlyDepartureApplication';
+import AnnualLeaveApplication from '../template/LeaveApplications/42_AnnualLeaveApplication';
+import FamilyCareLeaveApplication from '../template/LeaveApplications/43_FamilyCareLeaveApplication';
+import PackagingInspectionReport from '../template/44_PackagingInspectionReport';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -295,7 +300,37 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       name: '화장실 청소 점검표',
       description: 'TOILET CLEANING CHECK LIST',
       component: ToiletCleaningChecklist,
-    }
+    },
+    {
+      id: 'template-40',
+      name: '연차 신청서',
+      description: '',
+      component: AnnualApplication,
+    },
+    {
+      id: 'template-41',
+      name: '조기퇴근 신청서',
+      description: '',
+      component: EarlyDepartureApplication,
+    },
+    {
+      id: 'template-42',
+      name: '연차휴가신청서',
+      description: '',
+      component: AnnualLeaveApplication,
+    },
+    {
+      id: 'template-43',
+      name: '가족돌봄휴가 신청서',
+      description: '',
+      component: FamilyCareLeaveApplication,
+    },
+    {
+      id: 'template-44',
+      name: '용기 및 포장 외관검사 보고서',
+      description: '',
+      component: PackagingInspectionReport,
+    },
   ];
 
   if (!isOpen) return null;
