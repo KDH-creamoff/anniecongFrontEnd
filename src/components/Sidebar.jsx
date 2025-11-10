@@ -47,7 +47,9 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
           {!isCollapsed ? (
             <>
               <div className='flex items-center space-x-2'>
-                <div className='h-7 w-7 rounded bg-[#674529]'></div>
+                <div className='h-7 w-8 rounded'>
+                  <img src="/logo.png" alt="logo" className='flex w-full object-cover' />
+                </div>
                 <div>
                   <div className='text-sm font-bold'>애니콩</div>
                   <div className='text-[10px] text-gray-500'>펫 베이커리</div>

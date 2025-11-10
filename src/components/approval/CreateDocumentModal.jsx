@@ -36,6 +36,10 @@ import CCPMonitoringLog from '../template/32_CCPMonitoringLog';
 import HACCPTrainingPlan from '../template/33_HACCPTrainingPlan';
 import WasteManagementLedger from '../template/34_WasteManagementLedger';
 import HygieneSafetyInspectionLog from '../template/35_HygieneSafetyInspectionLog';
+import ImageTemplate36 from '../template/ImageTemplate/36_ImageTemplate';
+import ImageTemplate37 from '../template/ImageTemplate/37_ImageTemplate';
+import OverseasBusinessTripRequest from '../template/38_OverseasBusinessTripRequest';
+import ToiletCleaningChecklist from '../template/39_ToiletCleaningChecklist';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -268,6 +272,30 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       description: '',
       component: HygieneSafetyInspectionLog,
     },
+    {
+      id: 'template-36',
+      name: '',
+      description: '',
+      component: ImageTemplate36,
+    },
+    {
+      id: 'template-37',
+      name: '',
+      description: '',
+      component: ImageTemplate37,
+    },
+    {
+      id: 'template-38',
+      name: '애니콩 공문서',
+      description: '',
+      component: OverseasBusinessTripRequest,
+    },
+    {
+      id: 'template-39',
+      name: '화장실 청소 점검표',
+      description: 'TOILET CLEANING CHECK LIST',
+      component: ToiletCleaningChecklist,
+    }
   ];
 
   if (!isOpen) return null;
