@@ -45,6 +45,9 @@ import EarlyDepartureApplication from '../template/LeaveApplications/41_EarlyDep
 import AnnualLeaveApplication from '../template/LeaveApplications/42_AnnualLeaveApplication';
 import FamilyCareLeaveApplication from '../template/LeaveApplications/43_FamilyCareLeaveApplication';
 import PackagingInspectionReport from '../template/44_PackagingInspectionReport';
+import NewProductDevelopmentReport from '../template/45_NewProductDevelopmentReport';
+import DomesticBusinessTripReport from '../template/46_DomesticBusinessTripReport';
+import BusinessTripExpenseReport from '../template/47_BusinessTripExpenseReport';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -330,6 +333,24 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       name: '용기 및 포장 외관검사 보고서',
       description: '',
       component: PackagingInspectionReport,
+    },
+    {
+      id: 'template-45',
+      name: '신제품 개발기획서',
+      description: '',
+      component: NewProductDevelopmentReport,
+    },
+    {
+      id: 'template-46',
+      name: '국내출장 보고서',
+      description: '',
+      component: DomesticBusinessTripReport,
+    },
+    {
+      id: 'template-47',
+      name: '출장비 내역서',
+      description: '',
+      component: BusinessTripExpenseReport,
     },
   ];
 
