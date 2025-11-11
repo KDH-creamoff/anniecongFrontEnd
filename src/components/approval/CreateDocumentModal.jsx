@@ -48,6 +48,9 @@ import PackagingInspectionReport from '../template/44_PackagingInspectionReport'
 import NewProductDevelopmentReport from '../template/45_NewProductDevelopmentReport';
 import DomesticBusinessTripReport from '../template/46_DomesticBusinessTripReport';
 import BusinessTripExpenseReport from '../template/47_BusinessTripExpenseReport';
+import TravelExpenseSettlement from '../template/48_TravelExpenseSettlement';
+import PurchaseOrder from '../template/49_PurchaseOrder';
+import PetFoodProductDevelopment from '../template/50_PetFoodProductDevelopment';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -352,6 +355,24 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
       description: '',
       component: BusinessTripExpenseReport,
     },
+    {
+      id: 'template-48',
+      name: '제작 기획안',
+      description: '',
+      component: TravelExpenseSettlement,
+    },
+    {
+      id: 'template-49',
+      name: '발주서',
+      description: 'PURCHASE ORDER',
+      component: PurchaseOrder,
+    },
+    {
+      id: 'template-50',
+      name: '펫푸드 제품 개발의뢰서',
+      description: '',
+      component: PetFoodProductDevelopment,
+    }
   ];
 
   if (!isOpen) return null;
