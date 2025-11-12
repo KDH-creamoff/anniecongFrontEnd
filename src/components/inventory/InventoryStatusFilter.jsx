@@ -113,7 +113,7 @@ const InventoryStatusFilter = ({ onFilterChange }) => {
 
         {/* 검색 */}
         <div>
-          <label className='mb-2 block text-sm font-medium text-[#674529]'>
+          <label className='mb-2 block text-sm font-medium'>
             검색
           </label>
           <input
@@ -121,7 +121,7 @@ const InventoryStatusFilter = ({ onFilterChange }) => {
             value={filters.searchTerm}
             onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
             placeholder='품목명 또는 코드'
-            className='w-full rounded-xl border border-gray-300 px-4 py-2.5 text-[#674529] placeholder-gray-400 outline-none transition-all focus:border-transparent'
+            className='w-full rounded-xl border border-gray-300 px-4 py-2.5 placeholder-gray-400 outline-none transition-all focus:border-transparent'
           />
         </div>
 

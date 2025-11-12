@@ -37,9 +37,6 @@ const Dash = () => {
         <h1 className='text-2xl font-bold' style={{ color: '#674529' }}>
           애니콩 펫베이커리 제조관리 시스템
         </h1>
-        <p className='mt-1 text-sm text-gray-600'>
-          2025년 9월 11일 목요일 · 듀얼 플랜트 운영 중
-        </p>
       </div>
 
       {/* 제조 관리 통계 */}

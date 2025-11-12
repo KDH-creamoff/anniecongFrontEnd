@@ -3,7 +3,6 @@ import { Package } from 'lucide-react';
 import BasicTabSelector from '../components/basic/BasicTabSelector';
 import BasicNewItem from '../components/basic/BasicNewItem';
 import BasicItemList from '../components/basic/BasicItemList';
-import FactoryInfo from '../components/basic/FactoryInfo';
 import BOMManagement from '../components/basic/BOMManagement';
 import StorageTemperature from '../components/basic/StorageTemperature';
 
@@ -17,12 +16,6 @@ const Basic = () => {
           <>
             <BasicNewItem />
             <BasicItemList />
-          </>
-        );
-      case 'processes':
-        return (
-          <>
-            <FactoryInfo />
           </>
         );
       case 'bom':
@@ -52,9 +45,6 @@ const Basic = () => {
             기초정보 설정
           </h1>
         </div>
-        <p className='text-sm text-gray-600'>
-          품목 등록, 공정 정보, 바코드 템플릿 관리
-        </p>
       </div>
 
       {/* 탭 선택 */}

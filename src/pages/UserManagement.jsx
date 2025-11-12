@@ -38,11 +38,11 @@ const UserManagement = ({ subPage }) => {
   const getPageDescription = () => {
     switch (subPage) {
       case 'nav1':
-        return 'RBAC 기반 접근제어, 사용자 등록 및 관리';
+        return '사용자 관리';
       case 'nav2':
         return '사용자 권한 설정 및 관리';
       default:
-        return 'RBAC 기반 접근제어, 사용자 등록 및 권한 설정';
+        return '';
     }
   };
 

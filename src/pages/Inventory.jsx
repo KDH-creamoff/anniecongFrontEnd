@@ -75,9 +75,6 @@ const Inventory = () => {
               재고/이력 조회
             </h1>
           </div>
-          <p className='text-sm text-gray-600'>
-            공장, 창고, 로트, 유통기한 필터 및 바코드 히스토리
-          </p>
         </div>
         <button
           onClick={handleExport}
