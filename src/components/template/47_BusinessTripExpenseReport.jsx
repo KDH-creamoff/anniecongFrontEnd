@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import ContentEditor from '../common/ContentEditor';
 
 const BusinessTripExpenseReport = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
@@ -31,27 +32,11 @@ const BusinessTripExpenseReport = ({ pdfRef }) => {
     reporterName: '',
   });
 
-  const [receiptImages, setReceiptImages] = useState([]);
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleAddReceiptImage = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      id: Date.now() + Math.random(),
-      file: file,
-      url: URL.createObjectURL(file)
-    }));
-    setReceiptImages(prev => [...prev, ...newImages]);
-  };
-
-  const handleRemoveReceiptImage = (id) => {
-    setReceiptImages(prev => prev.filter(img => img.id !== id));
   };
 
   return (
@@ -291,45 +276,11 @@ const BusinessTripExpenseReport = ({ pdfRef }) => {
 
           {/* 비고 */}
           <tr>
-            <td className="border border-black px-3 py-3 relative min-h-[150px]" colSpan={3}>
+            <td className="border border-black px-3 py-3 relative" colSpan={3}>
               <div className="text-xs mb-2">
                 <span>(별첨 : 교통비명세서, 영수증, 숙박영수증 등 부착)</span>
               </div>
-
-              {/* 영수증 이미지 표시 영역 */}
-              {receiptImages.length > 0 && (
-                <div className="flex flex-col gap-3 mt-3 mb-16">
-                  {receiptImages.map((image) => (
-                    <div key={image.id} className="relative">
-                      <img
-                        src={image.url}
-                        alt="영수증"
-                        className="w-full h-auto max-h-[400px] object-contain border border-gray-300"
-                      />
-                      <button
-                        onClick={() => handleRemoveReceiptImage(image.id)}
-                        className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs print:hidden"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* 영수증 추가 버튼 - td 내 하단 오른쪽 위치 */}
-              <div className="absolute bottom-2 right-3 print:hidden">
-                <label className="cursor-pointer bg-[#674529] hover:bg-[#523620] text-white px-4 py-2 rounded text-xs font-medium transition-colors flex items-center gap-1 shadow">
-                  <span>이미지 추가</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleAddReceiptImage}
-                    className="hidden"
-                  />
-                </label>
-              </div>
+              <ContentEditor minHeight="150px" placeholder="" />
             </td>
           </tr>
         </tbody>

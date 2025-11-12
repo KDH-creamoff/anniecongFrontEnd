@@ -16,8 +16,6 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "express": "^5.1.0",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.3",
     "lucide-react": "^0.545.0",
     "ogl": "^1.0.11",
     "puppeteer": "^24.26.0",

@@ -198,7 +198,7 @@ const PackagingInspectionReport = ({ pdfRef }) => {
                     className="w-full text-center outline-none bg-transparent"
                   />
                 </td>
-                <td rowSpan={4} className="border border-black text-center p-2">
+                <td rowSpan={4} className="border border-black text-center p-1">
                   <label className="cursor-pointer block w-full h-full min-h-[60px] flex items-center justify-center">
                     <input
                       type="file"

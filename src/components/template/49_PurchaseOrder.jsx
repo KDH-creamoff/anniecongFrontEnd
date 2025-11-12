@@ -223,7 +223,10 @@ const PurchaseOrder = ({ pdfRef }) => {
                   <span className="mr-2">1)</span>
                   <div className="flex-1">
                     <span>지출조건 :</span>
-                    <span className="ml-2">납품 완료 후 30일 이내</span>
+                    <input
+                      type="text"
+                      className="ml-2 flex-1 outline-none"
+                    />
                   </div>
                 </div>
                 <div className="flex">

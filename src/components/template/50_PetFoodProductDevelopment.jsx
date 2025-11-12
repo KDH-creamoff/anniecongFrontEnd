@@ -1,9 +1,8 @@
 import { useState, useRef } from 'react';
+import ContentEditor from '../common/ContentEditor';
 
 const PetFoodProductDevelopment = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
-  const competitorFileInputRef = useRef();
-  const referenceFileInputRef = useRef();
 
   const [formData, setFormData] = useState({
     year: '',
@@ -21,68 +20,12 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
     possiblePrice: '',
   });
 
-  const [competitorContent, setCompetitorContent] = useState([]);
-  const [referenceContent, setReferenceContent] = useState([]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
-  };
-
-  // 경쟁사 - 텍스트 추가
-  const addCompetitorText = () => {
-    setCompetitorContent(prev => [...prev, { type: 'text', content: '' }]);
-  };
-
-  // 경쟁사 - 이미지 추가
-  const handleCompetitorImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      type: 'image',
-      content: URL.createObjectURL(file)
-    }));
-    setCompetitorContent(prev => [...prev, ...newImages]);
-  };
-
-  // 경쟁사 - 텍스트 내용 변경
-  const handleCompetitorTextChange = (index, value) => {
-    setCompetitorContent(prev => prev.map((item, i) =>
-      i === index ? { ...item, content: value } : item
-    ));
-  };
-
-  // 경쟁사 - 아이템 삭제
-  const removeCompetitorItem = (index) => {
-    setCompetitorContent(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // 참고 사진 - 텍스트 추가
-  const addReferenceText = () => {
-    setReferenceContent(prev => [...prev, { type: 'text', content: '' }]);
-  };
-
-  // 참고 사진 - 이미지 추가
-  const handleReferenceImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => ({
-      type: 'image',
-      content: URL.createObjectURL(file)
-    }));
-    setReferenceContent(prev => [...prev, ...newImages]);
-  };
-
-  // 참고 사진 - 텍스트 내용 변경
-  const handleReferenceTextChange = (index, value) => {
-    setReferenceContent(prev => prev.map((item, i) =>
-      i === index ? { ...item, content: value } : item
-    ));
-  };
-
-  // 참고 사진 - 아이템 삭제
-  const removeReferenceItem = (index) => {
-    setReferenceContent(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -197,16 +140,12 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
             </td>
           </tr>
         </tbody>
-      </table>
-
-      {/* 제품명 테이블 */}
-      <table className="w-full border border-black border-collapse mt-0 text-xs">
         <tbody>
           <tr>
             <td className="border border-black text-center py-1.5 px-2 w-[90px]" style={{ backgroundColor: '#e8e8e8' }}>
               제품명
             </td>
-            <td className="border border-black px-2 py-1.5">
+            <td className="border border-black px-2 py-1.5" colSpan={4}>
               <input
                 type="text"
                 value={formData.productType}
@@ -216,16 +155,12 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
             </td>
           </tr>
         </tbody>
-      </table>
-
-      {/* 개발 목적 테이블 */}
-      <table className="w-full border border-black border-collapse mt-0 text-xs">
         <tbody>
           <tr>
             <td className="border border-black text-center py-1.5 px-2 w-[90px]" style={{ backgroundColor: '#e8e8e8' }}>
               개발 목적
             </td>
-            <td className="border border-black px-2 py-1.5">
+            <td className="border border-black px-2 py-1.5" colSpan={4}>
               <input
                 type="text"
                 value={formData.salePlan}
@@ -235,10 +170,6 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
             </td>
           </tr>
         </tbody>
-      </table>
-
-      {/* 개발 목표 테이블 */}
-      <table className="w-full border border-black border-collapse mt-0 text-xs">
         <tbody>
           <tr>
             <td className="border border-black text-center py-3 px-2 w-[90px] align-center" style={{ backgroundColor: '#e8e8e8' }}>
@@ -246,7 +177,7 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
                 개 발<br/>요구사항<br/>(요 약)
               </div>
             </td>
-            <td className="border border-black px-3 py-3">
+            <td className="border border-black px-3 py-3" colSpan={4}>
               <div className="space-y-1.5">
                 <div className="flex items-start gap-2">
                   <span className="whitespace-nowrap">컨셉 :</span>
@@ -314,182 +245,121 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
         </tbody>
       </table>
 
-      {/* 경쟁사 섹션 */}
-      <table className="w-full border border-black border-collapse mt-0 text-xs">
+      {/* 경쟁사 / 참고 사진 테이블 (분리하여 하나로 보이게) */}
+      <table className="w-full border-t-0 border border-black border-collapse text-xs">
+        <colgroup>
+          <col style={{ width: '50%' }} />
+          <col style={{ width: '50%' }} />
+        </colgroup>
         <tbody>
           <tr>
-            <td className="border border-black text-center py-2 px-2 w-[100px] align-top" style={{ backgroundColor: '#e8e8e8' }}>
-              <div className="font-medium">경쟁사</div>
-            </td>
-            <td className="border border-black px-3 py-3 relative">
-              <input
-                ref={competitorFileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleCompetitorImageUpload}
-                className="hidden"
-              />
-              {/* 컨텐츠 목록 - 세로 정렬 */}
-              <div className="flex flex-col gap-3 min-h-[200px] pb-12">
-                {competitorContent.map((item, index) => (
-                  <div key={index} className="relative group">
-                    {item.type === 'text' ? (
-                      <div className="relative">
-                        <textarea
-                          value={item.content}
-                          onChange={(e) => handleCompetitorTextChange(index, e.target.value)}
-                          className="w-full outline-none border border-gray-300 rounded px-2 py-2 resize-none leading-relaxed overflow-hidden"
-                          rows="1"
-                          placeholder="텍스트를 입력하세요"
-                          style={{
-                            minHeight: '32px',
-                            height: 'auto'
-                          }}
-                          onInput={(e) => {
-                            e.target.style.height = 'auto';
-                            e.target.style.height = e.target.scrollHeight + 'px';
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeCompetitorItem(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-8 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="relative">
-                        <img
-                          src={item.content}
-                          alt={`경쟁사 이미지 ${index + 1}`}
-                          className="w-full h-auto max-w-full border border-gray-300 object-contain"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeCompetitorItem(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-8 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {competitorContent.length === 0 && (
-                  <div className="text-gray-400 text-center py-16">
-                    텍스트 또는 이미지를 추가하세요
-                  </div>
-                )}
+            <td className="border border-black px-0 py-0 align-top">
+              <div className="w-full h-full flex flex-col">
+                <div className="border-b border-black text-center py-2 px-2" style={{ backgroundColor: '#e8e8e8' }}>
+                  <div className="font-medium">경쟁사</div>
+                </div>
+                <div className="px-3 py-3">
+                  <ContentEditor minHeight="224px" />
+                </div>
               </div>
-              {/* 버튼 그룹 - 오른쪽 하단 */}
-              <div className="absolute bottom-2 right-2 flex gap-2 print:hidden z-10">
-                <button
-                  type="button"
-                  onClick={addCompetitorText}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
-                >
-                  텍스트 추가
-                </button>
-                <button
-                  type="button"
-                  onClick={() => competitorFileInputRef.current?.click()}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
-                >
-                  이미지 추가
-                </button>
+            </td>
+            <td className="border border-black px-0 py-0 align-top" rowSpan={2}>
+              <div className="w-full h-full flex flex-col">
+                <div className="border-b border-black text-center py-2 px-2" style={{ backgroundColor: '#e8e8e8' }}>
+                  <div className="font-medium">참고 사진</div>
+                </div>
+                <div className="px-3 py-3">
+                  <ContentEditor minHeight="480px" />
+                </div>
               </div>
             </td>
           </tr>
-        </tbody>
-      </table>
-
-      {/* 참고 사진 섹션 */}
-      <table className="w-full border border-black border-collapse mt-0 text-xs">
-        <tbody>
           <tr>
-            <td className="border border-black text-center py-2 px-2 w-[100px] align-top" style={{ backgroundColor: '#e8e8e8' }}>
-              <div className="font-medium">참고 사진</div>
-            </td>
-            <td className="border border-black px-3 py-3 relative">
-              <input
-                ref={referenceFileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleReferenceImageUpload}
-                className="hidden"
-              />
-              {/* 컨텐츠 목록 - 세로 정렬 */}
-              <div className="flex flex-col gap-3 min-h-[200px] pb-12">
-                {referenceContent.map((item, index) => (
-                  <div key={index} className="relative group">
-                    {item.type === 'text' ? (
-                      <div className="relative">
-                        <textarea
-                          value={item.content}
-                          onChange={(e) => handleReferenceTextChange(index, e.target.value)}
-                          className="w-full outline-none border border-gray-300 rounded px-2 py-2 resize-none leading-relaxed overflow-hidden"
-                          rows="1"
-                          placeholder="텍스트를 입력하세요"
-                          style={{
-                            minHeight: '32px',
-                            height: 'auto'
-                          }}
-                          onInput={(e) => {
-                            e.target.style.height = 'auto';
-                            e.target.style.height = e.target.scrollHeight + 'px';
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeReferenceItem(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-8 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          삭제
-                        </button>
+            <td className="border border-black px-0 py-0 align-top">
+              <div className="w-full h-full flex flex-col">
+                <div className="border-b border-black text-center py-2 px-2" style={{ backgroundColor: '#e8e8e8' }}>
+                  <div className="font-medium">경쟁사</div>
+                </div>
+                <div className="px-3 py-3 relative flex-1 min-h-[224px]">
+                  <input
+                    ref={competitor2FileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleCompetitor2ImageUpload}
+                    className="hidden"
+                  />
+                  {/* 컨텐츠 목록 - 세로 정렬 */}
+                  <div className="flex flex-col gap-3 h-full pb-12">
+                    {competitor2Content.map((item, index) => (
+                      <div key={index} className="relative group">
+                        {item.type === 'text' ? (
+                          <div className="relative">
+                            <textarea
+                              value={item.content}
+                              onChange={(e) => handleCompetitor2TextChange(index, e.target.value)}
+                              className="w-full outline-none border border-gray-300 rounded px-2 py-2 resize-none leading-relaxed overflow-hidden"
+                              rows="1"
+                              placeholder="텍스트를 입력하세요"
+                              style={{
+                                minHeight: '32px',
+                                height: 'auto'
+                              }}
+                              onInput={(e) => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeCompetitor2Item(index)}
+                              className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="relative">
+                            <img
+                              src={item.content}
+                              alt={`경쟁사 이미지 ${index + 1}`}
+                              className="w-full h-auto max-w-full border border-gray-300 object-contain"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeCompetitor2Item(index)}
+                              className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
+                            >
+                              삭제
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="relative">
-                        <img
-                          src={item.content}
-                          alt={`참고 사진 ${index + 1}`}
-                          className="w-full h-auto max-w-full border border-gray-300 object-contain"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeReferenceItem(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-8 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          삭제
-                        </button>
+                    ))}
+                    {competitor2Content.length === 0 && (
+                      <div className="text-gray-400 flex items-center justify-center flex-1">
+                        텍스트 또는 이미지를 추가하세요
                       </div>
                     )}
                   </div>
-                ))}
-                {referenceContent.length === 0 && (
-                  <div className="text-gray-400 text-center py-16">
-                    텍스트 또는 이미지를 추가하세요
+                  {/* 버튼 그룹 - 오른쪽 하단 */}
+                  <div className="absolute bottom-2 right-2 flex gap-2 print:hidden z-10">
+                    <button
+                      type="button"
+                      onClick={addCompetitor2Text}
+                      className="bg-[#674529] hover:bg-[#523620] text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
+                    >
+                      텍스트 추가
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => competitor2FileInputRef.current?.click()}
+                      className="bg-[#674529] hover:bg-[#523620] text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
+                    >
+                      이미지 추가
+                    </button>
                   </div>
-                )}
-              </div>
-              {/* 버튼 그룹 - 오른쪽 하단 */}
-              <div className="absolute bottom-2 right-2 flex gap-2 print:hidden z-10">
-                <button
-                  type="button"
-                  onClick={addReferenceText}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
-                >
-                  텍스트 추가
-                </button>
-                <button
-                  type="button"
-                  onClick={() => referenceFileInputRef.current?.click()}
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors shadow"
-                >
-                  이미지 추가
-                </button>
+                </div>
               </div>
             </td>
           </tr>

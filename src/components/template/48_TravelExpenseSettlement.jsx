@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
+import ContentEditor from '../common/ContentEditor';
 
 const TravelExpenseSettlement = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
-  const fileInputRef = useRef();
 
   const [formData, setFormData] = useState({
     documentNumber: '',
+    user: '',
+    updateDate: '',
     department: '',
     position: '',
     name: '',
@@ -22,23 +24,11 @@ const TravelExpenseSettlement = ({ pdfRef }) => {
     detailExpense: '',
   });
 
-  const [scheduleImages, setScheduleImages] = useState([]);
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map(file => URL.createObjectURL(file));
-    setScheduleImages(prev => [...prev, ...newImages]);
-  };
-
-  const handleRemoveImage = (index) => {
-    setScheduleImages(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -68,11 +58,25 @@ const TravelExpenseSettlement = ({ pdfRef }) => {
           </tr>
           <tr>
             <td className="border border-black text-center px-2 py-1" style={{ backgroundColor: '#e8e8e8' }}>작성자</td>
-            <td className="border border-black px-2 py-1"></td>
+            <td className="border border-black px-2 py-1">
+              <input
+                type="text"
+                value={formData.user}
+                onChange={(e) => handleInputChange('user', e.target.value)}
+                className="w-full outline-none text-center"
+              />
+            </td>
           </tr>
           <tr>
             <td className="border border-black text-center px-2 py-1" style={{ backgroundColor: '#e8e8e8' }}>수정일자</td>
-            <td className="border border-black px-2 py-1"></td>
+            <td className="border border-black px-2 py-1">
+              <input
+                type="text"
+                value={formData.updateDate}
+                onChange={(e) => handleInputChange('updateDate', e.target.value)}
+                className="w-full outline-none text-center"
+              />
+            </td>
           </tr>
         </tbody>
       </table>
@@ -242,41 +246,7 @@ const TravelExpenseSettlement = ({ pdfRef }) => {
                 </div>
                 {/* 우측: 이미지 영역 (40%) */}
                 <div className="w-[40%] px-2 py-2 relative">
-                  {/* 이미지 업로드 버튼 */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-2 right-2 bg-[#674529] hover:bg-[#523620] text-white px-3 py-2 rounded text-xs font-medium transition-colors flex items-center gap-1 shadow print:hidden z-10"
-                  >
-                    이미지 추가
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  {/* 업로드된 이미지 목록 */}
-                  <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto">
-                    {scheduleImages.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={img}
-                          alt={`제작일정 이미지 ${index + 1}`}
-                          className="w-full h-auto max-w-full border border-gray-300 rounded object-contain"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-8 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  <ContentEditor minHeight="220px" mode="imageOnly" placeholder="" />
                 </div>
               </div>
             </td>
