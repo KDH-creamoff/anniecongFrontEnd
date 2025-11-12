@@ -7,6 +7,7 @@ import inventorySaga from './modules/inventory/sagas';
 import basicSaga from './modules/basic/sagas';
 import manufacturingSaga from './modules/manufacturing/sagas';
 import labelSaga from './modules/label/sagas';
+import issuingSaga from './modules/issuing/sagas';
 // import receivingSaga from './modules/receiving/sagas';
 // import shippingSaga from './modules/shipping/sagas';
 // import approvalSaga from './modules/approval/sagas';
@@ -24,6 +25,7 @@ export default function* rootSaga() {
     basicSaga(),
     manufacturingSaga(),
     labelSaga(),
+    issuingSaga(),
     // receivingSaga(),
     // shippingSaga(),
     // approvalSaga(),

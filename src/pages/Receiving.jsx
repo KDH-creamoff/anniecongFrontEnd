@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Package } from 'lucide-react';
 import ReceivingWaitingList from '../components/receiving/ReceivingWaitingList';
 import AddReceivingModal from '../components/receiving/AddReceivingModal';
@@ -11,9 +12,30 @@ import ShippingConfirmModal from '../components/shipping/ShippingConfirmModal';
 import LabelPrintModal from '../components/receiving/LabelPrintModal';
 import AlertModal from '../components/common/AlertModal';
 import { getItemByName } from '../data/items';
-import { shippingAPI, inventoryAPI, receivingAPI } from '../api';
+import { receivingAPI } from '../api';
+
+// 출고 관리 Redux 액션 및 셀렉터
+import {
+  fetchIssuingList,
+  createIssuing,
+  deleteIssuing,
+  batchIssue,
+} from '../store/modules/issuing/actions';
+import {
+  selectIssuingListLoading,
+  selectPendingIssuings,
+  selectCompletedIssuings,
+} from '../store/modules/issuing/selectors';
 
 const Receiving = ({ subPage = 'nav1' }) => {
+  // Redux 설정
+  const dispatch = useDispatch();
+
+  // 출고 관련 Redux 상태
+  const issuingListLoading = useSelector(selectIssuingListLoading);
+  const pendingIssuings = useSelector(selectPendingIssuings);
+  const completedIssuings = useSelector(selectCompletedIssuings);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isLabelPrintModalOpen, setIsLabelPrintModalOpen] = useState(false);
@@ -86,101 +108,15 @@ const Receiving = ({ subPage = 'nav1' }) => {
   // 입고 완료 목록 상태
   const [completedData, setCompletedData] = useState([]);
 
-  // 출고 대기 목록 상태
-  const [shippingWaitingData, setShippingWaitingData] = useState([]);
-  const [isLoadingShipping, setIsLoadingShipping] = useState(false);
-
-  // 출고 완료 목록 상태
-  const [shippingCompletedData, setShippingCompletedData] = useState([]);
-
-  // 출고 대기 목록 로드
+  // 출고 관련 상태는 Redux로 관리됨 (pendingIssuings, completedIssuings)
+  // 출고 대기 목록 로드 - Redux 사용
   useEffect(() => {
     if (subPage === 'nav2') {
-      loadShippingWaitingList();
-      loadShippingCompletedList();
+      // Redux 액션으로 출고 대기 목록과 완료 목록 조회
+      dispatch(fetchIssuingList.request({ status: '대기' }));
+      dispatch(fetchIssuingList.request({ status: '완료' }));
     }
-  }, [subPage]);
-
-  const loadShippingWaitingList = async () => {
-    try {
-      setIsLoadingShipping(true);
-      // shipping API가 없을 경우 재고 이동 이력에서 출고 대기 상태를 가져오거나
-      // 로컬 상태로 관리
-      try {
-        const response = await shippingAPI.getShippingList({ 
-          status: 'pending' // 또는 'waiting' - 백엔드 API에 맞게 조정
-        });
-        const data = response.data?.data || response.data || [];
-        setShippingWaitingData(Array.isArray(data) ? data : []);
-      } catch (shippingError) {
-        // shipping API가 없을 경우 재고 이동 이력에서 출고 이력 가져오기
-        console.warn('shipping API 사용 불가, 재고 이동 이력 사용:', shippingError);
-        const movementsResponse = await inventoryAPI.getMovements({ 
-          type: 'issue',
-          status: 'pending'
-        });
-        const movementsData = movementsResponse.data?.data || movementsResponse.data || [];
-        // 재고 이동 이력을 출고 대기 목록 형식으로 변환
-        const waitingList = Array.isArray(movementsData) 
-          ? movementsData.map(movement => ({
-              id: movement.id,
-              itemCode: movement.itemCode || movement.code,
-              itemName: movement.itemName || movement.category,
-              expectedQuantity: `${movement.quantity || movement.expectedQuantity}${movement.unit || 'Kg'}`,
-              expectedDate: movement.expectedDate || movement.date,
-              supplier: movement.supplier || '공급업체',
-            }))
-          : [];
-        setShippingWaitingData(waitingList);
-      }
-    } catch (error) {
-      console.error('출고 대기 목록 로드 실패:', error);
-      // 에러를 조용히 처리하고 빈 배열로 설정
-      setShippingWaitingData([]);
-    } finally {
-      setIsLoadingShipping(false);
-    }
-  };
-
-  const loadShippingCompletedList = async () => {
-    try {
-      // shipping API가 없을 경우 재고 이동 이력에서 출고 완료 상태를 가져오거나
-      // 로컬 상태로 관리
-      try {
-        const response = await shippingAPI.getShippingList({ 
-          status: 'completed' // 또는 'confirmed' - 백엔드 API에 맞게 조정
-        });
-        const data = response.data?.data || response.data || [];
-        setShippingCompletedData(Array.isArray(data) ? data : []);
-      } catch (shippingError) {
-        // shipping API가 없을 경우 재고 이동 이력에서 출고 완료 이력 가져오기
-        console.warn('shipping API 사용 불가, 재고 이동 이력 사용:', shippingError);
-        const movementsResponse = await inventoryAPI.getMovements({ 
-          type: 'issue',
-          status: 'completed'
-        });
-        const movementsData = movementsResponse.data?.data || movementsResponse.data || [];
-        // 재고 이동 이력을 출고 완료 목록 형식으로 변환
-        const completedList = Array.isArray(movementsData)
-          ? movementsData.map(movement => ({
-              id: movement.id,
-              itemCode: movement.itemCode || movement.code,
-              itemName: movement.itemName || movement.category,
-              expectedQuantity: `${movement.expectedQuantity || movement.quantity}${movement.unit || 'Kg'}`,
-              shippedQuantity: `${movement.quantity || movement.shippedQuantity}${movement.unit || 'Kg'}`,
-              unitCount: movement.unitCount || '1',
-              shippedDate: movement.shippedDate || movement.date,
-              status: movement.status || '정상',
-            }))
-          : [];
-        setShippingCompletedData(completedList);
-      }
-    } catch (error) {
-      console.error('출고 완료 목록 로드 실패:', error);
-      // 에러를 조용히 처리하고 빈 배열로 설정
-      setShippingCompletedData([]);
-    }
-  };
+  }, [subPage, dispatch]);
 
   const handleAddReceiving = () => {
     setIsModalOpen(true);
@@ -283,7 +219,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
   };
 
   // 라벨 프린트 완료 후 입고 완료 처리
-  const handleLabelPrintComplete = async (labelData) => {
+  const handleLabelPrintComplete = async () => {
     if (subPage === 'nav1') {
       // 입고 처리
       if (selectedItem?.receivedQuantity && selectedItem?.unitCount) {
@@ -305,45 +241,16 @@ const Receiving = ({ subPage = 'nav1' }) => {
         showAlert('라벨을 프린트했습니다.', 'success');
       }
     } else {
-      // 출고 처리
+      // 출고 처리 - Redux 액션 사용
       if (selectedItem?.shippedQuantity && selectedItem?.unitCount) {
         try {
-          // 출고 확인 - shipping API 또는 inventory API 사용
-          try {
-            await shippingAPI.confirmShipping(selectedItem.id);
-          } catch (shippingError) {
-            // shipping API가 없을 경우 inventory API의 issueInventory 사용
-            console.warn('shipping API 사용 불가, inventory API 사용:', shippingError);
-            await inventoryAPI.issueInventory({
-              itemId: selectedItem.itemId || selectedItem.id,
-              itemCode: selectedItem.itemCode,
-              quantity: parseFloat(selectedItem.shippedQuantity) || parseFloat(selectedItem.expectedQuantity),
-              unit: selectedItem.unit || 'Kg',
-              date: new Date().toISOString().split('T')[0],
-              note: '출고 처리',
-            });
-          }
-          
-          // 로컬 상태 업데이트
-          setShippingWaitingData(shippingWaitingData.filter((data) => data.id !== selectedItem.id));
-          const completedItem = {
-            id: Date.now(),
-            itemCode: selectedItem.itemCode,
-            itemName: selectedItem.itemName,
-            expectedQuantity: selectedItem.expectedQuantity,
-            shippedQuantity: `${selectedItem.shippedQuantity}`,
-            unitCount: selectedItem.unitCount,
-            shippedDate: new Date().toISOString().split('T')[0],
-            status: '정상',
-          };
-          setShippingCompletedData([completedItem, ...shippingCompletedData]);
-          
+          // 출고 대기에서 완료로 변경 (일괄 출고 처리)
+          dispatch(batchIssue.request({ ids: [selectedItem.id] }));
+
           showAlert('라벨 프린트 및 출고가 완료되었습니다.', 'success');
           handleCloseConfirmModal();
-          
-          // 목록 새로고침
-          await loadShippingWaitingList();
-          await loadShippingCompletedList();
+
+          // Redux에서 자동으로 목록 업데이트됨
         } catch (error) {
           console.error('출고 확인 실패:', error);
           showAlert(
@@ -366,39 +273,27 @@ const Receiving = ({ subPage = 'nav1' }) => {
   const handleSubmitShipping = async (formData) => {
     try {
       const itemInfo = getItemByName(formData.itemName);
-      
-      // 백엔드 API에 맞는 데이터 형식으로 변환
-      const shippingData = {
+
+      // Redux 액션으로 출고 대기 목록에 추가
+      const issuingData = {
         itemCode: formData.itemCode,
         itemName: formData.itemName,
-        expectedQuantity: parseFloat(formData.expectedQuantity),
+        orderQuantity: parseFloat(formData.expectedQuantity),
         unit: formData.unit,
-        expectedDate: formData.expectedDate,
-        status: 'pending', // 대기 상태
-        supplier: itemInfo?.supplier || '공급업체',
+        scheduledDate: formData.expectedDate,
+        toCustomer: itemInfo?.supplier || '공급업체',
+        factory: '상주생산창고', // 기본값
+        factoryId: 'fac_P2',
+        availableQuantity: parseFloat(formData.expectedQuantity) * 1.5, // 임시 값
+        note: '',
       };
 
-      try {
-        await shippingAPI.createShipping(shippingData);
-      } catch (shippingError) {
-        // shipping API가 없을 경우 로컬 상태로 관리
-        console.warn('shipping API 사용 불가, 로컬 상태로 관리:', shippingError);
-        const newWaitingItem = {
-          id: Date.now(),
-          itemCode: formData.itemCode,
-          itemName: formData.itemName,
-          expectedQuantity: `${formData.expectedQuantity}${formData.unit}`,
-          expectedDate: formData.expectedDate,
-          supplier: itemInfo?.supplier || '공급업체',
-        };
-        setShippingWaitingData([...shippingWaitingData, newWaitingItem]);
-      }
-      
+      dispatch(createIssuing.request(issuingData));
+
       showAlert('출고 대기 목록에 추가되었습니다.', 'success');
       setIsModalOpen(false);
-      
-      // 목록 새로고침
-      await loadShippingWaitingList();
+
+      // Redux에서 자동으로 목록 업데이트됨
     } catch (error) {
       console.error('출고 목록 추가 실패:', error);
       showAlert(
@@ -417,42 +312,13 @@ const Receiving = ({ subPage = 'nav1' }) => {
     if (!selectedItem) return;
 
     try {
-      // 출고 확인 - shipping API 또는 inventory API 사용
-      try {
-        await shippingAPI.confirmShipping(selectedItem.id);
-      } catch (shippingError) {
-        // shipping API가 없을 경우 inventory API의 issueInventory 사용
-        console.warn('shipping API 사용 불가, inventory API 사용:', shippingError);
-        await inventoryAPI.issueInventory({
-          itemId: selectedItem.itemId || selectedItem.id,
-          itemCode: selectedItem.itemCode,
-          quantity: parseFloat(selectedItem.shippedQuantity) || parseFloat(selectedItem.expectedQuantity),
-          unit: selectedItem.unit || 'Kg',
-          date: new Date().toISOString().split('T')[0],
-          note: '출고 처리',
-        });
-      }
-      
-      // 로컬 상태 업데이트
-      setShippingWaitingData(shippingWaitingData.filter((data) => data.id !== selectedItem.id));
-      const completedItem = {
-        id: Date.now(),
-        itemCode: selectedItem.itemCode,
-        itemName: selectedItem.itemName,
-        expectedQuantity: selectedItem.expectedQuantity,
-        shippedQuantity: `${selectedItem.shippedQuantity}Kg`,
-        unitCount: selectedItem.unitCount,
-        shippedDate: new Date().toISOString().split('T')[0],
-        status: '정상',
-      };
-      setShippingCompletedData([completedItem, ...shippingCompletedData]);
-      
+      // Redux 액션으로 출고 완료 처리 (일괄 출고)
+      dispatch(batchIssue.request({ ids: [selectedItem.id] }));
+
       showAlert('출고가 완료되었습니다.', 'success');
       handleCloseConfirmModal();
-      
-      // 목록 새로고침
-      await loadShippingWaitingList();
-      await loadShippingCompletedList();
+
+      // Redux에서 자동으로 목록 업데이트됨
     } catch (error) {
       console.error('출고 확인 실패:', error);
       showAlert(
@@ -463,37 +329,17 @@ const Receiving = ({ subPage = 'nav1' }) => {
   };
 
   const handleCancelShipping = async (id) => {
-    const item = shippingCompletedData.find((data) => data.id === id);
+    const item = completedIssuings.find((data) => data.id === id);
     if (!item) return;
     if (!confirm('출고를 취소하시겠습니까? 대기 목록으로 돌아갑니다.')) return;
 
     try {
-      // 출고 취소 - shipping API 또는 로컬 상태로 관리
-      try {
-        await shippingAPI.updateShipping(id, {
-          status: 'pending',
-          cancelledAt: new Date().toISOString(),
-        });
-      } catch (shippingError) {
-        // shipping API가 없을 경우 로컬 상태로 관리
-        console.warn('shipping API 사용 불가, 로컬 상태로 관리:', shippingError);
-        setShippingCompletedData(shippingCompletedData.filter((data) => data.id !== id));
-        const waitingItem = {
-          id: Date.now(),
-          itemCode: item.itemCode,
-          itemName: item.itemName,
-          expectedQuantity: item.expectedQuantity,
-          expectedDate: new Date().toISOString().split('T')[0],
-          supplier: '공급업체',
-        };
-        setShippingWaitingData([...shippingWaitingData, waitingItem]);
-      }
-      
+      // Redux 액션으로 출고 삭제 (취소)
+      dispatch(deleteIssuing.request(id));
+
       showAlert('출고가 취소되었습니다.', 'info');
-      
-      // 목록 새로고침
-      await loadShippingWaitingList();
-      await loadShippingCompletedList();
+
+      // Redux에서 자동으로 목록 업데이트됨
     } catch (error) {
       console.error('출고 취소 실패:', error);
       showAlert(
@@ -559,18 +405,20 @@ const Receiving = ({ subPage = 'nav1' }) => {
           {/* 출고 대기 목록 */}
           <div className='mb-6'>
             <ShippingWaitingList
-              waitingData={shippingWaitingData}
+              waitingData={pendingIssuings}
               onAddShipping={handleAddShipping}
               onShip={handleShip}
+              isLoading={issuingListLoading}
             />
           </div>
 
           {/* 출고 완료 목록 */}
           <div>
             <ShippingCompletedList
-              completedData={shippingCompletedData}
+              completedData={completedIssuings}
               onCancel={handleCancelShipping}
               onLabelPrint={handleLabelPrint}
+              isLoading={issuingListLoading}
             />
           </div>
 

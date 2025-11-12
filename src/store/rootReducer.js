@@ -8,6 +8,7 @@ import basicReducer from './modules/basic/reducer';
 import receivingReducer from './modules/receiving/reducer';
 import manufacturingReducer from './modules/manufacturing/reducer';
 import labelReducer from './modules/label/reducer';
+import issuingReducer from './modules/issuing/reducer';
 // import shippingReducer from './modules/shipping/reducer';
 // import approvalReducer from './modules/approval/reducer';
 // import dashboardReducer from './modules/dashboard/reducer';
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   receiving: receivingReducer,
   manufacturing: manufacturingReducer,
   label: labelReducer,
+  issuing: issuingReducer,
   // shipping: shippingReducer,
   // approval: approvalReducer,
   // dashboard: dashboardReducer,

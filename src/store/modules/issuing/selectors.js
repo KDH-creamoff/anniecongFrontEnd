@@ -28,6 +28,13 @@ export const selectBatchError = (state) => state.issuing.batchError;
 
 // ==================== 파생 셀렉터 ====================
 
+// 상태별 출고 목록
+export const selectPendingIssuings = (state) =>
+  state.issuing.issuingList.filter(item => item.status === '대기');
+
+export const selectCompletedIssuings = (state) =>
+  state.issuing.issuingList.filter(item => item.status === '완료');
+
 // 카테고리별 출고 목록
 export const selectIssuingsByCategory = (state, category) =>
   state.issuing.issuingList.filter(item => item.category === category);
