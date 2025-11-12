@@ -120,6 +120,7 @@ const mockWarehouseUtilization = [
 const mockInventoryStatus = [
   {
     id: 1,
+    code: 'PROD-901',
     item: '연필',
     category: '소모품',
     quantity: 1500,
@@ -132,6 +133,7 @@ const mockInventoryStatus = [
   },
   {
     id: 2,
+    code: 'RAW-021',
     item: '닭가슴살',
     category: '원재료',
     quantity: 850,

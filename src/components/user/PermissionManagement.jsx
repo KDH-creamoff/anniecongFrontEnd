@@ -12,11 +12,11 @@ const PermissionManagement = () => {
       role: '생산 • 직원',
       permissions: {
         기초정보관리: false,
-        입고검수: false,
-        '1공장전처리': false,
-        공장간이동: false,
-        '2공장제조': false,
-        출고관리: false,
+        재고관리: false,
+        입출고관리: false,
+        제조관리: false,
+        배송관리: false,
+        전자결재: false,
         라벨관리: false,
         재고조회: false,
         풀질검사: false,
@@ -31,11 +31,11 @@ const PermissionManagement = () => {
       role: '경연지원 • 팀장',
       permissions: {
         기초정보관리: false,
-        입고검수: false,
-        '1공장전처리': false,
-        공장간이동: false,
-        '2공장제조': false,
-        출고관리: false,
+        재고관리: false,
+        입출고관리: false,
+        제조관리: false,
+        배송관리: false,
+        전자결재: false,
         라벨관리: false,
         재고조회: false,
         풀질검사: false,
@@ -50,11 +50,11 @@ const PermissionManagement = () => {
       role: '생산 • 이사',
       permissions: {
         기초정보관리: false,
-        입고검수: false,
-        '1공장전처리': false,
-        공장간이동: false,
-        '2공장제조': false,
-        출고관리: false,
+        재고관리: false,
+        입출고관리: false,
+        제조관리: false,
+        배송관리: false,
+        전자결재: false,
         라벨관리: false,
         재고조회: false,
         풀질검사: false,
@@ -69,11 +69,11 @@ const PermissionManagement = () => {
       role: '경영지원 • 알바',
       permissions: {
         기초정보관리: false,
-        입고검수: false,
-        '1공장전처리': false,
-        공장간이동: false,
-        '2공장제조': false,
-        출고관리: false,
+        재고관리: false,
+        입출고관리: false,
+        제조관리: false,
+        배송관리: false,
+        전자결재: false,
         라벨관리: false,
         재고조회: false,
         풀질검사: false,
@@ -156,13 +156,13 @@ const PermissionManagement = () => {
             />
             <PermissionItem
               title='1공장 전처리'
-              isEnabled={user.permissions['1공장전처리']}
-              onToggle={() => handlePermissionToggle(user.id, '1공장전처리')}
+              isEnabled={user.permissions['입출고관리']}
+              onToggle={() => handlePermissionToggle(user.id, '입출고관리')}
             />
             <PermissionItem
               title='2공장 제조'
-              isEnabled={user.permissions['2공장제조']}
-              onToggle={() => handlePermissionToggle(user.id, '2공장제조')}
+              isEnabled={user.permissions['배송관리']}
+              onToggle={() => handlePermissionToggle(user.id, '배송관리')}
             />
             <PermissionItem
               title='라벨관리'
@@ -180,18 +180,18 @@ const PermissionManagement = () => {
           <div className='space-y-4'>
             <PermissionItem
               title='입고'
-              isEnabled={user.permissions['입고검수']}
-              onToggle={() => handlePermissionToggle(user.id, '입고검수')}
+              isEnabled={user.permissions['재고관리']}
+              onToggle={() => handlePermissionToggle(user.id, '재고관리')}
             />
             <PermissionItem
               title='공장간 이동'
-              isEnabled={user.permissions['공장간이동']}
-              onToggle={() => handlePermissionToggle(user.id, '공장간이동')}
+              isEnabled={user.permissions['제조관리']}
+              onToggle={() => handlePermissionToggle(user.id, '제조관리')}
             />
             <PermissionItem
-              title='출고관리'
-              isEnabled={user.permissions['출고관리']}
-              onToggle={() => handlePermissionToggle(user.id, '출고관리')}
+              title='전자결재'
+              isEnabled={user.permissions['전자결재']}
+              onToggle={() => handlePermissionToggle(user.id, '전자결재')}
             />
             <PermissionItem
               title='재고조회'

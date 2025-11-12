@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
+import ContentEditor from '../common/ContentEditor';
 
 const TrainingMeetingReportForm = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
   const [managerImage, setManagerImage] = useState(null);
   const [supervisorImage, setSupervisorImage] = useState(null);
+  const [selectedType, setSelectedType] = useState(''); // 'education' or 'meeting'
   const managerInputRef = useRef(null);
   const supervisorInputRef = useRef(null);
 
@@ -63,7 +65,26 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
             <tr>
               <td className="border border-black text-center font-bold text-lg py-3 leading-tight" colSpan="4" rowSpan="2">
                 <div>교육/회의 결과보고서</div>
-                <div className="text-base font-normal mt-1">(☐ 교육, ☐ 회의)</div>
+                <div className="text-base font-normal mt-2 flex items-center justify-center gap-4">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedType === 'education'}
+                      onChange={() => setSelectedType(selectedType === 'education' ? '' : 'education')}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                    <span>교육</span>
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedType === 'meeting'}
+                      onChange={() => setSelectedType(selectedType === 'meeting' ? '' : 'meeting')}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                    <span>회의</span>
+                  </label>
+                </div>
               </td>
               <td className="border border-black text-center w-12 py-1.5 text-sm tracking-[0.3em]" rowSpan="2">결<br />재</td>
               <td className="border border-black text-center w-36 py-1.5 text-sm tracking-[0.3em]">담당자</td>
@@ -150,21 +171,25 @@ const TrainingMeetingReportForm = ({ pdfRef }) => {
           </tbody>
         </table>
 
-        {/* 주요내용 섹션 */}
-        <div className="border-2 border-black border-t-0 min-h-[180px] py-3 px-4">
-          <div className="mb-3 text-center font-normal text-sm tracking-[0.5em]">주 요 내 용</div>
-          <div className="space-y-3 px-2">
-            <div className="flex items-start gap-1">
-              <span className="text-sm">○.</span>
-              <input type="text" className="outline-none w-full text-sm" />
+        {/* 주요내용 섹션 - 2분할 */}
+        <div className="border-2 border-black border-t-0">
+          <div className="py-3 text-center font-normal text-sm tracking-[0.5em] border-b border-black">주 요 내 용</div>
+          <div className="flex min-h-[300px]">
+            {/* 좌측: 텍스트만 (자유 입력) */}
+            <div className="w-1/2 border-r border-black p-3">
+              <textarea
+                className="w-full h-full min-h-[250px] outline-none resize-none text-sm leading-relaxed"
+                placeholder="텍스트를 입력하세요"
+              />
             </div>
-            <div className="flex items-start gap-1">
-              <span className="text-sm">○.</span>
-              <input type="text" className="outline-none w-full text-sm" />
-            </div>
-            <div className="flex items-start gap-1">
-              <span className="text-sm">○.</span>
-              <input type="text" className="outline-none w-full text-sm" />
+            {/* 우측: 이미지만 (이미지 추가 버튼) */}
+            <div className="w-1/2 p-3">
+              <ContentEditor
+                minHeight="250px"
+                placeholder="이미지를 추가하세요"
+                showButtons={true}
+                mode="image"
+              />
             </div>
           </div>
         </div>
