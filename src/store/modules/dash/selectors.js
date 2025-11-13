@@ -1,5 +1,3 @@
-// ==================== Dash Selectors ====================
-
 // 제조관리 통계
 export const selectManufacturingStats = (state) => state.dash.manufacturingStats;
 export const selectManufacturingStatsData = (state) => state.dash.manufacturingStats.data;

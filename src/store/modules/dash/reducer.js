@@ -10,12 +10,6 @@ import {
   CLEAR_STATS_ERROR
 } from './actions';
 
-/**
- * ==================== 초기 상태 ====================
- *
- * 대시보드에서 필요한 모든 통계 데이터를 관리합니다.
- * 각 통계는 data(실제 데이터), loading(로딩 여부), error(에러 메시지) 3가지 상태를 가집니다.
- */
 const initialState = {
   // 제조관리 통계 (입고완료, 제조완료, 출고완료, 재고알람 등)
   manufacturingStats: {
@@ -74,14 +68,6 @@ const initialState = {
   }
 };
 
-/**
- * ==================== Dash Reducer ====================
- *
- * Reducer의 역할:
- * 1. 액션을 받아서 상태를 업데이트
- * 2. 항상 새로운 객체를 반환 (불변성 유지)
- * 3. switch문으로 액션 타입별로 처리
- */
 const dashReducer = (state = initialState, action) => {
   switch (action.type) {
     // ==================== 제조관리 통계 조회 ====================
@@ -352,35 +338,8 @@ const dashReducer = (state = initialState, action) => {
 
     // ==================== 기본 케이스 ====================
     default:
-      // 이 리듀서가 처리하지 않는 액션은 무시
       return state;
   }
 };
 
 export default dashReducer;
-
-/**
- * ==================== Reducer 사용 예시 ====================
- *
- * 컴포넌트에서 상태 사용하기:
- * ```javascript
- * import { useSelector } from 'react-redux';
- *
- * const Dashboard = () => {
- *   // 제조관리 통계 가져오기
- *   const { data, loading, error } = useSelector(state => state.dash.manufacturingStats);
- *
- *   if (loading) return <div>로딩 중...</div>;
- *   if (error) return <div>에러: {error}</div>;
- *   if (!data) return <div>데이터 없음</div>;
- *
- *   return (
- *     <div>
- *       <p>입고 완료: {data.receivingCompleted.value}건</p>
- *       <p>제조 완료: {data.productionCompleted.value}건</p>
- *       <p>출고 완료: {data.shippingCompleted.value}건</p>
- *     </div>
- *   );
- * };
- * ```
- */

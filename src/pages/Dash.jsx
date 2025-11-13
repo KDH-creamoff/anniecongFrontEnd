@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import ManufacturingManagement from '../components/dashboard/ManufacturingManagement';
 import MainModule from '../components/dashboard/MainModule';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 const Dash = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleNavigate = (nav) => {
     const navMap = {
