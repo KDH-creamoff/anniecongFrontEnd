@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState, useRef } from "react";
 
-const WasteManagementLedger = () => {
+const WasteManagementLedger = ({ pdfRef }) => {
+  const contentRef = pdfRef || useRef();
   const [formData, setFormData] = useState({
     year: "20",
     month: "",
@@ -43,7 +44,7 @@ const WasteManagementLedger = () => {
   };
 
   return (
-    <div className="w-[230mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
+    <div ref={contentRef} className="w-[230mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
       <div className="w-full h-full">
         <h1 className="text-center text-xl font-bold mb-3 tracking-wider">
           폐기물(폐사료) 관리대장

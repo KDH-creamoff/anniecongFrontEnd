@@ -102,6 +102,13 @@ const ApprovalDashboard = ({ subPage }) => {
           새 문서 작성
         </button>
         )}
+        {subPage === 'nav2' && (
+          <button
+            className='flex items-center space-x-2 rounded-xl border border-[#674529] bg-white px-4 py-2.5 font-medium text-[#674529] transition-colors hover:bg-gray-50'
+          >
+            알집으로 압축하기
+          </button>
+        )}
       </div>
 
       {/* 컨텐츠 */}

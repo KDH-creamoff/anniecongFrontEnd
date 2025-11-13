@@ -1,24 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { LogIn, User, Lock } from 'lucide-react';
+import { login } from '../store/modules/auth/actions';
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Redux state
+  const { loading, error, user } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     userId: '',
-    password: ''
+    password: '',
+    remember: false
   });
-  const [loading, setLoading] = useState(false);
+
+  // 로그인 성공 시 대시보드로 이동
+  useEffect(() => {
+    if (user) {
+      navigate('/dash');
+    }
+  }, [user, navigate]);
+
+  // 에러 발생 시 알림
+  useEffect(() => {
+    if (error) {
+      alert(error);
+    }
+  }, [error]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     // 유효성 체크
@@ -26,48 +47,14 @@ const Login = () => {
       alert('아이디와 비밀번호를 입력해주세요.');
       return;
     }
-    setLoading(true);
 
-    try {
-      // API로 로그인 요청보내기
-      const response = await fetch('http://localhost:4000/api/auth/login', {
-        method: 'POST',
-        credentials: 'include', // 세션 쿠키 받아오기 위해 필요!
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: formData.userId,
-          password: formData.password
-        })
-      });
-
-      if (!response.ok) {
-        // 서버에서 401 등 에러 메세지 내려주면
-        let msg = '로그인에 실패했습니다.';
-        try {
-          const res = await response.json();
-          msg = res?.message || msg;
-        } catch (err) {}
-        throw new Error(msg);
-      }
-
-      // 로그인 성공 시(여기선 로그인 성공 후 사용자의 정보는 직접 내려오는 API 따로 필요해 보임)
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          userId: formData.userId,
-          name: formData.userId, // TODO: 서버에서 이름이나 정보를 내려주도록 바꿀 수 있음
-          loginTime: new Date().toISOString()
-        })
-      );
-
-      navigate('/dash');
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
+    // Redux Saga를 통한 로그인 처리
+    // API는 email을 받지만, 프론트에서는 userId로 표시
+    dispatch(login.request({
+      email: formData.userId, // userId를 email 필드로 전송
+      password: formData.password,
+      remember: formData.remember
+    }));
   };
 
   return (

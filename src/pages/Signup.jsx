@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserPlus, User, Lock, Phone, Mail, Calendar, IdCard, Briefcase, Building2 } from 'lucide-react';
+import { signup } from '../store/modules/auth/actions';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Redux state
+  const { loading, error, signupSuccess } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     userId: '',
     password: '',
@@ -15,6 +22,21 @@ const Signup = () => {
     department: '',
     hireDate: ''
   });
+
+  // 회원가입 성공 시 로그인 페이지로 이동
+  useEffect(() => {
+    if (signupSuccess) {
+      alert('회원가입이 완료되었습니다!');
+      navigate('/login');
+    }
+  }, [signupSuccess, navigate]);
+
+  // 에러 발생 시 알림
+  useEffect(() => {
+    if (error) {
+      alert(error);
+    }
+  }, [error]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,27 +55,18 @@ const Signup = () => {
       return;
     }
 
-    // 회원가입 로직 구현
-    // 실제로는 서버에 데이터를 전송해야 하지만,
-    // 여기서는 임시로 localStorage에 저장
-    const { confirmPassword, ...userDataToSave } = formData;
-
-    // 기존 사용자 목록 가져오기
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-
-    // 중복 아이디 체크
-    const isDuplicate = existingUsers.some(user => user.userId === formData.userId);
-    if (isDuplicate) {
-      alert('이미 존재하는 아이디입니다.');
-      return;
-    }
-
-    // 새 사용자 추가
-    existingUsers.push(userDataToSave);
-    localStorage.setItem('users', JSON.stringify(existingUsers));
-
-    alert('회원가입이 완료되었습니다!');
-    navigate('/login');
+    // Redux Saga를 통한 회원가입 처리
+    // 화면에 표시된 모든 필드를 백엔드로 전송
+    dispatch(signup.request({
+      userId: formData.userId,
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      phone: formData.phone,
+      position: formData.position,
+      department: formData.department,
+      hireDate: formData.hireDate
+    }));
   };
 
   return (

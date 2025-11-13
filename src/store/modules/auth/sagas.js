@@ -1,6 +1,137 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
-import { authAPI } from '../../../api';
-import { LOGIN, LOGOUT, SIGNUP, login, logout, signup } from './actions';
+import { call, put, takeLatest, delay } from 'redux-saga/effects';
+import {
+  LOGIN,
+  LOGOUT,
+  SIGNUP,
+  GET_ME,
+  CHANGE_PASSWORD,
+  CHANGE_POSITION,
+  login,
+  logout,
+  signup,
+  getMe,
+  changePassword,
+  changePosition
+} from './actions';
+
+// ==================== Mock API (백엔드 배포 전 임시) ====================
+const mockAPI = {
+  login: (credentials) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => u.email === credentials.email && u.password === credentials.password);
+
+        if (user) {
+          const { password, ...userWithoutPassword } = user;
+          localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+          resolve({ data: { user: userWithoutPassword } });
+        } else {
+          reject({ response: { data: { message: '아이디 또는 비밀번호가 일치하지 않습니다.' } } });
+        }
+      }, 500);
+    });
+  },
+
+  signup: (userData) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const isDuplicate = users.some(u => u.email === userData.email);
+
+        if (isDuplicate) {
+          reject({ response: { data: { message: '이미 존재하는 이메일입니다.' } } });
+        } else {
+          const newUser = {
+            id: Date.now(),
+            ...userData,
+            joinDate: new Date().toISOString().split('T')[0]
+          };
+          users.push(newUser);
+          localStorage.setItem('users', JSON.stringify(users));
+
+          const { password, ...userWithoutPassword } = newUser;
+          resolve({ data: { user: userWithoutPassword } });
+        }
+      }, 500);
+    });
+  },
+
+  logout: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        localStorage.removeItem('currentUser');
+        resolve({ data: { message: '로그아웃 성공' } });
+      }, 300);
+    });
+  },
+
+  getMe: () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          resolve({ data: { user: JSON.parse(currentUser) } });
+        } else {
+          reject({ response: { data: { message: '인증이 필요합니다.' }, status: 401 } });
+        }
+      }, 300);
+    });
+  },
+
+  changePassword: (passwordData) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        if (!currentUser) {
+          reject({ response: { data: { message: '인증이 필요합니다.' }, status: 401 } });
+          return;
+        }
+
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+
+        if (userIndex !== -1 && users[userIndex].password === passwordData.currentPassword) {
+          users[userIndex].password = passwordData.newPassword;
+          localStorage.setItem('users', JSON.stringify(users));
+          resolve({ data: { message: '비밀번호가 변경되었습니다.' } });
+        } else {
+          reject({ response: { data: { message: '현재 비밀번호가 일치하지 않습니다.' } } });
+        }
+      }, 500);
+    });
+  },
+
+  changePosition: (positionData) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        if (!currentUser) {
+          reject({ response: { data: { message: '인증이 필요합니다.' }, status: 401 } });
+          return;
+        }
+
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.id === positionData.userId);
+
+        if (userIndex !== -1) {
+          users[userIndex].position = positionData.position;
+          localStorage.setItem('users', JSON.stringify(users));
+
+          // 현재 사용자 정보도 업데이트
+          if (currentUser.id === positionData.userId) {
+            currentUser.position = positionData.position;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
+
+          resolve({ data: { user: users[userIndex] } });
+        } else {
+          reject({ response: { data: { message: '사용자를 찾을 수 없습니다.' } } });
+        }
+      }, 500);
+    });
+  }
+};
 
 /**
  * ==================== Redux Saga란? ====================
@@ -99,6 +230,59 @@ function* signupSaga(action) {
 }
 
 /**
+ * ==================== 현재 사용자 조회 Saga ====================
+ */
+function* getMeSaga() {
+  try {
+    // 1. 현재 로그인한 사용자 정보 조회
+    const response = yield call(authAPI.getMe);
+
+    // 2. 성공 액션 디스패치
+    yield put(getMe.success(response.data));
+  } catch (error) {
+    // 3. 실패 액션 디스패치
+    yield put(getMe.failure(error.response?.data?.message || '사용자 정보를 불러오는데 실패했습니다.'));
+  }
+}
+
+/**
+ * ==================== 비밀번호 변경 Saga ====================
+ */
+function* changePasswordSaga(action) {
+  try {
+    // 1. 비밀번호 변경 API 호출
+    // - action.payload: { currentPassword, newPassword }
+    const response = yield call(userAPI.changePassword, action.payload);
+
+    // 2. 성공 액션 디스패치
+    yield put(changePassword.success(response.data));
+  } catch (error) {
+    // 3. 실패 액션 디스패치
+    yield put(changePassword.failure(error.response?.data?.message || '비밀번호 변경에 실패했습니다.'));
+  }
+}
+
+/**
+ * ==================== 직급 변경 Saga ====================
+ */
+function* changePositionSaga(action) {
+  try {
+    // 1. 직급 변경 API 호출
+    // - action.payload: { userId, position }
+    const response = yield call(userAPI.changePosition, action.payload);
+
+    // 2. 성공 액션 디스패치
+    yield put(changePosition.success(response.data));
+
+    // 3. 사용자 정보 다시 조회 (변경된 직급 반영)
+    yield put(getMe.request());
+  } catch (error) {
+    // 4. 실패 액션 디스패치
+    yield put(changePosition.failure(error.response?.data?.message || '직급 변경에 실패했습니다.'));
+  }
+}
+
+/**
  * ==================== Watcher Saga ====================
  *
  * 왜 Watcher Saga가 필요한가요?
@@ -120,6 +304,15 @@ export default function* authSaga() {
 
   // SIGNUP.REQUEST 액션이 디스패치되면 signupSaga 실행
   yield takeLatest(SIGNUP.REQUEST, signupSaga);
+
+  // GET_ME.REQUEST 액션이 디스패치되면 getMeSaga 실행
+  yield takeLatest(GET_ME.REQUEST, getMeSaga);
+
+  // CHANGE_PASSWORD.REQUEST 액션이 디스패치되면 changePasswordSaga 실행
+  yield takeLatest(CHANGE_PASSWORD.REQUEST, changePasswordSaga);
+
+  // CHANGE_POSITION.REQUEST 액션이 디스패치되면 changePositionSaga 실행
+  yield takeLatest(CHANGE_POSITION.REQUEST, changePositionSaga);
 }
 
 /**

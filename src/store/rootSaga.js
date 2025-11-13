@@ -8,10 +8,10 @@ import basicSaga from './modules/basic/sagas';
 import manufacturingSaga from './modules/manufacturing/sagas';
 import labelSaga from './modules/label/sagas';
 import issuingSaga from './modules/issuing/sagas';
+import dashSaga from './modules/dash/sagas';
 // import receivingSaga from './modules/receiving/sagas';
 // import shippingSaga from './modules/shipping/sagas';
 // import approvalSaga from './modules/approval/sagas';
-// import dashboardSaga from './modules/dashboard/sagas';
 
 /**
  * 모든 사가를 통합하는 루트 사가
@@ -26,9 +26,9 @@ export default function* rootSaga() {
     manufacturingSaga(),
     labelSaga(),
     issuingSaga(),
+    dashSaga(),
     // receivingSaga(),
     // shippingSaga(),
     // approvalSaga(),
-    // dashboardSaga(),
   ]);
 }

@@ -3,6 +3,7 @@ import ContentEditor from '../common/ContentEditor';
 
 const PetFoodProductDevelopment = ({ pdfRef }) => {
   const contentRef = pdfRef || useRef();
+  const competitor2FileInputRef = useRef();
 
   const [formData, setFormData] = useState({
     year: '',
@@ -20,12 +21,41 @@ const PetFoodProductDevelopment = ({ pdfRef }) => {
     possiblePrice: '',
   });
 
+  const [competitor2Content, setCompetitor2Content] = useState([]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleCompetitor2ImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCompetitor2Content(prev => [...prev, { type: 'image', content: reader.result }]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const addCompetitor2Text = () => {
+    setCompetitor2Content(prev => [...prev, { type: 'text', content: '' }]);
+  };
+
+  const handleCompetitor2TextChange = (index, value) => {
+    setCompetitor2Content(prev => {
+      const newContent = [...prev];
+      newContent[index].content = value;
+      return newContent;
+    });
+  };
+
+  const removeCompetitor2Item = (index) => {
+    setCompetitor2Content(prev => prev.filter((_, i) => i !== index));
   };
 
   return (

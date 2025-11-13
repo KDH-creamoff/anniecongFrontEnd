@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Package, Trash2, Plus, X, Check } from 'lucide-react';
+import { Package, Trash2, X, Check } from 'lucide-react';
 import { rawMaterialMaster } from '../../data/rawMaterialMaster';
 
 const BOMRegistration = ({ onSave }) => {
@@ -250,9 +250,8 @@ const BOMRegistration = ({ onSave }) => {
         <button
           onClick={handleAddMaterial}
           disabled={newMaterial !== null}
-          className='flex items-center gap-2 rounded-xl bg-[#674529] px-4 py-2 text-sm text-white transition-colors hover:bg-[#553821] disabled:cursor-not-allowed disabled:opacity-50'
+          className='flex items-center gap-2 rounded-xl bg-[#56331F] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95'
         >
-          <Plus className='h-4 w-4' />
           BOM 추가
         </button>
       </div>

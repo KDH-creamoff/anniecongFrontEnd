@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
-const ImageTemplate37 = () => {
+const ImageTemplate37 = ({ pdfRef }) => {
+  const contentRef = pdfRef || useRef();
   const [formData, setFormData] = useState({
     topLeftImage: null,
     topRightImage: null,
@@ -24,7 +25,7 @@ const ImageTemplate37 = () => {
   };
 
   return (
-    <div className="w-[210mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
+    <div ref={contentRef} className="w-[210mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
       <div className="w-full h-full">
         <table className="w-full border-collapse border-2 border-black">
           <tbody>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   User,
   Lock,
@@ -11,23 +12,14 @@ import {
   Save,
   X,
 } from "lucide-react";
-import axios from "axios";
+import { getMe, changePassword, changePosition, logout } from "../store/modules/auth/actions";
 
 const Mypage = () => {
   const navigate = useNavigate();
-  const api = axios.create({
-    baseURL: "http://localhost:4000",
-    withCredentials: true,
-  });
+  const dispatch = useDispatch();
 
-  const [userData, setUserData] = useState({
-    userId: "",
-    name: "",
-    phone: "",
-    email: "",
-    joinDate: "",
-    position: "",
-  });
+  // Redux state
+  const { user, loading, error } = useSelector((state) => state.auth);
 
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingPosition, setIsEditingPosition] = useState(false);
@@ -37,41 +29,28 @@ const Mypage = () => {
     confirmPassword: "",
   });
   const [newPosition, setNewPosition] = useState("");
-  const [loading, setLoading] = useState(true);
 
+  // 컴포넌트 마운트 시 사용자 정보 조회
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/api/auth/me");
-        console.log(res);
-        const user = res.data?.user ?? res.data;
-        if (!user) throw new Error("유저 정보를 불러올 수 없습니다.");
-        setUserData({
-          userId: user.id ?? "",
-          name: user.profile?.full_name ?? "",
-          phone: user.profile?.phone_number ?? "",
-          email: user.profile?.email ?? "",
-          joinDate: user.profile?.hire_date ?? "",
-          position: user.profile?.position ?? "",
-        });
-        setNewPosition(user.profile?.position ?? "");
-      } catch (err) {
-        if (
-          err.response?.status === 401 ||
-          (typeof err.response?.data === "string" &&
-            err.response.data.includes("<!DOCTYPE html"))
-        ) {
-          alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-          navigate("/login");
-        } else {
-          alert("유저 정보를 불러오는 중 오류가 발생했습니다.");
-        }
-      } finally {
-        setLoading(false);
+    dispatch(getMe.request());
+  }, [dispatch]);
+
+  // 사용자 정보 로드 시 position 설정
+  useEffect(() => {
+    if (user?.position) {
+      setNewPosition(user.position);
+    }
+  }, [user]);
+
+  // 에러 처리
+  useEffect(() => {
+    if (error) {
+      if (error.includes("401") || error.includes("인증")) {
+        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+        navigate("/login");
       }
-    };
-    fetchUser();
-  }, [navigate]);
+    }
+  }, [error, navigate]);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -81,35 +60,26 @@ const Mypage = () => {
     }));
   };
 
-  const handlePasswordSubmit = async () => {
+  const handlePasswordSubmit = () => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
     if (!currentPassword || !newPassword || !confirmPassword) return alert("모든 필드를 입력해주세요.");
     if (newPassword !== confirmPassword) return alert("새 비밀번호가 일치하지 않습니다.");
     if (newPassword.length < 4) return alert("비밀번호는 최소 4자 이상이어야 합니다.");
-    try {
-      const res = await api.post("/api/auth/password", {
-        currentPassword,
-        newPassword,
-      });
-      if (res.data.ok) {
-        alert("비밀번호가 변경되었습니다.");
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-        setIsEditingPassword(false);
-      } else {
-        alert(res.data.message ?? "비밀번호 변경 실패");
-      }
-    } catch (err) {
-      if (err.response?.status === 401) {
-        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        navigate("/login");
-      } else {
-        alert("비밀번호 변경 중 오류가 발생했습니다.");
-      }
-    }
+
+    // Redux Saga를 통한 비밀번호 변경
+    dispatch(changePassword.request({
+      currentPassword,
+      newPassword,
+    }));
+
+    // 성공 시 폼 초기화
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+    setIsEditingPassword(false);
+    alert("비밀번호가 변경되었습니다.");
   };
 
   const handlePasswordCancel = () => {
@@ -121,41 +91,34 @@ const Mypage = () => {
     setIsEditingPassword(false);
   };
 
-  const handlePositionSubmit = async () => {
+  const handlePositionSubmit = () => {
     if (newPosition === "대표") return alert("대표 직급으로 변경할 수 없습니다.");
-    if (userData.position === newPosition) {
+    if (user?.position === newPosition) {
       setIsEditingPosition(false);
       return;
     }
-    try {
-      const res = await api.post("/api/auth/position", { position: newPosition });
-      if (res.data.ok) {
-        setUserData((prev) => ({ ...prev, position: newPosition }));
-        alert("직급이 변경되었습니다.");
-        setIsEditingPosition(false);
-      } else {
-        alert(res.data.message ?? "직급 변경 실패");
-      }
-    } catch (err) {
-      if (err.response?.status === 401) {
-        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        navigate("/login");
-      } else {
-        alert("직급 변경 중 오류가 발생했습니다.");
-      }
-    }
+
+    // Redux Saga를 통한 직급 변경
+    // API 명세: { userId, position }
+    dispatch(changePosition.request({
+      userId: user?.id,
+      position: newPosition
+    }));
+
+    setIsEditingPosition(false);
+    alert("직급이 변경되었습니다.");
   };
 
   const handlePositionCancel = () => {
-    setNewPosition(userData.position);
+    setNewPosition(user?.position || "");
     setIsEditingPosition(false);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     if (!window.confirm("로그아웃 하시겠습니까?")) return;
-    try {
-      await api.post("/api/auth/logout");
-    } catch {}
+
+    // Redux Saga를 통한 로그아웃
+    dispatch(logout.request());
     navigate("/login");
   };
 
@@ -186,35 +149,35 @@ const Mypage = () => {
                 <User className="h-4 w-4" />
                 <span>아이디</span>
               </label>
-              <input type="text" value={userData.userId} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.id || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <User className="h-4 w-4" />
                 <span>이름</span>
               </label>
-              <input type="text" value={userData.name} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.name || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Phone className="h-4 w-4" />
                 <span>연락처</span>
               </label>
-              <input type="text" value={userData.phone} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.phone || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Mail className="h-4 w-4" />
                 <span>이메일</span>
               </label>
-              <input type="email" value={userData.email} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="email" value={user?.email || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Calendar className="h-4 w-4" />
                 <span>입사일</span>
               </label>
-              <input type="text" value={userData.joinDate} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.joinDate || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
@@ -222,7 +185,7 @@ const Mypage = () => {
                 <span>직급</span>
               </label>
               <div className="flex items-center space-x-2">
-                <input type="text" value={userData.position} disabled className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+                <input type="text" value={user?.position || ""} disabled className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
                 {!isEditingPosition && (
                   <button onClick={() => setIsEditingPosition(true)} className="rounded bg-[#674529] px-3 py-2 text-sm text-white transition-colors hover:bg-[#543620]">
                     변경

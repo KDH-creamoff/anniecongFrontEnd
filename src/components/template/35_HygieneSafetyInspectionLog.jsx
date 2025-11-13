@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState, useRef } from "react";
 
-const HygieneSafetyInspectionLog = () => {
+const HygieneSafetyInspectionLog = ({ pdfRef }) => {
+  const contentRef = pdfRef || useRef();
   const [formData, setFormData] = useState({
     year: "",
     month: "",
@@ -50,7 +51,7 @@ const HygieneSafetyInspectionLog = () => {
   };
 
   return (
-    <div className="w-[230mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
+    <div ref={contentRef} className="w-[230mm] mx-auto py-[10mm] px-[10mm] bg-white box-border">
       <div className="w-full h-full">
         {/* 상단 테이블 */}
         <h1 className="text-center text-3xl font-bold mb-6 tracking-wider">

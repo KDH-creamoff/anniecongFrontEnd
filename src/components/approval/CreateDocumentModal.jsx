@@ -681,17 +681,21 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
         {/* 메인 컨텐츠 */}
         <div className='flex flex-1 overflow-hidden'>
           {/* 왼쪽: 템플릿 목록 */}
-          <div className='w-80 border-r border-gray-200 overflow-y-auto bg-gray-50'>
-            <div className='p-4'>
+          <div className='w-80 border-r border-gray-200 bg-gray-50 flex flex-col'>
+            {/* 고정 헤더 영역 */}
+            <div className='p-4 bg-gray-50'>
               <div className='flex items-center justify-between mb-3'>
                 <h3 className='text-sm font-semibold text-gray-700'>템플릿 목록</h3>
                 <span className='text-xs text-gray-500'>
-                  {filteredTemplates.length}개
+                  {selectedTemplate
+                    ? `${templates.findIndex(t => t.id === selectedTemplate.id) + 1}/${templates.length}`
+                    : `${filteredTemplates.length}개`
+                  }
                 </span>
               </div>
 
               {/* 검색창 */}
-              <div className='relative mb-4'>
+              <div className='relative'>
                 <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
                 <input
                   type='text'
@@ -710,7 +714,10 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                   </button>
                 )}
               </div>
+            </div>
 
+            {/* 스크롤 가능한 템플릿 목록 영역 */}
+            <div className='flex-1 overflow-y-auto p-4'>
               <div className='space-y-2'>
                 {filteredTemplates.length > 0 ? (
                   filteredTemplates.map((template) => (

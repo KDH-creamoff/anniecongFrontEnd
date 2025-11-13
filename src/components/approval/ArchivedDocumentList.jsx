@@ -51,7 +51,7 @@ const ArchivedDocumentList = () => {
         },
     ];
 
-    const documentTypes = ['전체', '생산 원료 보고서', '안전점검표', '재고 실사 보고서'];
+    const documentTypes = ['전체', '최신순', '오래된순'];
 
     // 필터링 로직
     const filteredDocuments = archivedDocuments.filter((doc) => {
