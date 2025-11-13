@@ -112,9 +112,13 @@ const Receiving = ({ subPage = 'nav1' }) => {
   // 출고 대기 목록 로드 - Redux 사용
   useEffect(() => {
     if (subPage === 'nav2') {
-      // Redux 액션으로 출고 대기 목록과 완료 목록 조회
+      // Redux 액션으로 출고 대기 목록 조회
       dispatch(fetchIssuingList.request({ status: '대기' }));
-      dispatch(fetchIssuingList.request({ status: '완료' }));
+      // 출고 완료 목록 조회 (0.1초 후 호출하여 상태 업데이트 충돌 방지)
+      const timer = setTimeout(() => {
+        dispatch(fetchIssuingList.request({ status: '완료' }));
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [subPage, dispatch]);
 
@@ -180,6 +184,14 @@ const Receiving = ({ subPage = 'nav1' }) => {
     setCompletedData([completedItem, ...completedData]);
     showAlert('입고가 완료되었습니다.', 'success');
     handleCloseConfirmModal();
+  };
+
+  // 입고 대기 목록에서 삭제
+  const handleDeleteReceiving = (id) => {
+    if (!confirm('입고 대기 목록에서 삭제하시겠습니까?')) return;
+
+    setWaitingData(waitingData.filter((data) => data.id !== id));
+    showAlert('입고 대기 목록에서 삭제되었습니다.', 'info');
   };
 
   // 입고 취소 (완료 목록 -> 대기 목록)
@@ -328,6 +340,26 @@ const Receiving = ({ subPage = 'nav1' }) => {
     }
   };
 
+  // 출고 대기 목록에서 삭제
+  const handleDeleteShipping = async (id) => {
+    if (!confirm('출고 대기 목록에서 삭제하시겠습니까?')) return;
+
+    try {
+      // Redux 액션으로 출고 삭제
+      dispatch(deleteIssuing.request(id));
+
+      showAlert('출고 대기 목록에서 삭제되었습니다.', 'info');
+
+      // Redux에서 자동으로 목록 업데이트됨
+    } catch (error) {
+      console.error('출고 삭제 실패:', error);
+      showAlert(
+        error.response?.data?.message || '출고 삭제에 실패했습니다.',
+        'error'
+      );
+    }
+  };
+
   const handleCancelShipping = async (id) => {
     const item = completedIssuings.find((data) => data.id === id);
     if (!item) return;
@@ -372,6 +404,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
               waitingData={waitingData}
               onAddReceiving={handleAddReceiving}
               onReceive={handleReceive}
+              onDelete={handleDeleteReceiving}
             />
           </div>
 
@@ -408,6 +441,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
               waitingData={pendingIssuings}
               onAddShipping={handleAddShipping}
               onShip={handleShip}
+              onDelete={handleDeleteShipping}
               isLoading={issuingListLoading}
             />
           </div>

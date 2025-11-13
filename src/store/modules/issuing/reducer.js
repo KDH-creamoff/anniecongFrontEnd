@@ -9,8 +9,13 @@ import {
 
 // ==================== 초기 상태 ====================
 const initialState = {
-  // 출고 목록
+  // 출고 목록 (전체)
   issuingList: [],
+  // 출고 대기 목록 (status === '대기')
+  pendingIssuings: [],
+  // 출고 완료 목록 (status === '완료')
+  completedIssuings: [],
+
   issuingListLoading: false,
   issuingListError: null,
 
@@ -46,13 +51,23 @@ export default function issuingReducer(state = initialState, action) {
         issuingListLoading: true,
         issuingListError: null,
       };
-    case FETCH_ISSUING_LIST.SUCCESS:
+    case FETCH_ISSUING_LIST.SUCCESS: {
+      const newData = action.payload;
+      // 데이터의 status를 확인하여 적절한 배열에 저장
+      const isPending = newData.every(item => item.status === '대기');
+      const isCompleted = newData.every(item => item.status === '완료');
+
       return {
         ...state,
         issuingListLoading: false,
-        issuingList: action.payload,
+        issuingList: newData,
+        // status가 '대기'인 데이터만 들어왔다면 pendingIssuings 업데이트
+        pendingIssuings: isPending ? newData : state.pendingIssuings,
+        // status가 '완료'인 데이터만 들어왔다면 completedIssuings 업데이트
+        completedIssuings: isCompleted ? newData : state.completedIssuings,
         issuingListError: null,
       };
+    }
     case FETCH_ISSUING_LIST.FAILURE:
       return {
         ...state,
@@ -67,13 +82,17 @@ export default function issuingReducer(state = initialState, action) {
         createLoading: true,
         createError: null,
       };
-    case CREATE_ISSUING.SUCCESS:
+    case CREATE_ISSUING.SUCCESS: {
+      const newItem = action.payload;
       return {
         ...state,
         createLoading: false,
-        issuingList: [action.payload, ...state.issuingList],
+        issuingList: [newItem, ...state.issuingList],
+        // 새로 생성된 항목은 항상 '대기' 상태이므로 pendingIssuings에 추가
+        pendingIssuings: [newItem, ...state.pendingIssuings],
         createError: null,
       };
+    }
     case CREATE_ISSUING.FAILURE:
       return {
         ...state,
@@ -88,15 +107,23 @@ export default function issuingReducer(state = initialState, action) {
         updateLoading: true,
         updateError: null,
       };
-    case UPDATE_ISSUING.SUCCESS:
+    case UPDATE_ISSUING.SUCCESS: {
+      const updatedItem = action.payload;
       return {
         ...state,
         updateLoading: false,
         issuingList: state.issuingList.map((item) =>
-          item.id === action.payload.id ? action.payload : item
+          item.id === updatedItem.id ? updatedItem : item
+        ),
+        pendingIssuings: state.pendingIssuings.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
+        ),
+        completedIssuings: state.completedIssuings.map((item) =>
+          item.id === updatedItem.id ? updatedItem : item
         ),
         updateError: null,
       };
+    }
     case UPDATE_ISSUING.FAILURE:
       return {
         ...state,
@@ -111,13 +138,17 @@ export default function issuingReducer(state = initialState, action) {
         deleteLoading: true,
         deleteError: null,
       };
-    case DELETE_ISSUING.SUCCESS:
+    case DELETE_ISSUING.SUCCESS: {
+      const deletedId = action.payload;
       return {
         ...state,
         deleteLoading: false,
-        issuingList: state.issuingList.filter((item) => item.id !== action.payload),
+        issuingList: state.issuingList.filter((item) => item.id !== deletedId),
+        pendingIssuings: state.pendingIssuings.filter((item) => item.id !== deletedId),
+        completedIssuings: state.completedIssuings.filter((item) => item.id !== deletedId),
         deleteError: null,
       };
+    }
     case DELETE_ISSUING.FAILURE:
       return {
         ...state,
@@ -132,12 +163,27 @@ export default function issuingReducer(state = initialState, action) {
         batchLoading: true,
         batchError: null,
       };
-    case BATCH_ISSUE.SUCCESS:
+    case BATCH_ISSUE.SUCCESS: {
+      const { items } = action.payload; // saga에서 전달하는 완료된 항목 배열
+      const completedIds = items.map(item => item.id);
+
       return {
         ...state,
         batchLoading: false,
+        // pendingIssuings에서 완료된 항목들 제거
+        pendingIssuings: state.pendingIssuings.filter(
+          item => !completedIds.includes(item.id)
+        ),
+        // completedIssuings에 완료된 항목들 추가
+        completedIssuings: [...items, ...state.completedIssuings],
+        // issuingList도 업데이트 (대기 항목 제거, 완료 항목 추가)
+        issuingList: [
+          ...state.issuingList.filter(item => !completedIds.includes(item.id)),
+          ...items
+        ],
         batchError: null,
       };
+    }
     case BATCH_ISSUE.FAILURE:
       return {
         ...state,

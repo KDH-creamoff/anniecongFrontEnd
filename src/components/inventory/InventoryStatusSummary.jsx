@@ -12,7 +12,6 @@ export default function InventoryStatusSummary() {
     totalItems: 0,
     lowStock: 0,
     expiringSoon: 0,
-    expired: 0,
     warehouseCount: 0,
   };
 

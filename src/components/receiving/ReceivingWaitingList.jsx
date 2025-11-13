@@ -1,7 +1,7 @@
-import { Package, Calendar } from 'lucide-react';
+import { Package, Calendar, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive }) => {
+const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete }) => {
   const [receivingInputs, setReceivingInputs] = useState({});
 
   const handleInputChange = (id, field, value) => {
@@ -89,6 +89,9 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive }) => {
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 입고예정일
               </th>
+              <th className='px-4 py-3 text-center text-xs font-semibold text-gray-600' colSpan='2'>
+                작업
+              </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
@@ -131,12 +134,19 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive }) => {
                     <span>{item.expectedDate}</span>
                   </div>
                 </td>
-                <td className='px-4 py-4'>
+                <td className='flex gap-1 justify-center items-center px-4 py-4'>
                   <button
                     onClick={() => handleReceive(item)}
                     className='rounded-xl bg-[#674529] hover:bg-[#553821] px-4 py-2 text-sm font-medium text-white transition-colors'
                   >
                     입고
+                  </button>
+                  <button
+                    onClick={() => onDelete(item.id)}
+                    className='rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600'
+                    title='삭제'
+                  >
+                    <Trash2 className='h-4 w-4' />
                   </button>
                 </td>
               </tr>

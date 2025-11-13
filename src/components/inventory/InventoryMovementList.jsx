@@ -6,7 +6,7 @@ import { selectInventoryMovements } from "../../store/modules/inventory/selector
 
 const typeBadge = (type) => {
   if (type === "입고") return "bg-blue-50 text-blue-600";
-  if (type === "소모") return "bg-red-50 text-red-600";
+  if (type === "출고") return "bg-red-50 text-red-600";
   if (type === "생산") return "bg-green-50 text-green-600";
   if (type === "이동") return "bg-yellow-50 text-yellow-600";
   return "bg-gray-50 text-gray-600";

@@ -57,13 +57,13 @@ const ShippingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
                   {item.itemName}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.expectedQuantity}
+                  {item.orderQuantity || item.expectedQuantity} {item.unit}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.shippedQuantity}
+                  {item.issuedQuantity || item.shippedQuantity} {item.unit}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.unitCount}
+                  {item.unitCount || '-'}
                 </td>
                 <td className='px-4 py-4'>
                   <div className='flex items-center justify-end space-x-2'>
