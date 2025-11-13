@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Clock } from "lucide-react";
 import { fetchInventoryMovements } from "../../store/modules/inventory/actions";
 import { selectInventoryMovements } from "../../store/modules/inventory/selectors";
+import Pagination from "../common/Pagination";
 
 const typeBadge = (type) => {
   if (type === "입고") return "bg-blue-50 text-blue-600";
@@ -24,9 +25,19 @@ export default function InventoryMovementList() {
   const rows = useSelector(selectInventoryMovements) || [];
   const loading = useSelector((state) => state.inventory.inventoryMovements.loading);
 
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     dispatch(fetchInventoryMovements.request({ page: 1, limit: 50 }));
   }, [dispatch]);
+
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(rows.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedRows = rows.slice(startIndex, endIndex);
 
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -52,7 +63,7 @@ export default function InventoryMovementList() {
           <tbody>
             {loading ? (
               <tr><td className="px-4 py-6 text-sm text-gray-500" colSpan={9}>불러오는 중…</td></tr>
-            ) : rows.map((m, i) => (
+            ) : paginatedRows.map((m, i) => (
               <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="px-4 py-4 text-sm text-gray-900">{m.time}</td>
                 <td className="px-4 py-4">
@@ -74,6 +85,14 @@ export default function InventoryMovementList() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={rows.length}
+        itemsPerPage={itemsPerPage}
+      />
     </div>
   );
 }

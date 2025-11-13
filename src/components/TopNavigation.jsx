@@ -3,12 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Bell,
   User,
-  LogOut,
   Settings,
   Factory,
   BarChart3,
   Tags,
-  ShoppingCart,
   Truck,
   Home,
   Package,
@@ -170,7 +168,7 @@ const TopNavigation = () => {
         </div>
 
         {/* 우측: 알림 및 사용자 아이콘 */}
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-2 min-w-[100px]'>
           {/* 알림 아이콘 */}
           <button className='relative rounded-full p-1.5 transition-colors hover:bg-gray-100'>
             <Bell size={16} className='text-gray-600' />

@@ -1,24 +1,33 @@
+import { useSelector } from 'react-redux';
 import { Users } from 'lucide-react';
 
 const UserSummaryCards = () => {
+  const { users } = useSelector((state) => state.user);
+
+  // 사용자 데이터에서 통계 계산
+  const userData = users.data || [];
+  const totalUsers = userData.length;
+  const productionTeam = userData.filter((user) => user.department === '생산팀').length;
+  const managementTeam = userData.filter((user) => user.department === '경영지원팀').length;
+
   const summaryData = [
     {
       label: '전체 사용자',
-      count: 20,
+      count: totalUsers,
       icon: Users,
       bgColor: 'bg-[#674529]',
       iconColor: 'text-white',
     },
     {
       label: '생산팀',
-      count: 14,
+      count: productionTeam,
       icon: Users,
       bgColor: 'bg-orange-300',
       iconColor: 'text-white',
     },
     {
       label: '경영지원팀',
-      count: 6,
+      count: managementTeam,
       icon: Users,
       bgColor: 'bg-[#86A956]',
       iconColor: 'text-white',

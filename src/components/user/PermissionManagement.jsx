@@ -85,15 +85,17 @@ const PermissionManagement = () => {
   // 필터 상태
   const [filterPosition, setFilterPosition] = useState('전체');
   const [filterDepartment, setFilterDepartment] = useState('전체');
+  const [searchName, setSearchName] = useState('');
 
   // 필터링된 사용자 목록
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const matchPosition = filterPosition === '전체' || user.position === filterPosition;
       const matchDepartment = filterDepartment === '전체' || user.department === filterDepartment;
-      return matchPosition && matchDepartment;
+      const matchName = searchName === '' || user.name.toLowerCase().includes(searchName.toLowerCase());
+      return matchPosition && matchDepartment && matchName;
     });
-  }, [users, filterPosition, filterDepartment]);
+  }, [users, filterPosition, filterDepartment, searchName]);
 
   // 권한 토글 핸들러
   const handlePermissionToggle = (userId, permissionName) => {
@@ -223,6 +225,14 @@ const PermissionManagement = () => {
 
           {/* 필터 선택 */}
           <div className='flex items-center space-x-3'>
+            <input
+              type='text'
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              placeholder='사용자 이름 검색'
+              className='px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#674529] focus:border-transparent'
+            />
+
             <select
               value={filterPosition}
               onChange={(e) => setFilterPosition(e.target.value)}

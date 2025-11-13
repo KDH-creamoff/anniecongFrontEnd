@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MapPin, Clock, Package } from "lucide-react";
 import { fetchInventoryStatus } from "../../store/modules/inventory/actions";
@@ -6,27 +6,21 @@ import {
   selectInventoryStatus,
   selectInventoryStatusLoading,
 } from "../../store/modules/inventory/selectors";
+import Pagination from "../common/Pagination";
 
 export default function InventoryStatusList({ filters }) {
   const dispatch = useDispatch();
 
-  // Redux에서 데이터 가져오기
-  // - items: 재고 목록 데이터
-  // - loading: API 호출 로딩 상태
   const items = useSelector(selectInventoryStatus) || [];
   const loading = useSelector(selectInventoryStatusLoading);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   useEffect(() => {
-    // 재고 현황 조회 액션 디스패치
     dispatch(fetchInventoryStatus.request());
   }, [dispatch]);
 
-  /**
-   * 클라이언트 측 필터링
-   *
-   * Redux에서 가져온 데이터를 filters prop으로 필터링
-   * useMemo로 성능 최적화 (items나 filters가 바뀔 때만 재계산)
-   */
   const filteredItems = useMemo(() => {
     if (!filters || items.length === 0) return items;
 
@@ -71,6 +65,17 @@ export default function InventoryStatusList({ filters }) {
     });
   }, [items, filters]);
 
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+
+  // 필터가 변경되면 첫 페이지로 이동
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-sm">
       <div className="border-b border-gray-200 px-6 py-4">
@@ -114,7 +119,7 @@ export default function InventoryStatusList({ filters }) {
                 </td>
               </tr>
             ) : (
-              filteredItems.map((d) => {
+              paginatedItems.map((d) => {
                 const days = Number(d?.daysLeft ?? 0);
                 const daysLabel = days >= 0 ? `- ${days}일` : `+ ${Math.abs(days)}일`;
                 const badge =
@@ -154,6 +159,17 @@ export default function InventoryStatusList({ filters }) {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="px-6 pb-4 border-gray-200">
+
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredItems.length}
+        itemsPerPage={itemsPerPage}
+      />
       </div>
     </div>
   );

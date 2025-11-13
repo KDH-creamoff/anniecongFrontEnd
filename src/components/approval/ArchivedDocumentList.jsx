@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FileText, Download, Calendar, User, ChevronDown } from 'lucide-react';
+import Pagination from '../common/Pagination';
 
 const ArchivedDocumentList = () => {
     const [filters, setFilters] = useState({
         type: '전체',
         searchTerm: '',
     });
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     const handleFilterChange = (key, value) => {
         setFilters({ ...filters, [key]: value });
+        setCurrentPage(1); // 필터 변경 시 첫 페이지로 이동
     };
 
     const handleReset = () => {
@@ -16,6 +20,7 @@ const ArchivedDocumentList = () => {
             type: '전체',
             searchTerm: '',
         });
+        setCurrentPage(1); // 초기화 시 첫 페이지로 이동
     };
 
     const archivedDocuments = [
@@ -49,32 +54,160 @@ const ArchivedDocumentList = () => {
             approvedDate: '2024-01-11',
             approver: '최부장'
         },
+        {
+            id: 4,
+            docNumber: 'DOC-2024-0004',
+            title: '2월 품질검사 결과 보고서',
+            type: '품질검사 보고서',
+            author: '품질담당',
+            createdDate: '2024-02-05',
+            approvedDate: '2024-02-07',
+            approver: '이관리자'
+        },
+        {
+            id: 5,
+            docNumber: 'DOC-2024-0005',
+            title: '설비 유지보수 계획서',
+            type: '유지보수 계획서',
+            author: '설비담당',
+            createdDate: '2024-02-01',
+            approvedDate: '2024-02-03',
+            approver: '박부장'
+        },
+        {
+            id: 6,
+            docNumber: 'DOC-2024-0006',
+            title: '3월 1주차 생산 원료 보고서',
+            type: '생산 원료 보고서',
+            author: '김생산',
+            createdDate: '2024-03-01',
+            approvedDate: '2024-03-03',
+            approver: '이관리자'
+        },
+        {
+            id: 7,
+            docNumber: 'DOC-2024-0007',
+            title: '환경안전 점검표 (3월)',
+            type: '안전점검표',
+            author: '안전관리자',
+            createdDate: '2024-03-10',
+            approvedDate: '2024-03-12',
+            approver: '최부장'
+        },
+        {
+            id: 8,
+            docNumber: 'DOC-2024-0008',
+            title: '2월 재고 실사 보고서',
+            type: '재고 실사 보고서',
+            author: '재고담당',
+            createdDate: '2024-02-20',
+            approvedDate: '2024-02-22',
+            approver: '박부장'
+        },
+        {
+            id: 9,
+            docNumber: 'DOC-2024-0009',
+            title: '4월 생산 계획서',
+            type: '생산 계획서',
+            author: '김생산',
+            createdDate: '2024-03-25',
+            approvedDate: '2024-03-27',
+            approver: '이관리자'
+        },
+        {
+            id: 10,
+            docNumber: 'DOC-2024-0010',
+            title: '작업장 안전교육 결과 보고서',
+            type: '교육 보고서',
+            author: '안전관리자',
+            createdDate: '2024-03-15',
+            approvedDate: '2024-03-17',
+            approver: '최부장'
+        },
+        {
+            id: 11,
+            docNumber: 'DOC-2024-0011',
+            title: '3월 품질검사 결과 보고서',
+            type: '품질검사 보고서',
+            author: '품질담당',
+            createdDate: '2024-03-20',
+            approvedDate: '2024-03-22',
+            approver: '박부장'
+        },
+        {
+            id: 12,
+            docNumber: 'DOC-2024-0012',
+            title: '설비 교체 신청서',
+            type: '설비 신청서',
+            author: '설비담당',
+            createdDate: '2024-04-01',
+            approvedDate: '2024-04-03',
+            approver: '이관리자'
+        },
+        {
+            id: 13,
+            docNumber: 'DOC-2024-0013',
+            title: '4월 1주차 생산 원료 보고서',
+            type: '생산 원료 보고서',
+            author: '김생산',
+            createdDate: '2024-04-05',
+            approvedDate: '2024-04-07',
+            approver: '이관리자'
+        },
+        {
+            id: 14,
+            docNumber: 'DOC-2024-0014',
+            title: '소방안전 점검표 (4월)',
+            type: '안전점검표',
+            author: '안전관리자',
+            createdDate: '2024-04-10',
+            approvedDate: '2024-04-12',
+            approver: '최부장'
+        },
     ];
 
     const documentTypes = ['전체', '최신순', '오래된순'];
 
-    // 필터링 로직
-    const filteredDocuments = archivedDocuments.filter((doc) => {
-        // 유형 필터
-        if (filters.type !== '전체' && doc.type !== filters.type) {
-            return false;
-        }
+    // 정렬 및 필터링 로직
+    const filteredAndSortedDocuments = useMemo(() => {
+        // 1. 필터링
+        let filtered = archivedDocuments.filter((doc) => {
+            // 검색어 필터
+            if (filters.searchTerm.trim()) {
+                const search = filters.searchTerm.toLowerCase().trim();
+                const docNumber = doc.docNumber.toLowerCase();
+                const title = doc.title.toLowerCase();
+                const type = doc.type.toLowerCase();
+                const author = doc.author.toLowerCase();
 
-        // 검색어 필터
-        if (filters.searchTerm.trim()) {
-            const search = filters.searchTerm.toLowerCase().trim();
-            const docNumber = doc.docNumber.toLowerCase();
-            const title = doc.title.toLowerCase();
-            const type = doc.type.toLowerCase();
-            const author = doc.author.toLowerCase();
-
-            if (!docNumber.includes(search) && !title.includes(search) && !type.includes(search) && !author.includes(search)) {
-                return false;
+                if (!docNumber.includes(search) && !title.includes(search) && !type.includes(search) && !author.includes(search)) {
+                    return false;
+                }
             }
+
+            return true;
+        });
+
+        // 2. 정렬
+        if (filters.type === '최신순') {
+            filtered = [...filtered].sort((a, b) => new Date(b.approvedDate) - new Date(a.approvedDate));
+        } else if (filters.type === '오래된순') {
+            filtered = [...filtered].sort((a, b) => new Date(a.approvedDate) - new Date(b.approvedDate));
         }
 
-        return true;
-    });
+        return filtered;
+    }, [archivedDocuments, filters]);
+
+    // 페이지네이션 계산
+    const totalPages = Math.ceil(filteredAndSortedDocuments.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentDocuments = filteredAndSortedDocuments.slice(startIndex, endIndex);
+
+    // 페이지 변경 핸들러
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     return (
         <div className="space-y-6">
@@ -138,8 +271,8 @@ const ArchivedDocumentList = () => {
                     <div className="flex items-center space-x-2">
                         <FileText className="h-5 w-5 text-[#674529]" />
                         <h3 className="text-base font-semibold text-[#674529]">
-                            보관 문서 목록 ({filteredDocuments.length}건
-                            {archivedDocuments.length !== filteredDocuments.length && ` / ${archivedDocuments.length}건`})
+                            보관 문서 목록 ({filteredAndSortedDocuments.length}건
+                            {archivedDocuments.length !== filteredAndSortedDocuments.length && ` / ${archivedDocuments.length}건`})
                         </h3>
                     </div>
                     <p className="mt-1 text-sm text-gray-600">
@@ -178,7 +311,7 @@ const ArchivedDocumentList = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredDocuments.map((doc) => (
+                            {currentDocuments.map((doc) => (
                                 <tr
                                     key={doc.id}
                                     className="transition-colors hover:bg-gray-50/50"
@@ -223,6 +356,17 @@ const ArchivedDocumentList = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* 페이지네이션 */}
+                <div className="px-6 py-4 border-t border-gray-200">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        totalItems={filteredAndSortedDocuments.length}
+                        itemsPerPage={itemsPerPage}
+                    />
                 </div>
             </div>
         </div>

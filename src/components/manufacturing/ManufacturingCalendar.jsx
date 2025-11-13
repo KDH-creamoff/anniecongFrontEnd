@@ -114,8 +114,8 @@ const ManufacturingCalendar = ({ onDateSelect, manufacturingData }) => {
                             onClick={() => handleDateClick(day)}
                             className={`
                                 min-h-[80px] p-2 border border-[#F5E6D3]
-                                ${day ? 'cursor-pointer hover:bg-gray-50' : ''}
-                                ${isSelectedDate(day) ? 'bg-[#FFF8DC]' : ''}
+                                ${day ? 'cursor-pointer hover:bg-gray-100' : ''}
+                                ${isSelectedDate(day) ? 'bg-gray-100' : ''}
                             `}
                         >
                             {day && (
@@ -130,12 +130,12 @@ const ManufacturingCalendar = ({ onDateSelect, manufacturingData }) => {
                                     {dayData && (
                                         <div className="space-y-1">
                                             {dayData.pending > 0 && (
-                                                <div className="text-xs px-2 py-1 rounded bg-yellow-200 text-gray-700">
+                                                <div className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800">
                                                     대기 {dayData.pending}개
                                                 </div>
                                             )}
                                             {dayData.completed > 0 && (
-                                                <div className="text-xs px-2 py-1 rounded bg-green-200 text-gray-700">
+                                                <div className="text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-800">
                                                     완료 {dayData.completed}개
                                                 </div>
                                             )}

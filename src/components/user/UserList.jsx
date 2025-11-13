@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Users, Trash2 } from 'lucide-react';
 import Pagination from '../common/Pagination';
+import { fetchUsers, deleteUser } from '../../store/modules/user/actions';
 
 const UserList = () => {
+  const dispatch = useDispatch();
+  const { users, deleteStatus } = useSelector((state) => state.user);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const users = [
+  // 컴포넌트 마운트 시 사용자 목록 조회
+  useEffect(() => {
+    dispatch(fetchUsers.request());
+  }, [dispatch]);
+
+  const mockUsers = [
     // 대표 1명
     {
       id: 'USR001',
@@ -234,15 +243,33 @@ const UserList = () => {
     },
   ];
 
+  // 사용자 삭제 핸들러
+  const handleDelete = (userId) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    dispatch(deleteUser.request(userId));
+  };
+
+  // 리덕스에서 가져온 사용자 데이터가 없으면 mockUsers 사용
+  const displayUsers = users.data && users.data.length > 0 ? users.data : mockUsers;
+
   // 페이지네이션 계산
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const totalPages = Math.ceil(displayUsers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
+  const currentUsers = displayUsers.slice(startIndex, endIndex);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  // 로딩 상태 처리
+  if (users.loading) {
+    return (
+      <div className='rounded-xl border border-gray-200 bg-white p-8 shadow-sm'>
+        <div className='text-center text-gray-600'>로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className='rounded-xl border border-gray-200 bg-white shadow-sm'>
@@ -305,7 +332,10 @@ const UserList = () => {
                 </td>
                 <td className='px-4 py-3'>
                   <div className='flex items-center space-x-2'>
-                    <button className='text-red-600 hover:text-red-700'>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className='text-red-600 hover:text-red-700'
+                    >
                       <Trash2 className='h-4 w-4' />
                     </button>
                   </div>

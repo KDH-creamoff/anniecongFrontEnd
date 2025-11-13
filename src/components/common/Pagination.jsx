@@ -1,6 +1,18 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
+  // totalItems와 itemsPerPage가 제공되면, 아이템이 한 페이지를 초과할 때만 표시
+  if (totalItems !== undefined && itemsPerPage !== undefined) {
+    if (totalItems <= itemsPerPage) {
+      return null;
+    }
+  }
+
+  // totalPages가 1 이하면 페이지네이션 숨김
+  if (totalPages <= 1) {
+    return null;
+  }
+
   const getPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
