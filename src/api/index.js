@@ -97,15 +97,44 @@ export const manufacturingAPI = {
   getTransferStatus: (params) => apiClient.get('/manufacturing/transfers', { params }),
 };
 
-// ==================== 배송 관리 API ====================
+// ==================== 배송&출고 관리 API ====================
 export const shippingAPI = {
-  getShippingList: (params) => apiClient.get('/shipping', { params }),
+  // 출고 대기/완료 목록
+  getWaitingList: (params = {}) => apiClient.get('/shipping/waiting', { params }),
+  getCompletedList: (params = {}) => apiClient.get('/shipping/completed', { params }),
+
+  // 출고 생성/확인/취소
   createShipping: (data) => apiClient.post('/shipping', data),
-  updateShipping: (id, data) => apiClient.put(`/shipping/${id}`, data),
-  confirmShipping: (id) => apiClient.post(`/shipping/${id}/confirm`),
-  getB2BShippings: (params) => apiClient.get('/shipping/b2b', { params }),
-  getBC2Shippings: (params) => apiClient.get('/shipping/bc2', { params }),
+  confirmShipping: (id, data = {}) => apiClient.post(`/shipping/${id}/confirm`, data),
+  cancelShipping: (id) => apiClient.post(`/shipping/${id}/cancel`),
+
+  // 주문 관련
+  uploadOrders: (formData) =>
+    apiClient.post('/shipping/upload-orders', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  getOrders: (params = {}) => apiClient.get('/shipping/orders', { params }),
+  getOrder: (id) => apiClient.get(`/shipping/orders/${id}`),
+  updateOrder: (id, data) => apiClient.put(`/shipping/orders/${id}`, data),
+  deleteOrder: (id) => apiClient.delete(`/shipping/orders/${id}`),
+
+  // CJ/이슈 관련
+  exportCjLogistics: (data) => apiClient.post('/shipping/export/cj-logistics', data),
+  generateIssueList: (data) => apiClient.post('/shipping/issue-list/generate', data),
+  exportIssueList: (id) => apiClient.get(`/shipping/issue-list/${id}/export`),
+  processIssueList: (id, data = {}) => apiClient.post(`/shipping/issue-list/${id}/process`, data),
+
+  // 운송장/배치
+  bulkTrackingNumbers: (data) => apiClient.post('/shipping/tracking-numbers/bulk', data),
+  uploadTrackingNumbers: (formData) =>
+    apiClient.post('/shipping/tracking-numbers/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  getBatches: (params = {}) => apiClient.get('/shipping/batches', { params }),
+  getBatch: (id) => apiClient.get(`/shipping/batches/${id}`),
+  confirmBatch: (id, data = {}) => apiClient.post(`/shipping/batches/${id}/confirm`, data),
+  deleteBatch: (id) => apiClient.delete(`/shipping/batches/${id}`),
+
+  // 파일 다운로드
+  downloadFile: (filename) => apiClient.get(`/shipping/download/${filename}`),
 };
+
 
 // ==================== 입고 관리 API ====================
 export const receivingAPI = {
