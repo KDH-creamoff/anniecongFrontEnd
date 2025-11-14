@@ -23,6 +23,7 @@ import {
   SET_BASIC_FILTER,
   CLEAR_BASIC_ERROR,
   RESET_BASIC_STATE,
+  DELETE_STORAGE_CONDITION,
 } from './actions';
 
 const initialState = {
@@ -181,6 +182,13 @@ const basicReducer = (state = initialState, action) => {
         },
         storageOperation: { data: action.payload, loading: false, error: null }
       };
+    // BOM 삭제
+    case DELETE_STORAGE_CONDITION.REQUEST:
+      return { ...state, storageOperation: { ...state.storageOperation, loading: true, error: null } };
+    case DELETE_STORAGE_CONDITION.SUCCESS:
+      return { ...state, storageOperation: { data: action.payload, loading: false, error: null } };
+    case DELETE_STORAGE_CONDITION.FAILURE:
+      return { ...state, storageOperation: { ...state.storageOperation, loading: false, error: action.error } };
     case UPDATE_STORAGE_CONDITION.FAILURE:
       return { ...state, storageOperation: { ...state.storageOperation, loading: false, error: action.error } };
 

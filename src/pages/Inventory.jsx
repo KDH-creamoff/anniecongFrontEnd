@@ -24,12 +24,6 @@ const Inventory = () => {
     console.log('필터 변경:', newFilters);
   };
 
-  const handleExport = () => {
-    // 데이터 내보내기 로직
-    console.log('데이터 내보내기');
-    alert('데이터를 내보내는 중입니다...');
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'status':
@@ -76,12 +70,6 @@ const Inventory = () => {
             </h1>
           </div>
         </div>
-        <button
-          onClick={handleExport}
-          className='flex items-center space-x-2 rounded-xl border border-[#674529] bg-white px-4 py-2.5 font-medium text-[#674529] transition-colors hover:bg-gray-50'
-        >
-          <span>데이터 내보내기</span>
-        </button>
       </div>
 
       {/* 탭 선택 */}

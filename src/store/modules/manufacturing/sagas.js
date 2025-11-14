@@ -43,8 +43,6 @@ import {
   fetchCalendarSummary,
 } from './action';
 
-// ==================== 목데이터 ====================
-
 // 작업 지시서 목데이터
 let mockWorkOrders = [
   {
@@ -715,9 +713,8 @@ const generateCalendarSummary = (historyData) => {
 };
 
 // ==================== 작업 지시서 Saga ====================
-function* fetchWorkOrdersSaga(/* action */) {
+function* fetchWorkOrdersSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getWorkOrders, action.payload);
     // yield put(fetchWorkOrders.success(response.data));
 
@@ -730,7 +727,6 @@ function* fetchWorkOrdersSaga(/* action */) {
 
 function* fetchWorkOrderByIdSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getWorkOrderById, action.payload);
     // yield put(fetchWorkOrderById.success(response.data));
 
@@ -748,7 +744,6 @@ function* fetchWorkOrderByIdSaga(action) {
 
 function* createWorkOrderSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.createWorkOrder, action.payload);
     // yield put(createWorkOrder.success(response.data));
 
@@ -768,7 +763,6 @@ function* createWorkOrderSaga(action) {
 
 function* updateWorkOrderSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const { id, data } = action.payload;
     // const response = yield call(manufacturingAPI.updateWorkOrder, id, data);
     // yield put(updateWorkOrder.success(response.data));
@@ -789,7 +783,6 @@ function* updateWorkOrderSaga(action) {
 
 function* deleteWorkOrderSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.deleteWorkOrder, action.payload);
     // yield put(deleteWorkOrder.success(response.data));
 
@@ -803,7 +796,6 @@ function* deleteWorkOrderSaga(action) {
 
 function* updateWorkOrderStatusSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const { id, status } = action.payload;
     // const response = yield call(manufacturingAPI.updateWorkOrderStatus, id, status);
     // yield put(updateWorkOrderStatus.success(response.data));
@@ -823,9 +815,8 @@ function* updateWorkOrderStatusSaga(action) {
 }
 
 // ==================== 제조 이력 Saga ====================
-function* fetchManufacturingHistorySaga(/* action */) {
+function* fetchManufacturingHistorySaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getManufacturingHistory, action.payload);
     // yield put(fetchManufacturingHistory.success(response.data));
 
@@ -839,7 +830,6 @@ function* fetchManufacturingHistorySaga(/* action */) {
 
 function* fetchHistoryByDateSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getHistoryByDate, action.payload);
     // yield put(fetchHistoryByDate.success(response.data));
 
@@ -855,7 +845,6 @@ function* fetchHistoryByDateSaga(action) {
 
 function* createManufacturingRecordSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.createManufacturingRecord, action.payload);
     // yield put(createManufacturingRecord.success(response.data));
 
@@ -873,9 +862,8 @@ function* createManufacturingRecordSaga(action) {
 }
 
 // ==================== 공장간 이동 Saga ====================
-function* fetchTransfersSaga(/* action */) {
+function* fetchTransfersSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getTransfers, action.payload);
     // yield put(fetchTransfers.success(response.data));
 
@@ -888,7 +876,6 @@ function* fetchTransfersSaga(/* action */) {
 
 function* fetchTransferByIdSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getTransferById, action.payload);
     // yield put(fetchTransferById.success(response.data));
 
@@ -906,7 +893,6 @@ function* fetchTransferByIdSaga(action) {
 
 function* createTransferSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.createTransfer, action.payload);
     // yield put(createTransfer.success(response.data));
 
@@ -927,7 +913,6 @@ function* createTransferSaga(action) {
 
 function* updateTransferStatusSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const { id, status } = action.payload;
     // const response = yield call(manufacturingAPI.updateTransferStatus, id, status);
     // yield put(updateTransferStatus.success(response.data));
@@ -948,7 +933,6 @@ function* updateTransferStatusSaga(action) {
 
 function* cancelTransferSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.cancelTransfer, action.payload);
     // yield put(cancelTransfer.success(response.data));
 
@@ -966,9 +950,8 @@ function* cancelTransferSaga(action) {
 }
 
 // ==================== 2공장 제조 Saga ====================
-function* fetchFactory2WorksSaga(/* action */) {
+function* fetchFactory2WorksSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getFactory2Works, action.payload);
     // yield put(fetchFactory2Works.success(response.data));
 
@@ -979,9 +962,8 @@ function* fetchFactory2WorksSaga(/* action */) {
   }
 }
 
-function* fetchFactory2OrdersSaga(/* action */) {
+function* fetchFactory2OrdersSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getFactory2Orders, action.payload);
     // yield put(fetchFactory2Orders.success(response.data));
 
@@ -994,7 +976,6 @@ function* fetchFactory2OrdersSaga(/* action */) {
 
 function* updateFactory2WorkStatusSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const { id, status } = action.payload;
     // const response = yield call(manufacturingAPI.updateFactory2WorkStatus, id, status);
     // yield put(updateFactory2WorkStatus.success(response.data));
@@ -1014,9 +995,8 @@ function* updateFactory2WorkStatusSaga(action) {
 }
 
 // ==================== 작업 통계 Saga ====================
-function* fetchWorkStatisticsSaga(/* action */) {
+function* fetchWorkStatisticsSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getWorkStatistics, action.payload);
     // yield put(fetchWorkStatistics.success(response.data));
 
@@ -1028,9 +1008,8 @@ function* fetchWorkStatisticsSaga(/* action */) {
 }
 
 // ==================== 캘린더 요약 데이터 Saga ====================
-function* fetchCalendarSummarySaga(/* action */) {
+function* fetchCalendarSummarySaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(manufacturingAPI.getCalendarSummary, action.payload);
     // yield put(fetchCalendarSummary.success(response.data));
 

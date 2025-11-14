@@ -10,6 +10,13 @@ export const CREATE_ITEM = createRequestTypes('basic/CREATE_ITEM');
 export const UPDATE_ITEM = createRequestTypes('basic/UPDATE_ITEM');
 export const DELETE_ITEM = createRequestTypes('basic/DELETE_ITEM');
 
+// 공장 정보 관리
+export const FETCH_FACTORIES = createRequestTypes('basic/FETCH_FACTORIES');
+export const FETCH_FACTORY_BY_ID = createRequestTypes('basic/FETCH_FACTORY_BY_ID');
+export const CREATE_FACTORY = createRequestTypes('basic/CREATE_FACTORY');
+export const UPDATE_FACTORY = createRequestTypes('basic/UPDATE_FACTORY');
+export const DELETE_FACTORY = createRequestTypes('basic/DELETE_FACTORY');
+
 // BOM 관리
 export const FETCH_BOMS = createRequestTypes('basic/FETCH_BOMS');
 export const FETCH_BOM_BY_ID = createRequestTypes('basic/FETCH_BOM_BY_ID');
@@ -22,13 +29,7 @@ export const FETCH_STORAGE_CONDITIONS = createRequestTypes('basic/FETCH_STORAGE_
 export const FETCH_STORAGE_CONDITION = createRequestTypes('basic/FETCH_STORAGE_CONDITION');
 export const CREATE_STORAGE_CONDITION = createRequestTypes('basic/CREATE_STORAGE_CONDITION');
 export const UPDATE_STORAGE_CONDITION = createRequestTypes('basic/UPDATE_STORAGE_CONDITION');
-
-// 공장 정보 관리
-export const FETCH_FACTORIES = createRequestTypes('basic/FETCH_FACTORIES');
-export const FETCH_FACTORY_BY_ID = createRequestTypes('basic/FETCH_FACTORY_BY_ID');
-export const CREATE_FACTORY = createRequestTypes('basic/CREATE_FACTORY');
-export const UPDATE_FACTORY = createRequestTypes('basic/UPDATE_FACTORY');
-export const DELETE_FACTORY = createRequestTypes('basic/DELETE_FACTORY');
+export const DELETE_STORAGE_CONDITION = createRequestTypes('basic/DELETE_STORAGE_CONDITION');
 
 // UI 상태 관리
 export const SET_BASIC_FILTER = 'basic/SET_BASIC_FILTER';

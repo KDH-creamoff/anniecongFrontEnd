@@ -190,7 +190,6 @@ function* fetchIssuingListSaga(action) {
 // ==================== 출고 생성 (대기 목록에 추가) ====================
 function* createIssuingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.issueInventory, action.payload);
     // yield put(createIssuing.success(response.data));
 
@@ -213,7 +212,6 @@ function* createIssuingSaga(action) {
 // ==================== 출고 수정 ====================
 function* updateIssuingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.updateInventory, action.payload.id, action.payload.data);
     // yield put(updateIssuing.success(response.data));
 
@@ -246,7 +244,6 @@ function* updateIssuingSaga(action) {
 // ==================== 출고 삭제 ====================
 function* deleteIssuingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // yield call(inventoryAPI.deleteInventory, action.payload);
     // yield put(deleteIssuing.success(action.payload));
 
@@ -263,7 +260,6 @@ function* deleteIssuingSaga(action) {
 // ==================== 일괄 출고 (대기 → 완료 전환) ====================
 function* batchIssueSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.batchIssue, action.payload);
     // yield put(batchIssue.success(response.data));
 
@@ -298,9 +294,8 @@ function* batchIssueSaga(action) {
 }
 
 // ==================== 출고 통계 ====================
-function* fetchIssuingStatsSaga(/* action */) {
+function* fetchIssuingStatsSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.getTransactionStats, {
     //   ...action.payload,
     //   type: 'ISSUE'

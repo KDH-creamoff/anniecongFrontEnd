@@ -1,5 +1,3 @@
-// ==================== 라벨 Selectors ====================
-
 // 프린터
 export const selectPrinters = (state) => state.label.printers.data;
 export const selectPrintersLoading = (state) => state.label.printers.loading;

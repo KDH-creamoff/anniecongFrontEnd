@@ -197,7 +197,7 @@ const mockBC2Shippings = [
 ];
 
 // 배송 주문 목록 조회
-function* fetchShippingListSaga(/* action */) {
+function* fetchShippingListSaga(action) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(shippingAPI.getOrders, action.payload);
