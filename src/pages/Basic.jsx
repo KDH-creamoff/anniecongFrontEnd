@@ -5,6 +5,7 @@ import BasicNewItem from '../components/basic/BasicNewItem';
 import BasicItemList from '../components/basic/BasicItemList';
 import BOMManagement from '../components/basic/BOMManagement';
 import StorageTemperature from '../components/basic/StorageTemperature';
+import FactoryInfo from '../components/basic/FactoryInfo';
 
 const Basic = () => {
   const [activeTab, setActiveTab] = useState('items');
@@ -16,6 +17,12 @@ const Basic = () => {
           <>
             <BasicNewItem />
             <BasicItemList />
+          </>
+        );
+      case 'processes':
+        return (
+          <>
+            <FactoryInfo />
           </>
         );
       case 'bom':

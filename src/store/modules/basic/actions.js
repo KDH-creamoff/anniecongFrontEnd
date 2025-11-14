@@ -23,6 +23,13 @@ export const FETCH_STORAGE_CONDITION = createRequestTypes('basic/FETCH_STORAGE_C
 export const CREATE_STORAGE_CONDITION = createRequestTypes('basic/CREATE_STORAGE_CONDITION');
 export const UPDATE_STORAGE_CONDITION = createRequestTypes('basic/UPDATE_STORAGE_CONDITION');
 
+// 공장 정보 관리
+export const FETCH_FACTORIES = createRequestTypes('basic/FETCH_FACTORIES');
+export const FETCH_FACTORY_BY_ID = createRequestTypes('basic/FETCH_FACTORY_BY_ID');
+export const CREATE_FACTORY = createRequestTypes('basic/CREATE_FACTORY');
+export const UPDATE_FACTORY = createRequestTypes('basic/UPDATE_FACTORY');
+export const DELETE_FACTORY = createRequestTypes('basic/DELETE_FACTORY');
+
 // UI 상태 관리
 export const SET_BASIC_FILTER = 'basic/SET_BASIC_FILTER';
 export const CLEAR_BASIC_ERROR = 'basic/CLEAR_BASIC_ERROR';
@@ -50,6 +57,13 @@ export const fetchStorageConditions = createAsyncActions(FETCH_STORAGE_CONDITION
 export const fetchStorageCondition = createAsyncActions(FETCH_STORAGE_CONDITION);
 export const createStorageCondition = createAsyncActions(CREATE_STORAGE_CONDITION);
 export const updateStorageCondition = createAsyncActions(UPDATE_STORAGE_CONDITION);
+
+// 공장 정보 관리
+export const fetchFactories = createAsyncActions(FETCH_FACTORIES);
+export const fetchFactoryById = createAsyncActions(FETCH_FACTORY_BY_ID);
+export const createFactory = createAsyncActions(CREATE_FACTORY);
+export const updateFactory = createAsyncActions(UPDATE_FACTORY);
+export const deleteFactory = createAsyncActions(DELETE_FACTORY);
 
 // UI 액션 생성자
 export const setBasicFilter = (filter) => ({

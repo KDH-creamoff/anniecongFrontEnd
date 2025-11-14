@@ -12,9 +12,7 @@ import ShippingConfirmModal from '../components/shipping/ShippingConfirmModal';
 import LabelPrintModal from '../components/receiving/LabelPrintModal';
 import AlertModal from '../components/common/AlertModal';
 import { getItemByName } from '../data/items';
-import { receivingAPI } from '../api';
 
-// 출고 관리 Redux 액션 및 셀렉터
 import {
   fetchIssuingList,
   createIssuing,

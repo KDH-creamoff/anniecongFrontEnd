@@ -1,6 +1,3 @@
-// ==================== 출고 관리 액션 타입 정의 ====================
-// API: /api/inventories/issue, /api/inventory-transactions?type=ISSUE
-
 // 출고 목록 조회
 export const FETCH_ISSUING_LIST = {
   REQUEST: 'issuing/FETCH_ISSUING_LIST_REQUEST',

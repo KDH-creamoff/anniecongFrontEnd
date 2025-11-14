@@ -1,5 +1,5 @@
 import { /* call, */ put, takeLatest, delay } from 'redux-saga/effects';
-// import { inventoryAPI } from '../../../api'; // TODO: 백엔드 준비 시 주석 해제 및 call import 활성화
+import { inventoryAPI } from '../../../api'; 
 // API: POST /inventories/issue, GET /inventory-transactions?type=ISSUE
 import {
   FETCH_ISSUING_LIST,
@@ -164,7 +164,6 @@ const mockIssuingStats = {
 // ==================== 출고 목록 조회 ====================
 function* fetchIssuingListSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(inventoryAPI.getMovements, {
     //   ...action.payload,
     //   type: 'ISSUE'

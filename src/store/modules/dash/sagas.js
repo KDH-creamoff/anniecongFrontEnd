@@ -19,6 +19,8 @@ import {
   getRecentActivities
 } from './actions';
 
+import { dashboardAPI } from '../../../api';
+
 // ==================== Mock API (백엔드 배포 전 임시) ====================
 const mockAPI = {
   // 제조관리 통계 조회
@@ -44,18 +46,18 @@ const mockAPI = {
             },
             inventoryAlerts: {
               value: 3,
-              change: -2, // 감소는 긍정적
-              isPositive: true
+              change: 2, // 증가는 부정적
+              isPositive: false // 알람 증가는 나쁜 것이므로 false (빨간색)
             },
             expiryAlerts: {
               value: 3,
-              change: -2,
-              isPositive: true
+              change: 1,
+              isPositive: false // 유통기한 임박 증가는 나쁜 것이므로 false (빨간색)
             },
             pendingApprovals: {
               value: 3,
-              change: -2,
-              isPositive: true
+              change: -2, // 감소는 긍정적
+              isPositive: true // 승인 대기 감소는 좋은 것이므로 true (초록색)
             }
           }
         });
@@ -188,14 +190,16 @@ const mockAPI = {
 
 function* getManufacturingStatsSaga() {
   try {
-    // 1. API 호출 (yield call)
-    const response = yield call(mockAPI.getManufacturingStats);
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const response = yield call(dashboardAPI.getDashboard);
+    // yield put(getManufacturingStats.success(response.data));
+    // ===========================================================================
 
-    // 2. 성공 액션 디스패치 (yield put)
+    // 임시 Mock API 사용
+    const response = yield call(mockAPI.getManufacturingStats);
     yield put(getManufacturingStats.success(response.data));
 
   } catch (error) {
-    // 3. 실패 액션 디스패치
     yield put(getManufacturingStats.failure(
       error.response?.data?.message || '통계 조회에 실패했습니다.'
     ));
@@ -207,6 +211,10 @@ function* getManufacturingStatsSaga() {
  */
 function* getReceivingStatsSaga(action) {
   try {
+    // const response = yield call(dashboardAPI.getReceivingStats, action.payload);
+    // yield put(getReceivingStats.success(response.data));
+
+    // 임시 Mock API 사용
     const response = yield call(mockAPI.getReceivingStats, action.payload);
     yield put(getReceivingStats.success(response.data));
   } catch (error) {
@@ -221,6 +229,10 @@ function* getReceivingStatsSaga(action) {
  */
 function* getProductionStatsSaga(action) {
   try {
+    // const response = yield call(dashboardAPI.getProductionStats, action.payload);
+    // yield put(getProductionStats.success(response.data));
+
+    // 임시 Mock API 사용
     const response = yield call(mockAPI.getProductionStats, action.payload);
     yield put(getProductionStats.success(response.data));
   } catch (error) {

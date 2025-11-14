@@ -18,6 +18,11 @@ import {
   FETCH_STORAGE_CONDITION,
   CREATE_STORAGE_CONDITION,
   UPDATE_STORAGE_CONDITION,
+  FETCH_FACTORIES,
+  FETCH_FACTORY_BY_ID,
+  CREATE_FACTORY,
+  UPDATE_FACTORY,
+  DELETE_FACTORY,
   fetchItems,
   fetchItemById,
   fetchItemByCode,
@@ -33,6 +38,11 @@ import {
   fetchStorageCondition,
   createStorageCondition,
   updateStorageCondition,
+  fetchFactories,
+  fetchFactoryById,
+  createFactory,
+  updateFactory,
+  deleteFactory,
 } from './actions';
 
 // ==================== 목데이터 ====================
@@ -334,6 +344,22 @@ let mockStorageConditions = [
   },
 ];
 
+// 공장 정보 목데이터 (FactoryInfo 컴포넌트 데이터)
+let mockFactories = [
+  {
+    id: 1,
+    name: '애니콩 의성 공장',
+    address: '경북 의성군 안계면 용기5길 12 애니콩 본사',
+    processes: ['원재료 입고', '절단', '세척', '전처리', '농산물 가공'],
+  },
+  {
+    id: 2,
+    name: '애니콩 상주 공장',
+    address: '경북 상주시 냉림1길 66 애니콩 건물 상주지사',
+    processes: ['혼합/배합', '조리/제이킹', '포장', '냉동보관'],
+  },
+];
+
 function* fetchBomsSaga(/* action */) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
@@ -507,6 +533,101 @@ function* updateStorageConditionSaga(action) {
   }
 }
 
+// ==================== 공장 정보(Factory) Saga ====================
+function* fetchFactoriesSaga(/* action */) {
+  try {
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const response = yield call(factoryAPI.getFactories, action.payload);
+    // yield put(fetchFactories.success(response.data));
+    // ===========================================================================
+
+    // 임시 목데이터 사용
+    yield delay(500);
+    yield put(fetchFactories.success(mockFactories));
+  } catch (error) {
+    yield put(fetchFactories.failure(error.response?.data?.message || '공장 목록을 불러오는데 실패했습니다.'));
+  }
+}
+
+function* fetchFactoryByIdSaga(action) {
+  try {
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const response = yield call(factoryAPI.getFactoryById, action.payload);
+    // yield put(fetchFactoryById.success(response.data));
+    // ===========================================================================
+
+    // 임시 목데이터 사용
+    yield delay(500);
+    const factory = mockFactories.find((f) => f.id === action.payload);
+    if (factory) {
+      yield put(fetchFactoryById.success(factory));
+    } else {
+      yield put(fetchFactoryById.failure('공장을 찾을 수 없습니다.'));
+    }
+  } catch (error) {
+    yield put(fetchFactoryById.failure(error.response?.data?.message || '공장 상세 정보를 불러오는데 실패했습니다.'));
+  }
+}
+
+function* createFactorySaga(action) {
+  try {
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const response = yield call(factoryAPI.createFactory, action.payload);
+    // yield put(createFactory.success(response.data));
+    // ===========================================================================
+
+    // 임시 목데이터 사용
+    yield delay(500);
+    const newFactory = {
+      id: mockFactories.length + 1,
+      ...action.payload,
+    };
+    mockFactories = [...mockFactories, newFactory];
+    yield put(createFactory.success(newFactory));
+  } catch (error) {
+    yield put(createFactory.failure(error.response?.data?.message || '공장 등록에 실패했습니다.'));
+  }
+}
+
+function* updateFactorySaga(action) {
+  try {
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const { id, data } = action.payload;
+    // const response = yield call(factoryAPI.updateFactory, id, data);
+    // yield put(updateFactory.success(response.data));
+    // ===========================================================================
+
+    // 임시 목데이터 사용
+    yield delay(500);
+    const { id, data } = action.payload;
+    const index = mockFactories.findIndex((f) => f.id === id);
+    if (index !== -1) {
+      mockFactories[index] = { ...mockFactories[index], ...data };
+      yield put(updateFactory.success(mockFactories[index]));
+    } else {
+      yield put(updateFactory.failure('공장을 찾을 수 없습니다.'));
+    }
+  } catch (error) {
+    yield put(updateFactory.failure(error.response?.data?.message || '공장 수정에 실패했습니다.'));
+  }
+}
+
+function* deleteFactorySaga(action) {
+  try {
+    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
+    // const response = yield call(factoryAPI.deleteFactory, action.payload);
+    // yield put(deleteFactory.success(response.data));
+    // ===========================================================================
+
+    // 임시 목데이터 사용
+    yield delay(500);
+    mockFactories = mockFactories.filter((f) => f.id !== action.payload);
+    yield put(deleteFactory.success({ id: action.payload }));
+  } catch (error) {
+    yield put(deleteFactory.failure(error.response?.data?.message || '공장 삭제에 실패했습니다.'));
+  }
+}
+
 export default function* basicSaga() {
   yield takeLatest(FETCH_ITEMS.REQUEST, fetchItemsSaga);
   yield takeLatest(FETCH_ITEM_BY_ID.REQUEST, fetchItemByIdSaga);
@@ -523,4 +644,9 @@ export default function* basicSaga() {
   yield takeLatest(FETCH_STORAGE_CONDITION.REQUEST, fetchStorageConditionSaga);
   yield takeLatest(CREATE_STORAGE_CONDITION.REQUEST, createStorageConditionSaga);
   yield takeLatest(UPDATE_STORAGE_CONDITION.REQUEST, updateStorageConditionSaga);
+  yield takeLatest(FETCH_FACTORIES.REQUEST, fetchFactoriesSaga);
+  yield takeLatest(FETCH_FACTORY_BY_ID.REQUEST, fetchFactoryByIdSaga);
+  yield takeLatest(CREATE_FACTORY.REQUEST, createFactorySaga);
+  yield takeLatest(UPDATE_FACTORY.REQUEST, updateFactorySaga);
+  yield takeLatest(DELETE_FACTORY.REQUEST, deleteFactorySaga);
 }

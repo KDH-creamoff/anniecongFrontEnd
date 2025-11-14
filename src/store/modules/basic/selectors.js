@@ -64,6 +64,28 @@ export const selectStorageOperationLoading = (state) => state.basic.storageOpera
 // 보관 조건 등록/수정 작업 에러
 export const selectStorageOperationError = (state) => state.basic.storageOperation.error;
 
+// ==================== 공장 정보 관리 셀렉터 ====================
+// 공장 목록 데이터 조회 (배열)
+export const selectFactories = (state) => state.basic.factories.data;
+// 공장 목록 로딩 상태
+export const selectFactoriesLoading = (state) => state.basic.factories.loading;
+// 공장 목록 에러 정보
+export const selectFactoriesError = (state) => state.basic.factories.error;
+
+// 공장 상세 정보 조회 (단일 객체)
+export const selectFactoryDetail = (state) => state.basic.factoryDetail.data;
+// 공장 상세 정보 로딩 상태
+export const selectFactoryDetailLoading = (state) => state.basic.factoryDetail.loading;
+// 공장 상세 정보 에러
+export const selectFactoryDetailError = (state) => state.basic.factoryDetail.error;
+
+// 공장 등록/수정/삭제 작업 결과 데이터
+export const selectFactoryOperation = (state) => state.basic.factoryOperation.data;
+// 공장 등록/수정/삭제 작업 로딩 상태
+export const selectFactoryOperationLoading = (state) => state.basic.factoryOperation.loading;
+// 공장 등록/수정/삭제 작업 에러
+export const selectFactoryOperationError = (state) => state.basic.factoryOperation.error;
+
 // ==================== UI 상태 셀렉터 ====================
 // 필터링 상태 (검색 조건 등)
 export const selectBasicFilter = (state) => state.basic.filter;

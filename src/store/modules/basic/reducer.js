@@ -15,6 +15,11 @@ import {
   FETCH_STORAGE_CONDITION,
   CREATE_STORAGE_CONDITION,
   UPDATE_STORAGE_CONDITION,
+  FETCH_FACTORIES,
+  FETCH_FACTORY_BY_ID,
+  CREATE_FACTORY,
+  UPDATE_FACTORY,
+  DELETE_FACTORY,
   SET_BASIC_FILTER,
   CLEAR_BASIC_ERROR,
   RESET_BASIC_STATE,
@@ -30,6 +35,9 @@ const initialState = {
   storageConditions: createAsyncState([]),
   storageConditionDetail: createAsyncState(null),
   storageOperation: createAsyncState(null),
+  factories: createAsyncState([]),
+  factoryDetail: createAsyncState(null),
+  factoryOperation: createAsyncState(null),
   filter: {
     category: '',
     factoryId: '',
@@ -176,6 +184,55 @@ const basicReducer = (state = initialState, action) => {
     case UPDATE_STORAGE_CONDITION.FAILURE:
       return { ...state, storageOperation: { ...state.storageOperation, loading: false, error: action.error } };
 
+    // 공장 목록 조회
+    case FETCH_FACTORIES.REQUEST:
+      return { ...state, factories: { ...state.factories, loading: true, error: null } };
+    case FETCH_FACTORIES.SUCCESS:
+      return { ...state, factories: { data: action.payload, loading: false, error: null } };
+    case FETCH_FACTORIES.FAILURE:
+      return { ...state, factories: { ...state.factories, loading: false, error: action.error } };
+
+    // 공장 상세 조회
+    case FETCH_FACTORY_BY_ID.REQUEST:
+      return { ...state, factoryDetail: { ...state.factoryDetail, loading: true, error: null } };
+    case FETCH_FACTORY_BY_ID.SUCCESS:
+      return { ...state, factoryDetail: { data: action.payload, loading: false, error: null } };
+    case FETCH_FACTORY_BY_ID.FAILURE:
+      return { ...state, factoryDetail: { ...state.factoryDetail, loading: false, error: action.error } };
+
+    // 공장 등록
+    case CREATE_FACTORY.REQUEST:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: true, error: null } };
+    case CREATE_FACTORY.SUCCESS:
+      return { ...state, factoryOperation: { data: action.payload, loading: false, error: null } };
+    case CREATE_FACTORY.FAILURE:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: false, error: action.error } };
+
+    // 공장 수정
+    case UPDATE_FACTORY.REQUEST:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: true, error: null } };
+    case UPDATE_FACTORY.SUCCESS:
+      return {
+        ...state,
+        factories: {
+          ...state.factories,
+          data: state.factories.data.map((factory) =>
+            factory.id === action.payload.id ? action.payload : factory
+          ),
+        },
+        factoryOperation: { data: action.payload, loading: false, error: null }
+      };
+    case UPDATE_FACTORY.FAILURE:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: false, error: action.error } };
+
+    // 공장 삭제
+    case DELETE_FACTORY.REQUEST:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: true, error: null } };
+    case DELETE_FACTORY.SUCCESS:
+      return { ...state, factoryOperation: { data: action.payload, loading: false, error: null } };
+    case DELETE_FACTORY.FAILURE:
+      return { ...state, factoryOperation: { ...state.factoryOperation, loading: false, error: action.error } };
+
     // UI 상태 관리
     case SET_BASIC_FILTER:
       return { ...state, filter: { ...state.filter, ...action.payload } };
@@ -192,6 +249,9 @@ const basicReducer = (state = initialState, action) => {
         storageConditions: { ...state.storageConditions, error: null },
         storageConditionDetail: { ...state.storageConditionDetail, error: null },
         storageOperation: { ...state.storageOperation, error: null },
+        factories: { ...state.factories, error: null },
+        factoryDetail: { ...state.factoryDetail, error: null },
+        factoryOperation: { ...state.factoryOperation, error: null },
       };
 
     case RESET_BASIC_STATE:
