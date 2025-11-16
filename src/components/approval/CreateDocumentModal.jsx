@@ -1,5 +1,13 @@
 import { useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { X, FileText, ChevronRight, ArrowLeft, Search } from 'lucide-react';
+import { 
+  createApprovalDocument, 
+  fetchApprovalInbox 
+} from '../../store/modules/approval/actions';
+import { 
+  selectCreateDocumentLoading 
+} from '../../store/modules/approval/selectors';
 import PuppeteerPdfButton from '../common/PuppeteerPdfButton';
 import FeedMillStandards from '../template/PrerequisitePrograms/01_FeedMillStandards';
 import EquipmentManagement from '../template/PrerequisitePrograms/02_EquipmentManagement';
@@ -53,6 +61,9 @@ import PurchaseOrder from '../template/49_PurchaseOrder';
 import PetFoodProductDevelopment from '../template/50_PetFoodProductDevelopment';
 
 const CreateDocumentModal = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+  const isCreating = useSelector(selectCreateDocumentLoading);
+
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showSettingsForm, setShowSettingsForm] = useState(false);
@@ -61,7 +72,10 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
 
   // 문서 설정 상태
   const [documentSettings, setDocumentSettings] = useState({
-    requiredDocuments: '',
+    title: '', // 문서 제목
+    description: '', // 문서 설명
+    type: '', // 문서 유형
+    requiredApprovers: [], // 결재자 목록
     ceo: '',
     director: '',
     teamLeader: '',
@@ -388,6 +402,28 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
   };
 
   const handleSettingsSubmit = () => {
+    const approvers = [];
+    if (documentSettings.teamLeader) approvers.push(documentSettings.teamLeader);
+    if (documentSettings.director) approvers.push(documentSettings.director);
+    if (documentSettings.ceo) approvers.push(documentSettings.ceo);
+  
+    // 결재 문서 생성 데이터
+    const documentData = {
+      templateId: selectedTemplate.id,
+      title: documentSettings.title || selectedTemplate.name,
+      description: documentSettings.description || selectedTemplate.description,
+      type: documentSettings.type || selectedTemplate.type,
+      requiredApprovers: approvers,
+      content: {
+        // 템플릿 내용 (실제로는 pdfContentRef에서 가져옴)
+        template: selectedTemplate.name,
+        settings: documentSettings
+      }
+    };
+
+    // Redux 액션 디스패치
+    dispatch(createApprovalDocument.request(documentData));
+
     setShowSettingsForm(false);
     setIsEditMode(true);
   };
@@ -401,12 +437,37 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
     setIsEditMode(false);
   };
 
+  const handleSubmitDocument = () => {
+    // 문서 제출 (결재 요청)
+    const submitData = {
+      templateId: selectedTemplate.id,
+      title: documentSettings.title || selectedTemplate.name,
+      description: documentSettings.description || selectedTemplate.description,
+      type: documentSettings.type || selectedTemplate.type,
+      status: 'pending',
+      requester: '현재사용자', 
+    };
+
+    dispatch(createApprovalDocument.request(submitData));
+    
+    // 성공 시 결재함 새로고침
+    dispatch(fetchApprovalInbox.request());
+    
+    // 모달 닫기
+    handleClose();
+    
+    alert('결재 요청이 완료되었습니다.');
+  };
+
   const handleClose = () => {
     setIsEditMode(false);
     setShowSettingsForm(false);
     setSelectedTemplate(null);
     setSearchQuery('');
     setDocumentSettings({
+      title: '',
+      description: '',
+      type: '',
       requiredDocuments: '',
       ceo: '',
       director: '',
@@ -503,8 +564,6 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                 >
                   <option value='' disabled hidden>대표 선택</option>
                   <option value='김대표'>김대표</option>
-                  <option value='이대표'>이대표</option>
-                  <option value='박대표'>박대표</option>
                 </select>
               </div>
 
@@ -572,7 +631,7 @@ const CreateDocumentModal = ({ isOpen, onClose }) => {
                 onClick={handleSettingsSubmit}
                 className='px-6 py-2 rounded-lg font-semibold bg-[#724323] text-white hover:bg-[#5a3419] transition-colors'
               >
-                작성하기
+                {isCreating ? '처리중...' : '작성하기'}
               </button>
             </div>
           </div>

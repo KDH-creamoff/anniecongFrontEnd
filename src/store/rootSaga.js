@@ -11,7 +11,7 @@ import issuingSaga from './modules/issuing/sagas';
 import dashSaga from './modules/dash/sagas';
 // import receivingSaga from './modules/receiving/sagas';
 // import shippingSaga from './modules/shipping/sagas';
-// import approvalSaga from './modules/approval/sagas';
+import approvalSaga from './modules/approval/sagas';
 
 /**
  * 모든 사가를 통합하는 루트 사가
@@ -29,6 +29,6 @@ export default function* rootSaga() {
     dashSaga(),
     // receivingSaga(),
     // shippingSaga(),
-    // approvalSaga(),
+    approvalSaga(),
   ]);
 }

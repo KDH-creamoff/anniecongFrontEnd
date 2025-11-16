@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { FileText, Plus } from 'lucide-react';
 import DocumentStatusSummary from '../components/approval/DocumentStatusSummary';
 import ApprovalTabSelector from '../components/approval/ApprovalTabSelector';
@@ -7,31 +8,26 @@ import CreateDocumentModal from '../components/approval/CreateDocumentModal';
 import SubmittedDocumentList from '../components/approval/SubmittedDocumentList';
 import PendingDocumentList from '../components/approval/PendingDocumentList';
 import ArchivedDocumentList from '../components/approval/ArchivedDocumentList';
+import { fetchApprovalInbox } from '../store/modules/approval/actions';
 
 const ApprovalDashboard = ({ subPage }) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('all')
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 컴포넌트 마운트 시 결재함 데이터 로드 
+  useEffect(() => {
+    dispatch(fetchApprovalInbox.request());
+  }, [dispatch])
 
   const tabBar = () => {
     switch (activeTab) {
       case 'all':
-        return (
-          <>
-            <DocumentList />
-          </>
-        );
+        return <DocumentList />
       case 'pending':
-        return (
-          <>
-            <PendingDocumentList />
-          </>
-        );
+        return <PendingDocumentList />
       case 'draft':
-        return (
-          <>
-            <SubmittedDocumentList />
-          </>
-        );
+        return <SubmittedDocumentList />
       default:
         return null;
     }
@@ -48,11 +44,7 @@ const ApprovalDashboard = ({ subPage }) => {
           </>
         );
       case 'nav2': // 문서보관함
-        return (
-          <>
-            <ArchivedDocumentList />
-          </>
-        );
+        return <ArchivedDocumentList />
       default:
         return null;
     }
@@ -91,7 +83,7 @@ const ApprovalDashboard = ({ subPage }) => {
               {getPageTitle()}
             </h1>
           </div>
-         <p className='text-sm text-gray-600'>{getPageDescription()}</p>
+          <p className='text-sm text-gray-600'>{getPageDescription()}</p>
         </div>
         {subPage === 'nav1' && (
         <button

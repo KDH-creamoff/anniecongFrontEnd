@@ -1,8 +1,16 @@
 import { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { FileText, Download, Calendar, User, ChevronDown } from 'lucide-react';
 import Pagination from '../common/Pagination';
+import { 
+    selectApprovalInbox, 
+    selectApprovalInboxLoading 
+} from '../../store/modules/approval/selectors';
 
 const ArchivedDocumentList = () => {
+    const approvals = useSelector(selectApprovalInbox);
+    const isLoading = useSelector(selectApprovalInboxLoading);
+
     const [filters, setFilters] = useState({
         type: '전체',
         searchTerm: '',

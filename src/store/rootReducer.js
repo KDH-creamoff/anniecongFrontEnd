@@ -11,7 +11,7 @@ import labelReducer from './modules/label/reducer';
 import issuingReducer from './modules/issuing/reducer';
 import dashReducer from './modules/dash/reducer';
 // import shippingReducer from './modules/shipping/reducer';
-// import approvalReducer from './modules/approval/reducer';
+import approvalReducer from './modules/approval/reducer';
 
 const rootReducer = combineReducers({
   // 각 도메인별 리듀서
@@ -25,7 +25,7 @@ const rootReducer = combineReducers({
   issuing: issuingReducer,
   dash: dashReducer,
   // shipping: shippingReducer,
-  // approval: approvalReducer,
+  approval: approvalReducer,
 });
 
 export default rootReducer;

@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { FileText, Download, Filter, ChevronDown } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { FileText, Download, ChevronDown } from 'lucide-react';
+import { 
+  selectApprovalInbox, 
+  selectApprovalInboxLoading 
+} from '../../store/modules/approval/selectors';
 
 const DocumentList = () => {
+  const approvals = useSelector(selectApprovalInbox);
+  const isLoading = useSelector(selectApprovalInboxLoading);
+  
   const [filters, setFilters] = useState({
-    type: '전체',
     status: '전체',
     searchTerm: '',
   });
@@ -14,87 +21,115 @@ const DocumentList = () => {
 
   const handleReset = () => {
     setFilters({
-      type: '전체',
       status: '전체',
       searchTerm: '',
     });
   };
 
-  const documents = [
-    {
-      id: 1,
-      docNumber: 'DOC-2024-0001',
-      title: '1월 1주차 생산 원료 보고서',
-      type: '생산 원료 보고서',
-      status: '결재중',
-      statusColor: 'bg-[#ffedd4] text-[#f65814]',
-      author: '김생산',
-      createdDate: '2024-01-15',
-      approvalSteps: [
-        { step: 1, status: 'completed' },
-        { step: 2, status: 'pending' },
-        { step: 3, status: 'waiting' },
-      ],
-    },
-    {
-      id: 2,
-      docNumber: 'DOC-2024-0002',
-      title: '제품 불량 발생 보고서',
-      type: '불량 보고서',
-      status: '반려',
-      statusColor: 'bg-[#f8d7da] text-[#dc3545]',
-      author: '이품질',
-      createdDate: '2024-01-14',
-      approvalSteps: [
-        { step: 1, status: 'completed' },
-        { step: 2, status: 'rejected' },
-        { step: 3, status: 'waiting' },
-      ],
-    },
-    {
-      id: 3,
-      docNumber: 'DOC-2024-0003',
-      title: '안전점검표 (1월 2주차)',
-      type: '안전점검표',
-      status: '승인완료',
-      statusColor: 'bg-[#d4edda] text-[#28a745]',
-      author: '안전관리자',
-      createdDate: '2024-01-12',
-      approvalSteps: [
-        { step: 1, status: 'completed' },
-        { step: 2, status: 'completed' },
-        { step: 3, status: 'completed' },
-      ],
-    },
-  ];
+  // const approvals = [
+  //   {
+  //     id: 1,
+  //     docNumber: 'DOC-2024-0001',
+  //     title: '1월 1주차 생산 원료 보고서',
+  //     type: '생산 원료 보고서',
+  //     status: '결재중',
+  //     statusColor: 'bg-[#ffedd4] text-[#f65814]',
+  //     author: '김생산',
+  //     createdDate: '2024-01-15',
+  //     approvalSteps: [
+  //       { step: 1, status: 'completed' },
+  //       { step: 2, status: 'pending' },
+  //       { step: 3, status: 'waiting' },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     docNumber: 'DOC-2024-0002',
+  //     title: '제품 불량 발생 보고서',
+  //     type: '불량 보고서',
+  //     status: '반려',
+  //     statusColor: 'bg-[#f8d7da] text-[#dc3545]',
+  //     author: '이품질',
+  //     createdDate: '2024-01-14',
+  //     approvalSteps: [
+  //       { step: 1, status: 'completed' },
+  //       { step: 2, status: 'rejected' },
+  //       { step: 3, status: 'waiting' },
+  //     ],
+  //   },
+  //   {
+  //     id: 3,
+  //     docNumber: 'DOC-2024-0003',
+  //     title: '안전점검표 (1월 2주차)',
+  //     type: '안전점검표',
+  //     status: '승인완료',
+  //     statusColor: 'bg-[#d4edda] text-[#28a745]',
+  //     author: '안전관리자',
+  //     createdDate: '2024-01-12',
+  //     approvalSteps: [
+  //       { step: 1, status: 'completed' },
+  //       { step: 2, status: 'completed' },
+  //       { step: 3, status: 'completed' },
+  //     ],
+  //   },
+  // ];
 
-  const documentTypes = ['전체', '생산 원료 보고서', '불량 보고서', '안전점검표'];
   const documentStatuses = ['전체', '결재중', '반려', '승인완료'];
 
-  // 필터링 로직
-  const filteredDocuments = documents.filter((doc) => {
+  const getStatusText = (status) => {
+    const statusMap = {
+      'pending': '결재중',
+      'approved': '승인완료',
+      'rejected': '반려'
+    };
+    return statusMap[status] || status;
+  };
 
+  const getStatusColor = (status) => {
+    const colorMap = {
+      'pending': 'bg-[#ffedd4] text-[#f65814]',
+      'approved': 'bg-[#d4edda] text-[#28a745]',
+      'rejected': 'bg-[#f8d7da] text-[#dc3545]'
+    };
+    return colorMap[status] || 'bg-gray-200 text-gray-700';
+  };
+
+  // 필터링 로직
+  const filteredDocuments = approvals.filter((doc) => {
     // 상태 필터
-    if (filters.status !== '전체' && doc.status !== filters.status) {
-      return false;
+    if (filters.status !== '전체') {
+      const statusText = getStatusText(doc.status);
+      if (statusText !== filters.status) {
+        return false;
+      }
     }
 
-    // 검색어 필터 (문서번호, 제목, 작성자)
+    // 검색어 필터
     if (filters.searchTerm.trim()) {
       const search = filters.searchTerm.toLowerCase().trim();
-      const docNumber = doc.docNumber.toLowerCase();
-      const title = doc.title.toLowerCase();
-      const type = doc.type.toLowerCase();
-      const author = doc.author.toLowerCase();
-      const createdDate = doc.createdDate.toLowerCase();
+      const docNumber = (doc.docNumber || '').toLowerCase();
+      const title = (doc.title || '').toLowerCase();
+      const type = (doc.type || '').toLowerCase();
+      const author = (doc.author || doc.requester || '').toLowerCase();
+      const createdDate = (doc.createdAt || '').toLowerCase();
 
-      if (!docNumber.includes(search) && !title.includes(search) && !type.includes(search) && !author.includes(search) && !createdDate.includes(search)) {
+      if (!docNumber.includes(search) && !title.includes(search) && 
+          !type.includes(search) && !author.includes(search) && 
+          !createdDate.includes(search)) {
         return false;
       }
     }
 
     return true;
   });
+
+  if (isLoading) {
+    return (
+      <div className="rounded-xl bg-white shadow-sm p-8">
+        <div className="text-center text-gray-500">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -160,7 +195,7 @@ const DocumentList = () => {
             <FileText className='h-5 w-5 text-[#674529]' />
             <h3 className='text-base font-semibold text-[#674529]'>
               전체 결재 문서 ({filteredDocuments.length}건
-              {documents.length !== filteredDocuments.length && ` / ${documents.length}건`})
+              {approvals.length !== filteredDocuments.length && ` / ${approvals.length}건`})
             </h3>
           </div>
           <p className='mt-1 text-sm text-gray-600'>
@@ -213,14 +248,14 @@ const DocumentList = () => {
                   <span
                     className={`inline-flex rounded px-3 py-1 text-xs font-medium ${doc.statusColor}`}
                   >
-                    {doc.status}
+                    {getStatusText(doc.status)}
                   </span>
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
                   {doc.author}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {doc.createdDate}
+                  {doc.createdDate ? new Date(doc.createdAt).toLocaleDateString() : '-'}
                 </td>
                 <td className='px-4 py-4'>
                   <div className='flex items-center space-x-2'>
@@ -250,7 +285,7 @@ const DocumentList = () => {
                   </div>
                 </td>
                 <td className='px-4 py-4'>
-                  {doc.status === '승인완료' && (
+                  {doc.status === 'approved' && (
                     <button className='text-gray-500 transition-colors hover:text-[#674529]'>
                       <Download className='h-5 w-5' />
                     </button>
