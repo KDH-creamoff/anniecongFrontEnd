@@ -58,6 +58,7 @@ export const fetchStorageConditions = createAsyncActions(FETCH_STORAGE_CONDITION
 export const fetchStorageCondition = createAsyncActions(FETCH_STORAGE_CONDITION);
 export const createStorageCondition = createAsyncActions(CREATE_STORAGE_CONDITION);
 export const updateStorageCondition = createAsyncActions(UPDATE_STORAGE_CONDITION);
+export const deleteStorageCondition = createAsyncActions(DELETE_STORAGE_CONDITION);
 
 // 공장 정보 관리
 export const fetchFactories = createAsyncActions(FETCH_FACTORIES);

@@ -43,6 +43,7 @@ function* saveTemplateSaga(action) {
 
 function* fetchLabelTemplateSaga(action) {
   try {
+    // labelAPI.getLabelTemplate 사용
     const response = yield call(labelAPI.getLabelTemplate, action.payload);
     yield put(fetchLabelTemplate.success(response.data));
   } catch (error) {
@@ -53,6 +54,7 @@ function* fetchLabelTemplateSaga(action) {
 // ==================== 라벨 목록 조회 ====================
 function* fetchAllLabelsSaga(action) {
   try {
+    // labelAPI.getAllLabels 사용
     const response = yield call(labelAPI.getAllLabels, action.payload);
     yield put(fetchAllLabels.success(response.data));
   } catch (error) {
@@ -62,6 +64,7 @@ function* fetchAllLabelsSaga(action) {
 
 function* fetchLabelsByBarcodeSaga(action) {
   try {
+    // labelAPI.getLabelsByBarcode 사용
     const response = yield call(labelAPI.getLabelsByBarcode, action.payload);
     yield put(fetchLabelsByBarcode.success(response.data));
   } catch (error) {
@@ -71,6 +74,7 @@ function* fetchLabelsByBarcodeSaga(action) {
 
 function* fetchLabelsByInventorySaga(action) {
   try {
+    // labelAPI.getLabelsByInventory 사용
     const response = yield call(labelAPI.getLabelsByInventory, action.payload);
     yield put(fetchLabelsByInventory.success(response.data));
   } catch (error) {
@@ -81,6 +85,7 @@ function* fetchLabelsByInventorySaga(action) {
 // ==================== 라벨 출력 ====================
 function* printSavedLabelSaga(action) {
   try {
+    // labelAPI.printSavedLabel 사용
     const response = yield call(labelAPI.printSavedLabel, action.payload);
     yield put(printSavedLabel.success(response.data));
   } catch (error) {
@@ -91,6 +96,7 @@ function* printSavedLabelSaga(action) {
 // ==================== 바코드 생성 ====================
 function* generateBarcodeSaga(action) {
   try {
+    // labelAPI.generateBarcode 사용
     const response = yield call(labelAPI.generateBarcode, action.payload);
     yield put(generateBarcode.success(response.data));
   } catch (error) {
@@ -100,6 +106,7 @@ function* generateBarcodeSaga(action) {
 
 function* generateIssueLabelSaga(action) {
   try {
+    // labelAPI.generateIssueLabel 사용
     const response = yield call(labelAPI.generateIssueLabel, action.payload);
     yield put(generateIssueLabel.success(response.data));
   } catch (error) {

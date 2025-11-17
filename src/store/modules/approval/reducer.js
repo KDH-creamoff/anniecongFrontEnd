@@ -4,6 +4,7 @@ import {
   FETCH_APPROVAL_DETAIL,
   APPROVE_REQUEST,
   REJECT_REQUEST,
+  CREATE_APPROVAL_DOCUMENT,
   SET_APPROVAL_FILTER,
   CLEAR_APPROVAL_ERROR,
   RESET_APPROVAL_STATE,
@@ -12,16 +13,19 @@ import {
 const initialState = {
   // 결재함 목록
   inbox: createAsyncState([]),
-  
+
   // 결재 상세 정보
   detail: createAsyncState(null),
-  
+
   // 승인 처리
   approveOperation: createAsyncState(null),
-  
+
   // 반려 처리
   rejectOperation: createAsyncState(null),
-  
+
+  // 문서 생성
+  createDocument: createAsyncState(null),
+
   // 필터 상태
   filter: {
     status: '', // pending, approved, rejected
@@ -94,26 +98,43 @@ const approvalReducer = (state = initialState, action) => {
 
     // 결재 반려
     case REJECT_REQUEST.REQUEST:
-      return { 
-        ...state, 
-        rejectOperation: { ...state.rejectOperation, loading: true, error: null } 
+      return {
+        ...state,
+        rejectOperation: { ...state.rejectOperation, loading: true, error: null }
       };
     case REJECT_REQUEST.SUCCESS:
-      return { 
-        ...state, 
+      return {
+        ...state,
         rejectOperation: { data: action.payload, loading: false, error: null },
         // 반려 후 상세 정보 업데이트
-        detail: state.detail.data 
-          ? { 
-              ...state.detail, 
-              data: { ...state.detail.data, status: 'rejected' } 
+        detail: state.detail.data
+          ? {
+              ...state.detail,
+              data: { ...state.detail.data, status: 'rejected' }
             }
           : state.detail,
       };
     case REJECT_REQUEST.FAILURE:
-      return { 
-        ...state, 
-        rejectOperation: { ...state.rejectOperation, loading: false, error: action.error } 
+      return {
+        ...state,
+        rejectOperation: { ...state.rejectOperation, loading: false, error: action.error }
+      };
+
+    // 결재 문서 생성
+    case CREATE_APPROVAL_DOCUMENT.REQUEST:
+      return {
+        ...state,
+        createDocument: { ...state.createDocument, loading: true, error: null }
+      };
+    case CREATE_APPROVAL_DOCUMENT.SUCCESS:
+      return {
+        ...state,
+        createDocument: { data: action.payload, loading: false, error: null }
+      };
+    case CREATE_APPROVAL_DOCUMENT.FAILURE:
+      return {
+        ...state,
+        createDocument: { ...state.createDocument, loading: false, error: action.error }
       };
 
     // UI 상태 관리
@@ -130,6 +151,7 @@ const approvalReducer = (state = initialState, action) => {
         detail: { ...state.detail, error: null },
         approveOperation: { ...state.approveOperation, error: null },
         rejectOperation: { ...state.rejectOperation, error: null },
+        createDocument: { ...state.createDocument, error: null },
       };
 
     case RESET_APPROVAL_STATE:

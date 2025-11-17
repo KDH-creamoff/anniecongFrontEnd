@@ -37,6 +37,7 @@ import {
   fetchStorageCondition,
   createStorageCondition,
   updateStorageCondition,
+  deleteStorageCondition,
   fetchFactories,
   fetchFactoryById,
   createFactory,
@@ -162,7 +163,7 @@ function* fetchItemsSaga(action) {
 
 function* fetchItemByIdSaga(action) {
   try {
-    // const response = yield call(itemsAPI.getItemById, action.payload);
+    // const response = yield call(itemsAPI.getItem, action.payload);
     // yield put(fetchItemById.success(response.data));
 
     yield delay(500);
@@ -179,6 +180,7 @@ function* fetchItemByIdSaga(action) {
 
 function* fetchItemByCodeSaga(action) {
   try {
+    // TODO: 백엔드에 getItemByCode API 없음 - 임시 목데이터 사용
     // const response = yield call(itemsAPI.getItemByCode, action.payload);
     // yield put(fetchItemByCode.success(response.data));
 
@@ -366,7 +368,7 @@ function* fetchBomsSaga(action) {
 
 function* fetchBomByIdSaga(action) {
   try {
-    // const response = yield call(bomsAPI.getBomById, action.payload);
+    // const response = yield call(bomsAPI.getBom, action.payload);
     // yield put(fetchBomById.success(response.data));
 
     yield delay(500);
@@ -444,7 +446,7 @@ function* deleteBomSaga(action) {
 // ==================== 보관 조건(Storage) Saga ====================
 function* fetchStorageConditionsSaga(action) {
   try {
-    // const response = yield call(storageAPI.getStorage, action.payload);
+    // const response = yield call(storageConditionsAPI.getStorageConditions);
     // yield put(fetchStorageConditions.success(response.data));
 
     // 임시 목데이터 사용
@@ -457,7 +459,7 @@ function* fetchStorageConditionsSaga(action) {
 
 function* fetchStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageAPI.getStorage, action.payload);
+    // const response = yield call(storageConditionsAPI.getStorageCondition, action.payload);
     // yield put(fetchStorageCondition.success(response.data));
 
     // 임시 목데이터 사용
@@ -475,7 +477,7 @@ function* fetchStorageConditionSaga(action) {
 
 function* createStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageAPI.createStorage, action.payload);
+    // const response = yield call(storageConditionsAPI.createStorageCondition, action.payload);
     // yield put(createStorageCondition.success(response.data));
 
     // 임시 목데이터 사용
@@ -494,7 +496,7 @@ function* createStorageConditionSaga(action) {
 function* updateStorageConditionSaga(action) {
   try {
     // const { id, data } = action.payload;
-    // const response = yield call(storageAPI.updateStorage, id, data);
+    // const response = yield call(storageConditionsAPI.updateStorageCondition, id, data);
     // yield put(updateStorageCondition.success(response.data));
 
     // 임시 목데이터 사용
@@ -514,22 +516,22 @@ function* updateStorageConditionSaga(action) {
 
 function* deleteStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageAPI.deleteStorage, action.payload);
+    // const response = yield call(storageConditionsAPI.deleteStorageCondition, action.payload);
     // yield put(deleteStorageCondition.success(response.data));
 
     // 임시 목데이터 사용
     yield delay(500);
-    mockFactories = mockFactories.filter((f) => f.id !== action.payload);
-    yield put(deleteFactory.success({ id: action.payload }));
+    mockStorageConditions = mockStorageConditions.filter((s) => s.id !== action.payload);
+    yield put(deleteStorageCondition.success({ id: action.payload }));
   } catch (error) {
-    yield put(deleteFactory.failure(error.response?.data?.message || '공장 삭제에 실패했습니다.'));
+    yield put(deleteStorageCondition.failure(error.response?.data?.message || '보관 조건 삭제에 실패했습니다.'));
   }
 }
 
 // ==================== 공장 정보(Factory) Saga ====================
 function* fetchFactoriesSaga(action) {
   try {
-    // const response = yield call(factoryAPI.getFactories, action.payload);
+    // const response = yield call(factoriesAPI.getFactories);
     // yield put(fetchFactories.success(response.data));
 
     yield delay(500);
@@ -541,7 +543,7 @@ function* fetchFactoriesSaga(action) {
 
 function* fetchFactoryByIdSaga(action) {
   try {
-    // const response = yield call(factoryAPI.getFactoryById, action.payload);
+    // const response = yield call(factoriesAPI.getFactory, action.payload);
     // yield put(fetchFactoryById.success(response.data));
 
     // 임시 목데이터 사용
@@ -559,7 +561,7 @@ function* fetchFactoryByIdSaga(action) {
 
 function* createFactorySaga(action) {
   try {
-    // const response = yield call(factoryAPI.createFactory, action.payload);
+    // const response = yield call(factoriesAPI.createFactory, action.payload);
     // yield put(createFactory.success(response.data));
 
     // 임시 목데이터 사용
@@ -578,7 +580,7 @@ function* createFactorySaga(action) {
 function* updateFactorySaga(action) {
   try {
     // const { id, data } = action.payload;
-    // const response = yield call(factoryAPI.updateFactory, id, data);
+    // const response = yield call(factoriesAPI.updateFactory, id, data);
     // yield put(updateFactory.success(response.data));
 
     // 임시 목데이터 사용
@@ -598,7 +600,7 @@ function* updateFactorySaga(action) {
 
 function* deleteFactorySaga(action) {
   try {
-    // const response = yield call(factoryAPI.deleteFactory, action.payload);
+    // const response = yield call(factoriesAPI.deleteFactory, action.payload);
     // yield put(deleteFactory.success(response.data));
 
     // 임시 목데이터 사용

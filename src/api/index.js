@@ -96,6 +96,35 @@ export const labelAPI = {
     const response = await apiClient.get(`/label/template/${templateId}`);
     return response;
   },
+  // 추가 메서드 (saga 호환용)
+  getLabelTemplate: async (templateId) => {
+    const response = await apiClient.get(`/label/template/${templateId}`);
+    return response;
+  },
+  getAllLabels: async (params = {}) => {
+    const response = await apiClient.get('/label/labels', { params });
+    return response;
+  },
+  getLabelsByBarcode: async (barcode) => {
+    const response = await apiClient.get(`/label/labels/barcode/${barcode}`);
+    return response;
+  },
+  getLabelsByInventory: async (inventoryId) => {
+    const response = await apiClient.get(`/label/labels/inventory/${inventoryId}`);
+    return response;
+  },
+  printSavedLabel: async (data) => {
+    const response = await apiClient.post('/label/print', data);
+    return response;
+  },
+  generateBarcode: async (data) => {
+    const response = await apiClient.post('/label/barcode/generate', data);
+    return response;
+  },
+  generateIssueLabel: async (data) => {
+    const response = await apiClient.post('/label/issue/generate', data);
+    return response;
+  },
 };
 
 // ============================================
@@ -148,8 +177,8 @@ export const authAPI = {
     const response = await apiClient.get('/auth/me');
     return response;
   },
-  getUsers: async () => {
-    const response = await apiClient.get('/auth/');
+  getUsers: async (params = {}) => {
+    const response = await apiClient.get('/auth/', { params });
     return response;
   },
   getUser: async (id) => {
@@ -164,6 +193,14 @@ export const authAPI = {
     const response = await apiClient.delete(`/auth/${id}`);
     return response;
   },
+  changePassword: async (data) => {
+    const response = await apiClient.post('/auth/password', data);
+    return response;
+  },
+  changePosition: async (id, data) => {
+    const response = await apiClient.put(`/auth/${id}`, data);
+    return response;
+  },
   signup: async (data) => {
     return authAPI.join(data);
   },
@@ -174,7 +211,7 @@ export const authAPI = {
 // ============================================
 export const userAPI = {
   getUsers: async (params = {}) => {
-    return authAPI.getUsers();
+    return authAPI.getUsers(params);
   },
   getUserById: async (id) => {
     return authAPI.getUser(id);
@@ -187,6 +224,12 @@ export const userAPI = {
   },
   deleteUser: async (id) => {
     return authAPI.deleteUser(id);
+  },
+  changePassword: async (data) => {
+    return authAPI.changePassword(data);
+  },
+  changePosition: async (data) => {
+    return authAPI.changePosition(data);
   },
   getAccessLogs: async (params = {}) => {
     console.warn('getAccessLogs API는 문서에 정의되지 않았습니다.');
@@ -479,6 +522,10 @@ export const approvalAPI = {
     const response = await apiClient.get(`/approval/approvals/${id}`);
     return response;
   },
+  createDocument: async (data) => {
+    const response = await apiClient.post('/approval/approvals', data);
+    return response;
+  },
   approve: async (id, data = {}) => {
     const response = await apiClient.post(`/approval/approvals/${id}/approve`, data);
     return response;
@@ -609,27 +656,6 @@ export const shippingAPI = {
   },
   downloadFile: async (filename) => {
     const response = await apiClient.get(`/shipping/download/${filename}`);
-    return response;
-  },
-  // 기존 출고 관련 API (호환성 유지)
-  getWaitingList: async (params = {}) => {
-    const response = await apiClient.get('/shipping/waiting', { params });
-    return response;
-  },
-  getCompletedList: async (params = {}) => {
-    const response = await apiClient.get('/shipping/completed', { params });
-    return response;
-  },
-  createShipping: async (data) => {
-    const response = await apiClient.post('/shipping', data);
-    return response;
-  },
-  confirmShipping: async (id, data = {}) => {
-    const response = await apiClient.put(`/shipping/${id}/confirm`, data);
-    return response;
-  },
-  cancelShipping: async (id) => {
-    const response = await apiClient.put(`/shipping/${id}/cancel`);
     return response;
   },
 };

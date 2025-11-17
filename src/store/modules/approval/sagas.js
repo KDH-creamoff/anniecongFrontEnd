@@ -5,10 +5,12 @@ import {
   FETCH_APPROVAL_DETAIL,
   APPROVE_REQUEST,
   REJECT_REQUEST,
+  CREATE_APPROVAL_DOCUMENT,
   fetchApprovalInbox,
   fetchApprovalDetail,
   approveRequest,
   rejectRequest,
+  createApprovalDocument,
 } from './actions';
 
 // ==================== 결재함 목록 조회 ====================
@@ -57,10 +59,23 @@ function* rejectRequestSaga(action) {
   }
 }
 
+// ==================== 결재 문서 생성 ====================
+function* createApprovalDocumentSaga(action) {
+  try {
+    const response = yield call(approvalAPI.createDocument, action.payload);
+    yield put(createApprovalDocument.success(response.data));
+    // 문서 생성 후 결재함 목록 새로고침
+    yield put(fetchApprovalInbox.request());
+  } catch (error) {
+    yield put(createApprovalDocument.failure(error.response?.data?.message || '결재 문서 생성에 실패했습니다.'));
+  }
+}
+
 // ==================== Root Saga ====================
 export default function* approvalSaga() {
   yield takeLatest(FETCH_APPROVAL_INBOX.REQUEST, fetchApprovalInboxSaga);
   yield takeLatest(FETCH_APPROVAL_DETAIL.REQUEST, fetchApprovalDetailSaga);
   yield takeLatest(APPROVE_REQUEST.REQUEST, approveRequestSaga);
   yield takeLatest(REJECT_REQUEST.REQUEST, rejectRequestSaga);
+  yield takeLatest(CREATE_APPROVAL_DOCUMENT.REQUEST, createApprovalDocumentSaga);
 }

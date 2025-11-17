@@ -14,6 +14,9 @@ export const APPROVE_REQUEST = createRequestTypes('approval/APPROVE_REQUEST');
 // 결재 반려
 export const REJECT_REQUEST = createRequestTypes('approval/REJECT_REQUEST');
 
+// 결재 문서 생성
+export const CREATE_APPROVAL_DOCUMENT = createRequestTypes('approval/CREATE_APPROVAL_DOCUMENT');
+
 // UI 상태 관리
 export const SET_APPROVAL_FILTER = 'approval/SET_APPROVAL_FILTER';
 export const CLEAR_APPROVAL_ERROR = 'approval/CLEAR_APPROVAL_ERROR';
@@ -32,6 +35,9 @@ export const approveRequest = createAsyncActions(APPROVE_REQUEST);
 
 // 결재 반려
 export const rejectRequest = createAsyncActions(REJECT_REQUEST);
+
+// 결재 문서 생성
+export const createApprovalDocument = createAsyncActions(CREATE_APPROVAL_DOCUMENT);
 
 // UI 액션 생성자
 export const setApprovalFilter = (filter) => ({

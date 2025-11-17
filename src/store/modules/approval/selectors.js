@@ -18,5 +18,10 @@ export const selectRejectOperation = (state) => state.approval.rejectOperation.d
 export const selectRejectOperationLoading = (state) => state.approval.rejectOperation.loading;
 export const selectRejectOperationError = (state) => state.approval.rejectOperation.error;
 
+// 문서 생성
+export const selectCreateDocument = (state) => state.approval.createDocument?.data;
+export const selectCreateDocumentLoading = (state) => state.approval.createDocument?.loading;
+export const selectCreateDocumentError = (state) => state.approval.createDocument?.error;
+
 // 필터
 export const selectApprovalFilter = (state) => state.approval.filter;
