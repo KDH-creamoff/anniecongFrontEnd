@@ -11,6 +11,7 @@ import {
   LogOut,
   Save,
   X,
+  CheckCircle,
 } from "lucide-react";
 import { getMe, changePassword, changePosition, logout } from "../store/modules/auth/actions";
 
@@ -24,11 +25,18 @@ const Mypage = () => {
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingPosition, setIsEditingPosition] = useState(false);
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [newPosition, setNewPosition] = useState("");
+
+  // 이메일 인증 관련 상태
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState("");
 
   // 컴포넌트 마운트 시 사용자 정보 조회
   useEffect(() => {
@@ -60,34 +68,73 @@ const Mypage = () => {
     }));
   };
 
+  // 이메일 인증번호 전송
+  const handleSendVerificationCode = async () => {
+    if (!verificationEmail) return alert("이메일을 입력해주세요.");
+    if (verificationEmail !== user?.email) return alert("등록된 이메일과 일치하지 않습니다.");
+
+    setIsSendingCode(true);
+    setVerificationMessage("인증번호 전송 중입니다...");
+
+    // TODO: 실제 API 연동 시 교체
+    // 임시로 setTimeout 사용
+    setTimeout(() => {
+      setIsSendingCode(false);
+      setIsCodeSent(true);
+      setVerificationMessage("인증번호가 전송되었습니다. 이메일을 확인해주세요.");
+    }, 1500);
+  };
+
+  // 인증번호 확인
+  const handleVerifyCode = () => {
+    if (!verificationCode) return alert("인증번호를 입력해주세요.");
+
+    // TODO: 실제 API 연동 시 교체
+    // 임시로 인증번호 123456 사용
+    if (verificationCode === "123456") {
+      setIsVerified(true);
+      setVerificationMessage("인증이 완료되었습니다.");
+    } else {
+      alert("인증번호가 일치하지 않습니다.");
+    }
+  };
+
   const handlePasswordSubmit = () => {
-    const { currentPassword, newPassword, confirmPassword } = passwordData;
-    if (!currentPassword || !newPassword || !confirmPassword) return alert("모든 필드를 입력해주세요.");
+    const { newPassword, confirmPassword } = passwordData;
+    if (!isVerified) return alert("이메일 인증을 완료해주세요.");
+    if (!newPassword || !confirmPassword) return alert("모든 필드를 입력해주세요.");
     if (newPassword !== confirmPassword) return alert("새 비밀번호가 일치하지 않습니다.");
     if (newPassword.length < 4) return alert("비밀번호는 최소 4자 이상이어야 합니다.");
 
     // Redux Saga를 통한 비밀번호 변경
     dispatch(changePassword.request({
-      currentPassword,
       newPassword,
     }));
 
     // 성공 시 폼 초기화
     setPasswordData({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
+    setVerificationEmail("");
+    setVerificationCode("");
+    setIsCodeSent(false);
+    setIsVerified(false);
+    setVerificationMessage("");
     setIsEditingPassword(false);
     alert("비밀번호가 변경되었습니다.");
   };
 
   const handlePasswordCancel = () => {
     setPasswordData({
-      currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
+    setVerificationEmail("");
+    setVerificationCode("");
+    setIsCodeSent(false);
+    setIsVerified(false);
+    setVerificationMessage("");
     setIsEditingPassword(false);
   };
 
@@ -246,48 +293,95 @@ const Mypage = () => {
           {isEditingPassword && (
             <>
               <div className="space-y-4">
+                {/* 이메일 인증 섹션 */}
                 <div>
                   <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
-                    <Lock className="h-4 w-4" />
-                    <span>기존 비밀번호</span>
+                    <Mail className="h-4 w-4" />
+                    <span>이메일 인증</span>
+                    {isVerified && <CheckCircle className="h-4 w-4 text-green-500" />}
                   </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="기존 비밀번호를 입력하세요"
-                    className="w-full rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
-                  />
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="email"
+                      value={verificationEmail}
+                      onChange={(e) => setVerificationEmail(e.target.value)}
+                      placeholder="이메일을 입력하세요"
+                      disabled={isVerified}
+                      className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529] disabled:opacity-50"
+                    />
+                    <button
+                      onClick={handleSendVerificationCode}
+                      disabled={isSendingCode || isVerified}
+                      className="whitespace-nowrap rounded bg-[#674529] px-4 py-2 text-sm text-white transition-colors hover:bg-[#543620] disabled:opacity-50"
+                    >
+                      {isSendingCode ? "전송중..." : isCodeSent ? "재전송" : "인증하기"}
+                    </button>
+                  </div>
+                  {verificationMessage && (
+                    <p className={`mt-2 text-sm ${isVerified ? "text-green-600" : "text-[#674529]"}`}>
+                      {verificationMessage}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
-                    <Lock className="h-4 w-4" />
-                    <span>새 비밀번호</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="새 비밀번호를 입력하세요"
-                    className="w-full rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
-                  />
-                </div>
-                <div>
-                  <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
-                    <Lock className="h-4 w-4" />
-                    <span>비밀번호 확인</span>
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="새 비밀번호를 다시 입력하세요"
-                    className="w-full rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
-                  />
-                </div>
+
+                {/* 인증번호 입력 (인증번호 전송 후 표시) */}
+                {isCodeSent && !isVerified && (
+                  <div>
+                    <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
+                      <Lock className="h-4 w-4" />
+                      <span>인증번호</span>
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        placeholder="인증번호를 입력하세요"
+                        className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
+                      />
+                      <button
+                        onClick={handleVerifyCode}
+                        className="whitespace-nowrap rounded bg-[#674529] px-4 py-2 text-sm text-white transition-colors hover:bg-[#543620]"
+                      >
+                        인증완료
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 새 비밀번호 입력 (인증 완료 후 표시) */}
+                {isVerified && (
+                  <>
+                    <div>
+                      <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <Lock className="h-4 w-4" />
+                        <span>새 비밀번호</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="새 비밀번호를 입력하세요"
+                        className="w-full rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        <Lock className="h-4 w-4" />
+                        <span>비밀번호 확인</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="새 비밀번호를 다시 입력하세요"
+                        className="w-full rounded bg-gray-100 px-3 py-2 text-sm focus:border-[#674529] focus:outline-none focus:ring-1 focus:ring-[#674529]"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
               <div className="mt-4 flex justify-end space-x-2">
                 <button
@@ -297,13 +391,15 @@ const Mypage = () => {
                   <X className="h-4 w-4" />
                   <span>취소</span>
                 </button>
-                <button
-                  onClick={handlePasswordSubmit}
-                  className="flex items-center space-x-2 rounded bg-[#674529] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#543620]"
-                >
-                  <Save className="h-4 w-4" />
-                  <span>저장</span>
-                </button>
+                {isVerified && (
+                  <button
+                    onClick={handlePasswordSubmit}
+                    className="flex items-center space-x-2 rounded bg-[#674529] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#543620]"
+                  >
+                    <Save className="h-4 w-4" />
+                    <span>저장</span>
+                  </button>
+                )}
               </div>
             </>
           )}

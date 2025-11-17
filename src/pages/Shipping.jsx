@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import ShippingB2B from '../components/shipping/ShippingB2B';
 import ShippingB2C from '../components/shipping/ShippingB2C';
-import ShippingList from '../components/shipping/ShippingList';
 import { Box } from 'lucide-react';
 
 const Shipping = () => {
-  const [activeTab, setActiveTab] = useState('B2C');
+  const [activeTab, setActiveTab] = useState('B2B');
   const [selectedPlatform, setSelectedPlatform] = useState({
     B2C: {
       자사몰: { 미완료: false, 완료: false },
