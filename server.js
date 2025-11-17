@@ -5,6 +5,10 @@ const puppeteer = require('puppeteer');
 const app = express();
 const PORT = 3001;
 
+const archiver = require('archiver');
+const path = require('path');
+const fs = require('fs');
+
 // 미들웨어 설정
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -119,6 +123,40 @@ app.post('/api/generate-pdf', async (req, res) => {
 // 헬스 체크 엔드포인트
 app.get('/health', (_req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// ZIP 다운로드 엔드포인트
+app.post('/api/download-zip', async (req, res) => {
+  try {
+    const { files } = req.body; 
+    // files = ["a.pdf", "b.pdf"]
+
+    if (!files || !Array.isArray(files)) {
+      return res.status(400).json({ error: 'File list is required' });
+    }
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="pdfs.zip"');
+
+    const archive = archiver('zip', { zlib: { level: 9 }});
+    archive.pipe(res);
+
+    files.forEach(filename => {
+      const filePath = path.join(__dirname, 'pdf', filename);  // PDF 저장 위치
+
+      if (fs.existsSync(filePath)) {
+        archive.file(filePath, { name: filename });
+      } else {
+        console.warn(`File not found: ${filePath}`);
+      }
+    });
+
+    await archive.finalize();
+
+  } catch (err) {
+    console.error('ZIP creation error:', err);
+    res.status(500).json({ error: 'Failed to create zip file' });
+  }
 });
 
 // 서버 시작
