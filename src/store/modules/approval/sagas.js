@@ -17,7 +17,13 @@ import {
 function* fetchApprovalInboxSaga() {
   try {
     const response = yield call(approvalAPI.getInbox);
-    yield put(fetchApprovalInbox.success(response.data));
+    // 백엔드 응답 구조에 따라 배열 추출
+    // response.data.data 또는 response.data가 배열일 수 있음
+    const approvals = Array.isArray(response.data) 
+      ? response.data 
+      : (response.data?.data || response.data?.approvals || []);
+    
+    yield put(fetchApprovalInbox.success(approvals));
   } catch (error) {
     yield put(fetchApprovalInbox.failure(error.response?.data?.message || '결재함 목록을 불러오지 못했습니다.'));
   }

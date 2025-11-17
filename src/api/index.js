@@ -96,35 +96,6 @@ export const labelAPI = {
     const response = await apiClient.get(`/label/template/${templateId}`);
     return response;
   },
-  // 추가 메서드 (saga 호환용)
-  getLabelTemplate: async (templateId) => {
-    const response = await apiClient.get(`/label/template/${templateId}`);
-    return response;
-  },
-  getAllLabels: async (params = {}) => {
-    const response = await apiClient.get('/label/labels', { params });
-    return response;
-  },
-  getLabelsByBarcode: async (barcode) => {
-    const response = await apiClient.get(`/label/labels/barcode/${barcode}`);
-    return response;
-  },
-  getLabelsByInventory: async (inventoryId) => {
-    const response = await apiClient.get(`/label/labels/inventory/${inventoryId}`);
-    return response;
-  },
-  printSavedLabel: async (data) => {
-    const response = await apiClient.post('/label/print', data);
-    return response;
-  },
-  generateBarcode: async (data) => {
-    const response = await apiClient.post('/label/barcode/generate', data);
-    return response;
-  },
-  generateIssueLabel: async (data) => {
-    const response = await apiClient.post('/label/issue/generate', data);
-    return response;
-  },
 };
 
 // ============================================
@@ -193,16 +164,16 @@ export const authAPI = {
     const response = await apiClient.delete(`/auth/${id}`);
     return response;
   },
+  signup: async (data) => {
+    return authAPI.join(data);
+  },
   changePassword: async (data) => {
     const response = await apiClient.post('/auth/password', data);
     return response;
   },
-  changePosition: async (id, data) => {
-    const response = await apiClient.put(`/auth/${id}`, data);
+  changePosition: async (data) => {
+    const response = await apiClient.post('/auth/position', data);
     return response;
-  },
-  signup: async (data) => {
-    return authAPI.join(data);
   },
 };
 
@@ -534,6 +505,12 @@ export const approvalAPI = {
     const response = await apiClient.post(`/approval/approvals/${id}/reject`, data);
     return response;
   },
+  // ✅ createDocument는 추가 완료
+  // ℹ️ API 사용 예시:
+  // - getInbox(): 결재함 목록 조회 (내가 결재할 문서, 내가 작성한 문서 등)
+  // - createDocument(data): 새 결재 문서 생성
+  // - approve(id, data): 문서 승인
+  // - reject(id, data): 문서 반려
 };
 
 // ============================================
@@ -656,6 +633,27 @@ export const shippingAPI = {
   },
   downloadFile: async (filename) => {
     const response = await apiClient.get(`/shipping/download/${filename}`);
+    return response;
+  },
+  // 기존 출고 관련 API (호환성 유지)
+  getWaitingList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/waiting', { params });
+    return response;
+  },
+  getCompletedList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/completed', { params });
+    return response;
+  },
+  createShipping: async (data) => {
+    const response = await apiClient.post('/shipping', data);
+    return response;
+  },
+  confirmShipping: async (id, data = {}) => {
+    const response = await apiClient.put(`/shipping/${id}/confirm`, data);
+    return response;
+  },
+  cancelShipping: async (id) => {
+    const response = await apiClient.put(`/shipping/${id}/cancel`);
     return response;
   },
 };

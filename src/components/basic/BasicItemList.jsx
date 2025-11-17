@@ -114,6 +114,18 @@ const BasicItemList = () => {
   const unitOptions = ['kg', 'g', 'ea', 'box', 'pallet'];
   const factoryOptions = ['1공장', '2공장'];
   const storageOptions = ['냉동', '냉장', '실온'];
+  const columnWidths = [
+    { width: '9%', key: 'code' },
+    { width: '20%', key: 'name' },
+    { width: '9%', key: 'category' },
+    { width: '9%', key: 'factory' },
+    { width: '9%', key: 'storage' },
+    { width: '9%', key: 'shelfLife' },
+    { width: '9%', key: 'price' },
+    { width: '9%', key: 'quantity' },
+    { width: '9%', key: 'unit' },
+    { width: '8%', key: 'actions' },
+  ];
 
   return (
     <div className='rounded-xl bg-white p-6 shadow-sm'>
@@ -125,16 +137,9 @@ const BasicItemList = () => {
       <div className='overflow-x-auto'>
         <table className='w-full table-fixed'>
           <colgroup>
-            <col style={{ width: '9%' }} />  {/* 품목코드 */}
-            <col style={{ width: '20%' }} /> {/* 품목명 */}
-            <col style={{ width: '9%' }} />  {/* 카테고리 */}
-            <col style={{ width: '9%' }} />  {/* 담당공장 */}
-            <col style={{ width: '9%' }} />  {/* 보관조건 */}
-            <col style={{ width: '9%' }} />  {/* 유통기한 */}
-            <col style={{ width: '9%' }} />  {/* 도매가 */}
-            <col style={{ width: '9%' }} />  {/* 수량 */}
-            <col style={{ width: '9%' }} />  {/* 단위 */}
-            <col style={{ width: '8%' }} />  {/* 작업 */}
+            {columnWidths.map((col) => (
+              <col key={col.key} style={{ width: col.width }} />
+            ))}
           </colgroup>
           <thead className='border-b border-gray-200'>
             <tr>

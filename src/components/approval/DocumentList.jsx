@@ -9,6 +9,15 @@ import {
 const DocumentList = () => {
   const approvals = useSelector(selectApprovalInbox);
   const isLoading = useSelector(selectApprovalInboxLoading);
+  const normalizedApprovals = Array.isArray(approvals)
+    ? approvals
+    : approvals?.data?.rows ||
+      approvals?.data ||
+      approvals?.rows ||
+      approvals?.approvals ||
+      approvals?.results ||
+      approvals?.items ||
+      [];
   
   const [filters, setFilters] = useState({
     status: '전체',
@@ -95,7 +104,7 @@ const DocumentList = () => {
   };
 
   // 필터링 로직
-  const filteredDocuments = approvals.filter((doc) => {
+  const filteredDocuments = normalizedApprovals.filter((doc) => {
     // 상태 필터
     if (filters.status !== '전체') {
       const statusText = getStatusText(doc.status);
@@ -195,7 +204,7 @@ const DocumentList = () => {
             <FileText className='h-5 w-5 text-[#674529]' />
             <h3 className='text-base font-semibold text-[#674529]'>
               전체 결재 문서 ({filteredDocuments.length}건
-              {approvals.length !== filteredDocuments.length && ` / ${approvals.length}건`})
+              {normalizedApprovals.length !== filteredDocuments.length && ` / ${normalizedApprovals.length}건`})
             </h3>
           </div>
           <p className='mt-1 text-sm text-gray-600'>
@@ -234,7 +243,10 @@ const DocumentList = () => {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-100'>
-            {filteredDocuments.map((doc) => (
+            {filteredDocuments.map((doc) => {
+              const approvalSteps = Array.isArray(doc.approvalSteps) ? doc.approvalSteps : [];
+              const createdAt = doc.createdAt || doc.createdDate;
+              return (
               <tr
                 key={doc.id}
                 className='transition-colors hover:bg-gray-50/50'
@@ -255,15 +267,12 @@ const DocumentList = () => {
                   {doc.author}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {doc.createdDate ? new Date(doc.createdAt).toLocaleDateString() : '-'}
+                  {createdAt ? new Date(createdAt).toLocaleDateString() : '-'}
                 </td>
                 <td className='px-4 py-4'>
                   <div className='flex items-center space-x-2'>
-                    {doc.approvalSteps.map((stepData, index) => (
-                      <div
-                        key={index}
-                        className='flex items-center'
-                      >
+                    {approvalSteps.map((stepData, index) => (
+                      <div key={index} className='flex items-center'>
                         <div
                           className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${
                             stepData.status === 'completed'
@@ -277,7 +286,7 @@ const DocumentList = () => {
                         >
                           {stepData.step}
                         </div>
-                        {index < doc.approvalSteps.length - 1 && (
+                        {index < approvalSteps.length - 1 && (
                           <div className='mx-1 text-gray-400'>→</div>
                         )}
                       </div>
@@ -292,7 +301,8 @@ const DocumentList = () => {
                   )}
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>

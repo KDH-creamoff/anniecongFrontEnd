@@ -15,7 +15,15 @@ const PendingDocumentList = () => {
     const isApproving = useSelector(selectApproveOperationLoading);
     const isRejecting = useSelector(selectRejectOperationLoading);
 
-    const pendingData = approvals.filter(doc => doc.status === 'pending');
+    // API에서 배열이 온다고 가정 (saga에서 처리됨)
+    const approvalsArray = Array.isArray(approvals) ? approvals : [];
+    const pendingData = approvalsArray.filter(doc => doc.status === 'pending');
+
+    const handleApprove = (id) => {
+        if (window.confirm('이 문서를 승인하시겠습니까?')) {
+            dispatch(approveRequest.request({ id }));
+        }
+    };
 
     // const pendingData = [
     //     {

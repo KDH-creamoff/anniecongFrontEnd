@@ -9,7 +9,14 @@ const SubmittedDocumentList = () => {
   const approvals = useSelector(selectApprovalInbox);
   const isLoading = useSelector(selectApprovalInboxLoading);
 
-  const documents = approvals;
+  // API에서 배열이 온다고 가정 (saga에서 처리됨)
+  const documents = Array.isArray(approvals) ? approvals : [];
+  
+  // approvalSteps가 없는 경우 빈 배열로 초기화
+  const safeDocuments = documents.map(doc => ({
+    ...doc,
+    approvalSteps: Array.isArray(doc.approvalSteps) ? doc.approvalSteps : []
+  }));
 
   // const documents = [
   //   {
@@ -96,7 +103,7 @@ const SubmittedDocumentList = () => {
         <div className='flex items-center space-x-2'>
           <FileText className='h-5 w-5 text-[#674529]' />
           <h3 className='text-base font-semibold text-[#674529]'>
-            내가 작성한 문서 ({documents.length}건)
+            내가 작성한 문서 ({safeDocuments.length}건)
           </h3>
         </div>
         <p className='mt-1 text-sm text-gray-600'>
@@ -132,14 +139,14 @@ const SubmittedDocumentList = () => {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-100'>
-          {documents.length === 0 ? (
+          {safeDocuments.length === 0 ? (
               <tr>
                 <td colSpan={7} className='px-4 py-8 text-center text-gray-500'>
                   작성한 문서가 없습니다
                 </td>
               </tr>
             ) : (
-              documents.map((doc) => (
+              safeDocuments.map((doc) => (
                 <tr
                   key={doc.id}
                   className='transition-colors hover:bg-gray-50/50'

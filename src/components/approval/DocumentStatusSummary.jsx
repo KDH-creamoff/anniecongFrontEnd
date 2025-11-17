@@ -3,7 +3,14 @@ import { FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { selectApprovalInbox } from '../../store/modules/approval/selectors';
 
 const DocumentStatusSummary = () => {
-  const approvals = useSelector(selectApprovalInbox);
+  const rawApprovals = useSelector(selectApprovalInbox);
+  const approvals = Array.isArray(rawApprovals)
+    ? rawApprovals
+    : rawApprovals?.data?.rows ||
+      rawApprovals?.data ||
+      rawApprovals?.rows ||
+      rawApprovals?.approvals ||
+      [];
 
   //상태별 카운트 계산
   const totalCount = approvals.length;
