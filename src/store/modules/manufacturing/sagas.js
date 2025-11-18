@@ -17,6 +17,7 @@ import {
   CREATE_TRANSFER,
   UPDATE_TRANSFER_STATUS,
   CANCEL_TRANSFER,
+  FETCH_AVAILABLE_PRODUCTS,
   FETCH_FACTORY2_WORKS,
   FETCH_FACTORY2_ORDERS,
   UPDATE_FACTORY2_WORK_STATUS,
@@ -36,6 +37,7 @@ import {
   createTransfer,
   updateTransferStatus,
   cancelTransfer,
+  fetchAvailableProducts,
   fetchFactory2Works,
   fetchFactory2Orders,
   updateFactory2WorkStatus,
@@ -56,6 +58,7 @@ let mockWorkOrders = [
     status: 'in_progress',
     deadlineDate: '2025-10-22',
     manager: '김전처리',
+    worker: '김전처리',
     factoryId: 1,
     createdAt: '2025-10-15',
   },
@@ -70,6 +73,7 @@ let mockWorkOrders = [
     status: 'waiting',
     deadlineDate: '2025-10-24',
     manager: '나작업',
+    worker: '나작업',
     factoryId: 1,
     createdAt: '2025-10-16',
   },
@@ -84,6 +88,7 @@ let mockWorkOrders = [
     status: 'completed',
     deadlineDate: '2025-10-20',
     manager: '박포장',
+    worker: '박포장',
     factoryId: 1,
     createdAt: '2025-10-14',
   },
@@ -98,8 +103,39 @@ let mockWorkOrders = [
     status: 'waiting',
     deadlineDate: '2025-10-25',
     manager: '최냉동',
+    worker: '최냉동',
     factoryId: 1,
     createdAt: '2025-10-17',
+  },
+  {
+    id: 9,
+    code: 'WO005',
+    title: '건조 작업',
+    product: '건조 채소 믹스 - 25개',
+    material: '브로콜리',
+    materialCode: 'RAW009',
+    quantity: '40 kg',
+    status: 'in_progress',
+    deadlineDate: '2025-10-26',
+    manager: '이건조',
+    worker: '이건조',
+    factoryId: 1,
+    createdAt: '2025-10-18',
+  },
+  {
+    id: 10,
+    code: 'WO006',
+    title: '분쇄 작업',
+    product: '분쇄 곡물 - 30개',
+    material: '현미',
+    materialCode: 'RAW010',
+    quantity: '60 kg',
+    status: 'waiting',
+    deadlineDate: '2025-10-27',
+    manager: '정분쇄',
+    worker: '정분쇄',
+    factoryId: 1,
+    createdAt: '2025-10-19',
   },
 ];
 
@@ -651,42 +687,146 @@ let mockFactory2Works = [
 // 2공장 주문 목데이터
 let mockFactory2Orders = [
   {
-    id: 1,
+    id: 5,
     orderCode: 'F2O001',
+    code: 'F2O001',
+    title: '콩부장쿠키 제조',
     product: '콩부장쿠키',
+    material: '밀가루',
+    materialCode: 'RAW005',
     quantity: '200 box',
     orderDate: '2025-10-10',
     deadline: '2025-10-20',
+    deadlineDate: '2025-10-20',
     status: 'in_progress',
+    worker: '이제조',
+    manager: '이제조',
+    factoryId: 2,
+    createdAt: '2025-10-10',
   },
   {
-    id: 2,
+    id: 6,
     orderCode: 'F2O002',
+    code: 'F2O002',
+    title: '펫디너 비프 제조',
     product: '애니콩 펫디너 비프',
+    material: '소고기',
+    materialCode: 'RAW006',
     quantity: '500 ea',
     orderDate: '2025-10-12',
     deadline: '2025-10-22',
+    deadlineDate: '2025-10-22',
     status: 'waiting',
+    worker: '박공장',
+    manager: '박공장',
+    factoryId: 2,
+    createdAt: '2025-10-12',
   },
   {
-    id: 3,
+    id: 7,
     orderCode: 'F2O003',
+    code: 'F2O003',
+    title: '펫베이커리 제조',
     product: '애니콩 펫베이커리',
+    material: '호밀',
+    materialCode: 'RAW007',
     quantity: '300 box',
     orderDate: '2025-10-14',
     deadline: '2025-10-24',
+    deadlineDate: '2025-10-24',
     status: 'completed',
+    worker: '최생산',
+    manager: '최생산',
+    factoryId: 2,
+    createdAt: '2025-10-14',
   },
   {
-    id: 4,
+    id: 8,
     orderCode: 'F2O004',
+    code: 'F2O004',
+    title: '치킨 믹스 제조',
     product: '펫간식 치킨 믹스',
+    material: '닭고기',
+    materialCode: 'RAW008',
     quantity: '150 box',
     orderDate: '2025-10-15',
     deadline: '2025-10-25',
+    deadlineDate: '2025-10-25',
     status: 'waiting',
+    worker: '정작업',
+    manager: '정작업',
+    factoryId: 2,
+    createdAt: '2025-10-15',
+  },
+  {
+    id: 11,
+    orderCode: 'F2O005',
+    code: 'F2O005',
+    title: '펫쿠키 연어맛 제조',
+    product: '펫쿠키 연어맛 - 100개',
+    material: '연어',
+    materialCode: 'RAW011',
+    quantity: '80 box',
+    orderDate: '2025-10-16',
+    deadline: '2025-10-26',
+    deadlineDate: '2025-10-26',
+    status: 'in_progress',
+    worker: '강펫푸드',
+    manager: '강펫푸드',
+    factoryId: 2,
+    createdAt: '2025-10-16',
+  },
+  {
+    id: 12,
+    orderCode: 'F2O006',
+    code: 'F2O006',
+    title: '펫저키 오리맛 제조',
+    product: '펫저키 오리맛 - 200개',
+    material: '오리고기',
+    materialCode: 'RAW012',
+    quantity: '120 box',
+    orderDate: '2025-10-17',
+    deadline: '2025-10-27',
+    deadlineDate: '2025-10-27',
+    status: 'waiting',
+    worker: '윤펫간식',
+    manager: '윤펫간식',
+    factoryId: 2,
+    createdAt: '2025-10-17',
   },
 ];
+
+// 출고가능품목 목데이터 (품목별로 관리)
+const mockAvailableProducts = {
+  'RAW001': [ // 닭고기 (가슴살)
+    { id: 1, itemCode: 'RAW001', itemName: '닭고기 (가슴살)', expiry: 'D-5', receiveDate: '2025-10-10', quantity: '100 kg' },
+    { id: 2, itemCode: 'RAW001', itemName: '닭고기 (가슴살)', expiry: 'D-8', receiveDate: '2025-10-21', quantity: '150 kg' },
+  ],
+  'RAW002': [ // 당근
+    { id: 3, itemCode: 'RAW002', itemName: '당근', expiry: 'D-3', receiveDate: '2025-10-15', quantity: '80 kg' },
+    { id: 4, itemCode: 'RAW002', itemName: '당근', expiry: 'D-10', receiveDate: '2025-10-18', quantity: '120 kg' },
+  ],
+  'RAW003': [ // 양배추
+    { id: 5, itemCode: 'RAW003', itemName: '양배추', expiry: 'D-7', receiveDate: '2025-10-12', quantity: '60 kg' },
+  ],
+  'RAW004': [ // 소고기 (등심)
+    { id: 6, itemCode: 'RAW004', itemName: '소고기 (등심)', expiry: 'D-4', receiveDate: '2025-10-20', quantity: '200 kg' },
+    { id: 7, itemCode: 'RAW004', itemName: '소고기 (등심)', expiry: 'D-12', receiveDate: '2025-10-25', quantity: '180 kg' },
+  ],
+  'RAW005': [ // 밀가루
+    { id: 8, itemCode: 'RAW005', itemName: '밀가루', expiry: 'D-15', receiveDate: '2025-10-05', quantity: '300 kg' },
+  ],
+  'RAW006': [ // 소고기
+    { id: 9, itemCode: 'RAW006', itemName: '소고기', expiry: 'D-6', receiveDate: '2025-10-14', quantity: '150 kg' },
+  ],
+  'RAW007': [ // 호밀
+    { id: 10, itemCode: 'RAW007', itemName: '호밀', expiry: 'D-20', receiveDate: '2025-10-08', quantity: '100 kg' },
+  ],
+  'RAW008': [ // 닭고기
+    { id: 11, itemCode: 'RAW008', itemName: '닭고기', expiry: 'D-5', receiveDate: '2025-10-16', quantity: '120 kg' },
+    { id: 12, itemCode: 'RAW008', itemName: '닭고기', expiry: 'D-9', receiveDate: '2025-10-22', quantity: '90 kg' },
+  ],
+};
 
 // 작업 통계 목데이터
 const mockWorkStatistics = {
@@ -748,14 +888,39 @@ function* createWorkOrderSaga(action) {
     // yield put(createWorkOrder.success(response.data));
 
     yield delay(500);
-    const newWorkOrder = {
-      id: mockWorkOrders.length + 1,
-      code: `WO${String(mockWorkOrders.length + 1).padStart(3, '0')}`,
-      ...action.payload,
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    mockWorkOrders = [...mockWorkOrders, newWorkOrder];
-    yield put(createWorkOrder.success(newWorkOrder));
+    const { factoryId, ...orderData } = action.payload;
+    
+    // factoryId에 따라 다른 목록에 추가
+    if (factoryId === 1) {
+      // 1공장 작업 지시서
+      const newWorkOrder = {
+        id: mockWorkOrders.length + mockFactory2Orders.length + 1,
+        code: `WO${String(mockWorkOrders.length + 1).padStart(3, '0')}`,
+        ...orderData,
+        factoryId: 1,
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+      mockWorkOrders = [...mockWorkOrders, newWorkOrder];
+      yield put(createWorkOrder.success(newWorkOrder));
+    } else if (factoryId === 2) {
+      // 2공장 작업 지시서
+      const newFactory2Order = {
+        id: mockWorkOrders.length + mockFactory2Orders.length + 1,
+        orderCode: `F2O${String(mockFactory2Orders.length + 1).padStart(3, '0')}`,
+        product: orderData.product,
+        quantity: orderData.quantity,
+        orderDate: new Date().toISOString().split('T')[0],
+        deadline: orderData.deadlineDate,
+        status: orderData.status,
+        worker: orderData.worker,
+        ...orderData,
+        factoryId: 2,
+      };
+      mockFactory2Orders = [...mockFactory2Orders, newFactory2Order];
+      yield put(createWorkOrder.success(newFactory2Order));
+    } else {
+      yield put(createWorkOrder.failure('공장을 선택해주세요.'));
+    }
   } catch (error) {
     yield put(createWorkOrder.failure(error.response?.data?.message || '작업 지시서 등록에 실패했습니다.'));
   }
@@ -796,16 +961,21 @@ function* deleteWorkOrderSaga(action) {
 
 function* updateWorkOrderStatusSaga(action) {
   try {
-    // const { id, status } = action.payload;
-    // const response = yield call(manufacturingAPI.updateWorkOrderStatus, id, status);
+    // const { id, status, worker } = action.payload;
+    // const response = yield call(manufacturingAPI.updateWorkOrderStatus, id, { status, worker });
     // yield put(updateWorkOrderStatus.success(response.data));
 
     yield delay(500);
-    const { id, status } = action.payload;
+    const { id, status, worker } = action.payload;
     const index = mockWorkOrders.findIndex((wo) => wo.id === id);
     if (index !== -1) {
-      mockWorkOrders[index] = { ...mockWorkOrders[index], status };
-      yield put(updateWorkOrderStatus.success({ id, status }));
+      const updatedOrder = { 
+        ...mockWorkOrders[index], 
+        status,
+        ...(worker && { worker })
+      };
+      mockWorkOrders[index] = updatedOrder;
+      yield put(updateWorkOrderStatus.success(updatedOrder));
     } else {
       yield put(updateWorkOrderStatus.failure('작업 지시서를 찾을 수 없습니다.'));
     }
@@ -976,21 +1146,60 @@ function* fetchFactory2OrdersSaga(action) {
 
 function* updateFactory2WorkStatusSaga(action) {
   try {
-    // const { id, status } = action.payload;
-    // const response = yield call(manufacturingAPI.updateFactory2WorkStatus, id, status);
+    // const { id, status, worker, ...rest } = action.payload;
+    // const response = yield call(manufacturingAPI.updateFactory2WorkStatus, id, { status, worker, ...rest });
     // yield put(updateFactory2WorkStatus.success(response.data));
 
     yield delay(500);
-    const { id, status } = action.payload;
-    const index = mockFactory2Works.findIndex((w) => w.id === id);
-    if (index !== -1) {
-      mockFactory2Works[index] = { ...mockFactory2Works[index], status };
-      yield put(updateFactory2WorkStatus.success({ id, status }));
+    const { id, status, worker, ...rest } = action.payload;
+    
+    // mockFactory2Works 업데이트
+    const workIndex = mockFactory2Works.findIndex((w) => w.id === id);
+    if (workIndex !== -1) {
+      const updatedWork = { 
+        ...mockFactory2Works[workIndex], 
+        status,
+        ...(worker && { worker }),
+        ...rest
+      };
+      mockFactory2Works[workIndex] = updatedWork;
+    }
+    
+    // mockFactory2Orders 업데이트
+    const orderIndex = mockFactory2Orders.findIndex((o) => o.id === id);
+    if (orderIndex !== -1) {
+      const updatedOrder = { 
+        ...mockFactory2Orders[orderIndex], 
+        status,
+        ...(worker && { worker }),
+        ...rest
+      };
+      mockFactory2Orders[orderIndex] = updatedOrder;
+      yield put(updateFactory2WorkStatus.success(updatedOrder));
+    } else if (workIndex !== -1) {
+      yield put(updateFactory2WorkStatus.success(mockFactory2Works[workIndex]));
     } else {
       yield put(updateFactory2WorkStatus.failure('작업 정보를 찾을 수 없습니다.'));
     }
   } catch (error) {
     yield put(updateFactory2WorkStatus.failure(error.response?.data?.message || '2공장 작업 상태 변경에 실패했습니다.'));
+  }
+}
+
+// ==================== 출고가능품목 Saga ====================
+function* fetchAvailableProductsSaga(action) {
+  try {
+    // const response = yield call(manufacturingAPI.getAvailableProducts, action.payload);
+    // yield put(fetchAvailableProducts.success(response.data));
+
+    yield delay(500);
+    const { itemCode } = action.payload || {};
+    
+    // itemCode가 제공되면 해당 품목의 출고가능품목 반환, 아니면 빈 배열
+    const products = itemCode && mockAvailableProducts[itemCode] ? mockAvailableProducts[itemCode] : [];
+    yield put(fetchAvailableProducts.success(products));
+  } catch (error) {
+    yield put(fetchAvailableProducts.failure(error.response?.data?.message || '출고가능품목을 불러오는데 실패했습니다.'));
   }
 }
 
@@ -1043,6 +1252,7 @@ export default function* manufacturingSaga() {
   yield takeLatest(CREATE_TRANSFER.REQUEST, createTransferSaga);
   yield takeLatest(UPDATE_TRANSFER_STATUS.REQUEST, updateTransferStatusSaga);
   yield takeLatest(CANCEL_TRANSFER.REQUEST, cancelTransferSaga);
+  yield takeLatest(FETCH_AVAILABLE_PRODUCTS.REQUEST, fetchAvailableProductsSaga);
 
   // 2공장 제조
   yield takeLatest(FETCH_FACTORY2_WORKS.REQUEST, fetchFactory2WorksSaga);

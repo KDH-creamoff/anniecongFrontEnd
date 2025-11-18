@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFactory2Orders } from "../../store/modules/manufacturing/action";
+import { fetchFactory2Orders, updateFactory2WorkStatus } from "../../store/modules/manufacturing/action";
 import { selectFactory2Orders, selectFactory2OrdersLoading } from "../../store/modules/manufacturing/selectors";
+import Pagination from '../common/Pagination';
+import Factory2WorkList from './Factory2WorkList';
 
 const Factory2OrderList = () => {
     const dispatch = useDispatch();
     const [filterType, setFilterType] = useState('전체');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
     const [showCompletionModal, setShowCompletionModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [completionData, setCompletionData] = useState({
@@ -15,21 +19,45 @@ const Factory2OrderList = () => {
         note: ''
     });
 
-    // Redux에서 2공장 주문 목록 가져오기
+    // Redux에서 작업 지시서 목록 가져오기
     const factory2OrdersFromRedux = useSelector(selectFactory2Orders);
     const loading = useSelector(selectFactory2OrdersLoading);
 
-    // 컴포넌트 마운트 시 2공장 주문 목록 조회
+    // 컴포넌트 마운트 시 작업 지시서 목록 조회
     useEffect(() => {
         dispatch(fetchFactory2Orders.request());
     }, [dispatch]);
 
-    const workOrders = factory2OrdersFromRedux || [];
+    // 2공장 데이터만 필터링
+    const factory2Orders = (factory2OrdersFromRedux || []).filter(order => order.factoryId === 2);
+
+    // 상태별 개수 계산
+    const statusCounts = {
+        inProgress: factory2Orders.filter(order => order.status === 'in_progress').length,
+        waiting: factory2Orders.filter(order => order.status === 'waiting').length,
+        completed: factory2Orders.filter(order => order.status === 'completed').length,
+        total: factory2Orders.length
+    };
+
+    // 페이지네이션 계산
+    const totalPages = Math.ceil(factory2Orders.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const workOrders = factory2Orders.slice(startIndex, endIndex);
+
+    // 필터 변경 시 첫 페이지로 이동
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filterType]);
 
     // 시작 버튼 핸들러
     const handleStart = (orderId) => {
         console.log('작업 시작:', orderId);
-        // TODO: 상태 변경 액션 디스패치
+        // 상태를 진행중으로 변경
+        dispatch(updateFactory2WorkStatus.request({ 
+            id: orderId, 
+            status: 'in_progress'
+        }));
     };
 
     // 완료 버튼 핸들러
@@ -40,8 +68,8 @@ const Factory2OrderList = () => {
 
     // 완료 폼 제출
     const handleSubmitCompletion = () => {
-        if (!completionData.damage || !completionData.temperature || !completionData.duration) {
-            alert('파손량, 온도, 소요시간은 필수 입력 항목입니다.');
+        if (!completionData.damage  || !completionData.duration) {
+            alert('파손량, 소요시간은 필수 입력 항목입니다.');
             return;
         }
 
@@ -52,7 +80,12 @@ const Factory2OrderList = () => {
             ...completionData
         });
 
-        // TODO: 완료 액션 디스패치
+        // 완료 액션 디스패치
+        dispatch(updateFactory2WorkStatus.request({
+            id: selectedOrder.id,
+            status: 'completed',
+            ...completionData
+        }));
 
         // 모달 닫기 및 초기화
         setShowCompletionModal(false);
@@ -81,21 +114,23 @@ const Factory2OrderList = () => {
     <>
     <div>
         <div className="mx-auto">
-        <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl text-[#674529]">작업 지시서 목록</h3>
-            {loading && (
-                <span className="text-sm text-gray-500">로딩 중...</span>
-            )}
-        </div>
+        <Factory2WorkList 
+            inProgressCount={statusCounts.inProgress}
+            waitingCount={statusCounts.waiting}
+            completedCount={statusCounts.completed}
+            workerCount={3}
+        />
+        
+        <h3 className="text-lg font-semibold text-[#674529] mb-4">작업 지시서 목록</h3>
 
-        <div className="mb-6">
+        <div className="mb-6 flex gap-4">
             <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none"
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none"
             >
-            <option value="전체">전체</option>
-            <option value="내 작업">내 작업</option>
+                <option value="전체">전체</option>
+                <option value="내 작업">내 작업</option>
             </select>
         </div>
 
@@ -109,8 +144,8 @@ const Factory2OrderList = () => {
                 <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
                     <div className="flex justify-between items-start mb-4">
                         <div>
-                            <h4 className="text-base font-semibold text-gray-900 mb-1">{order.product}</h4>
-                            <p className="text-sm text-gray-600">주문코드: {order.orderCode}</p>
+                            <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
+                            <p className="text-sm text-gray-600">{order.product}</p>
                         </div>
                         <div className="text-right space-y-2">
                             <div className="flex space-x-4">
@@ -149,26 +184,35 @@ const Factory2OrderList = () => {
 
                     <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
                     <div className="justify-between">
-                        <span className="text-gray-600">제품명</span>
-                        <p className="text-gray-900 font-medium">{order.product}</p>
+                        <span className="text-gray-600">원재료코드</span>
+                        <p className="text-gray-900 font-medium">{order.materialCode || order.orderCode || '-'}</p>
                     </div>
                     <div className="justify-between">
-                        <span className="text-gray-600">수량</span>
+                        <span className="text-gray-600">원재료명</span>
+                        <p className="text-gray-900 font-medium">{order.material || '-'}</p>
+                    </div>
+                    <div className="justify-between">
+                        <span className="text-gray-600">필요량</span>
                         <p className="text-gray-900 font-medium">{order.quantity}</p>
                     </div>
                     <div className="justify-between">
-                        <span className="text-gray-600">주문일</span>
-                        <p className="text-gray-900 font-medium">{order.orderDate}</p>
-                    </div>
-                    <div className="justify-between">
-                        <span className="text-gray-600">마감일</span>
-                        <p className="text-gray-900 font-medium">{order.deadline}</p>
+                        <span className="text-gray-600">작업예정일</span>
+                        <p className="text-gray-900 font-medium">{order.deadlineDate || order.deadline || '-'}</p>
                     </div>
                     </div>
                 </div>
                 ))
             )}
         </div>
+
+        {/* 페이지네이션 */}
+        <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={factory2Orders.length}
+            itemsPerPage={itemsPerPage}
+        />
     </div>
     </div>
 
@@ -188,7 +232,7 @@ const Factory2OrderList = () => {
 
                 <div className="mb-4 p-4 bg-gray-50 rounded">
                     <p className="text-sm text-gray-600 mb-1">제품명: <span className="font-medium text-gray-900">{selectedOrder.product}</span></p>
-                    <p className="text-sm text-gray-600">작업량: <span className="font-medium text-gray-900">{selectedOrder.quantity}개</span></p>
+                    <p className="text-sm text-gray-600">작업량: <span className="font-medium text-gray-900">{selectedOrder.quantity}</span></p>
                 </div>
 
                 <div className="space-y-4">
@@ -209,14 +253,14 @@ const Factory2OrderList = () => {
                         </div>
                         {completionData.damage && (
                             <p className="mt-1 text-xs text-gray-500">
-                                완료된 수량: {selectedOrder.quantity - parseInt(completionData.damage || 0)}개
+                                완료된 수량: {parseInt(selectedOrder.quantity) - parseInt(completionData.damage || 0)}개
                             </p>
                         )}
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            온도 <span className="text-red-500">*</span>
+                            온도
                         </label>
                         <div className="flex items-center gap-2">
                             <input

@@ -21,6 +21,7 @@ export const FETCH_TRANSFER_BY_ID = createRequestTypes('manufacturing/FETCH_TRAN
 export const CREATE_TRANSFER = createRequestTypes('manufacturing/CREATE_TRANSFER'); // 이송 등록
 export const UPDATE_TRANSFER_STATUS = createRequestTypes('manufacturing/UPDATE_TRANSFER_STATUS'); // 이송 상태 변경
 export const CANCEL_TRANSFER = createRequestTypes('manufacturing/CANCEL_TRANSFER'); // 이송 취소
+export const FETCH_AVAILABLE_PRODUCTS = createRequestTypes('manufacturing/FETCH_AVAILABLE_PRODUCTS'); // 출고가능품목 조회
 
 // 2공장 제조 관리
 export const FETCH_FACTORY2_WORKS = createRequestTypes('manufacturing/FETCH_FACTORY2_WORKS'); // 2공장 작업 목록 조회
@@ -59,6 +60,7 @@ export const fetchTransferById = createAsyncActions(FETCH_TRANSFER_BY_ID);
 export const createTransfer = createAsyncActions(CREATE_TRANSFER);
 export const updateTransferStatus = createAsyncActions(UPDATE_TRANSFER_STATUS);
 export const cancelTransfer = createAsyncActions(CANCEL_TRANSFER);
+export const fetchAvailableProducts = createAsyncActions(FETCH_AVAILABLE_PRODUCTS);
 
 // 2공장 제조 관리
 export const fetchFactory2Works = createAsyncActions(FETCH_FACTORY2_WORKS);
