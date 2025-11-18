@@ -21,6 +21,7 @@
     "jspdf": "^3.0.3",
     "lucide-react": "^0.545.0",
     "ogl": "^1.0.11",
+    "prop-types": "^15.8.1",
     "puppeteer": "^24.26.0",
     "react": "^19.1.0",
     "react-calendar": "^6.0.0",

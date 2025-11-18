@@ -75,12 +75,12 @@ const Signup = () => {
         {/* 로고/헤더 */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-[#F9B679] rounded-lg flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">애</span>
+            <div className="w-28 h-16 rounded-xl flex items-center justify-center">
+              <img src="/logo-nobg.png" alt="logo-nobg" className='flex w-full object-cover' />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-[#674529]">애니콩 펫베이커리</h1>
-          <p className="text-gray-600 mt-2">제조관리 시스템</p>
+          <p className="text-gray-600 mt-2">재고관리 시스템</p>
         </div>
 
         {/* 회원가입 폼 */}
@@ -106,7 +106,7 @@ const Signup = () => {
                   name="userId"
                   value={formData.userId}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                   placeholder="아이디를 입력하세요"
                   required
                 />
@@ -129,7 +129,7 @@ const Signup = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="비밀번호"
                     required
                   />
@@ -150,7 +150,7 @@ const Signup = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="비밀번호 확인"
                     required
                   />
@@ -173,7 +173,7 @@ const Signup = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                   placeholder="이름을 입력하세요"
                   required
                 />
@@ -196,7 +196,7 @@ const Signup = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="010-0000-0000"
                     required
                   />
@@ -217,7 +217,7 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                     placeholder="example@email.com"
                     required
                   />
@@ -240,7 +240,7 @@ const Signup = () => {
                     name="position"
                     value={formData.position}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
                     style={{ color: formData.position ? '#111827' : '#9ca3af' }}
                     required
                   >
@@ -266,7 +266,7 @@ const Signup = () => {
                     name="department"
                     value={formData.department}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all appearance-none bg-white"
                     style={{ color: formData.department ? '#111827' : '#9ca3af' }}
                     required
                   >
@@ -293,7 +293,7 @@ const Signup = () => {
                   name="hireDate"
                   value={formData.hireDate}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#724323] focus:border-transparent outline-none transition-all"
                   style={{ color: formData.hireDate ? '#111827' : '#9ca3af' }}
                   required
                 />
@@ -303,7 +303,7 @@ const Signup = () => {
             {/* 회원가입 버튼 */}
             <button
               type="submit"
-              className="w-full bg-[#724323] text-white py-3 rounded-lg font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6"
+              className="w-full bg-[#724323] text-white py-3 rounded-xl font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6"
             >
               회원가입
             </button>
@@ -312,7 +312,7 @@ const Signup = () => {
           {/* 로그인 링크 */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              이미 계정이 있으신가요?
+              이미 계정이 있으신가요?{' '}
               <Link
                 to="/login"
                 className="text-[#724323] font-semibold hover:text-[#5a3419] transition-colors"

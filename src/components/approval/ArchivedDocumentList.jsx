@@ -7,7 +7,6 @@ import {
     selectApprovalInboxLoading,
 } from '../../store/modules/approval/selectors';
 import { fetchApprovalInbox } from '../../store/modules/approval/actions';
-import HaccpStandardForm from '../template/15_HaccpStandardForm';
 
 const ArchivedDocumentList = () => {
     const dispatch = useDispatch();
@@ -455,7 +454,7 @@ const ArchivedDocumentList = () => {
         }
     };
 
-    if (isLoading && normalizedApprovals.length === 0) {
+    if (isLoading && archivedDocuments.length === 0) {
         return (
             <div className="rounded-xl bg-white p-8 text-center shadow-sm">
                 <p className="text-sm text-gray-500">보관 문서를 불러오는 중입니다...</p>

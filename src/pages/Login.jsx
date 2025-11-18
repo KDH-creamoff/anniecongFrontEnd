@@ -63,12 +63,12 @@ const Login = () => {
         {/* 로고/헤더 */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-[#F9B679] rounded-lg flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">애</span>
+            <div className="w-28 h-16 rounded-xl flex items-center justify-center">
+              <img src="/logo-nobg.png" alt="logo-nobg" className='flex w-full object-cover' />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-[#674529]">애니콩 펫베이커리</h1>
-          <p className="text-gray-600 mt-2">제조관리 시스템</p>
+          <p className="text-gray-600 mt-2">재고관리 시스템</p>
         </div>
 
         {/* 로그인 폼 */}
@@ -94,7 +94,7 @@ const Login = () => {
                   name="userId"
                   value={formData.userId}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#674529] focus:border-transparent outline-none transition-all"
                   placeholder="아이디를 입력하세요"
                   required
                   disabled={loading}
@@ -117,7 +117,7 @@ const Login = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A3C478] focus:border-transparent outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#674529] focus:border-transparent outline-none transition-all"
                   placeholder="비밀번호를 입력하세요"
                   required
                   disabled={loading}
@@ -129,7 +129,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-[#724323] text-white py-3 rounded-lg font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
+              className={`w-full bg-[#724323] text-white py-3 rounded-xl font-semibold hover:bg-[#5a3419] transition-colors duration-200 mt-6 ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
               {loading ? '로그인 중...' : '로그인'}
             </button>

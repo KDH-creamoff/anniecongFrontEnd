@@ -12,6 +12,7 @@ import {
   Save,
   X,
   CheckCircle,
+  Users,
 } from "lucide-react";
 import { getMe, changePassword, changePosition, logout } from "../store/modules/auth/actions";
 
@@ -207,6 +208,13 @@ const Mypage = () => {
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <Briefcase className="h-4 w-4" />
+                <span>부서</span>
+              </label>
+              <input type="text" value={user?.department || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+            </div>
+            <div>
+              <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Phone className="h-4 w-4" />
                 <span>연락처</span>
               </label>
@@ -255,8 +263,6 @@ const Mypage = () => {
               >
                 <option value="알바">알바</option>
                 <option value="직원">직원</option>
-                <option value="경영지원팀">경영지원팀</option>
-                <option value="생산팀">생산팀</option>
                 <option value="팀장">팀장</option>
                 <option value="이사">이사</option>
               </select>

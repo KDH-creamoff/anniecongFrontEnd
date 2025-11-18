@@ -1,14 +1,22 @@
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Users } from 'lucide-react';
+import { fetchUsers } from '../../store/modules/user/actions';
 
 const UserSummaryCards = () => {
+  const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    // Redux를 통해 사용자 데이터 가져오기
+    dispatch(fetchUsers.request());
+  }, [dispatch]);
 
   // 사용자 데이터에서 통계 계산
   const userData = users.data || [];
   const totalUsers = userData.length;
-  const productionTeam = userData.filter((user) => user.department === '생산팀').length;
-  const managementTeam = userData.filter((user) => user.department === '경영지원팀').length;
+  const productionTeam = userData.filter((user) => user.department === '생산팀' || user.department === '생산').length;
+  const managementTeam = userData.filter((user) => user.department === '경영지원팀' || user.department === '경영지원').length;
 
   const summaryData = [
     {

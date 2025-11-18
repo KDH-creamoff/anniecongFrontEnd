@@ -1,8 +1,3 @@
-/**
- * User 모듈 셀렉터
- * 컴포넌트에서 상태를 조회할 때 사용
- */
-
 // ==================== 사용자 목록 ====================
 export const selectUsers = (state) => state.user.users.data;
 export const selectUsersLoading = (state) => state.user.users.loading;

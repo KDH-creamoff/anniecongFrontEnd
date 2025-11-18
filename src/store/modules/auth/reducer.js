@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT, SIGNUP, CHECK_AUTH, CLEAR_AUTH_ERROR } from './actions';
+import { LOGIN, LOGOUT, SIGNUP, GET_ME, CHECK_AUTH, CLEAR_AUTH_ERROR } from './actions';
 
 const initialState = {
   isAuthenticated: false, // 로그인 여부
@@ -30,11 +30,26 @@ const authReducer = (state = initialState, action) => {
 
     // ==================== 회원가입 성공 ====================
     case SIGNUP.SUCCESS:
-      return { ...state, loading: false, error: null };
+      return { ...state, loading: false, error: null, signupSuccess: true };
 
     // ==================== 로그인/회원가입 실패 ====================
     case LOGIN.FAILURE:
     case SIGNUP.FAILURE:
+      return { ...state, loading: false, error: action.error };
+
+    // ==================== 사용자 정보 조회 ====================
+    case GET_ME.REQUEST:
+      return { ...state, loading: true, error: null };
+
+    case GET_ME.SUCCESS:
+      return {
+        ...state,
+        user: action.payload.user,
+        loading: false,
+        error: null,
+      };
+
+    case GET_ME.FAILURE:
       return { ...state, loading: false, error: action.error };
 
     // ==================== 로그아웃 성공 ====================

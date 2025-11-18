@@ -12,6 +12,7 @@ import UserManagement from './pages/UserManagement';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Mypage from './pages/Mypage';
+import ProtectedRoute from './components/ProtectedRoute';
 import { isMobile } from 'react-device-detect';
 import Scanner from './pages/Scanner';
 import { useEffect } from 'react';
@@ -33,49 +34,134 @@ export default function App() {
             {/* 메인 애플리케이션 라우트 */}
             <Route path='/' element={<Navigate to='/dash' replace />} />
             <Route path='/' element={<Home />}>
-              <Route path='dash' element={<Dash />} />
-              <Route path='basic' element={<Basic />} />
+              <Route
+                path='dash'
+                element={
+                  <ProtectedRoute permission='dash'>
+                    <Dash />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='basic'
+                element={
+                  <ProtectedRoute permission='basic'>
+                    <Basic />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path='receiving/nav1'
-                element={<Receiving subPage='nav1' />}
+                element={
+                  <ProtectedRoute permission='receiving'>
+                    <Receiving subPage='nav1' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='receiving/nav2'
-                element={<Receiving subPage='nav2' />}
+                element={
+                  <ProtectedRoute permission='receiving'>
+                    <Receiving subPage='nav2' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='manufacturing/nav1'
-                element={<Manufacturing subPage='nav1' />}
+                element={
+                  <ProtectedRoute permission='manufacturing'>
+                    <Manufacturing subPage='nav1' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='manufacturing/nav2'
-                element={<Manufacturing subPage='nav2' />}
+                element={
+                  <ProtectedRoute permission='manufacturing'>
+                    <Manufacturing subPage='nav2' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='manufacturing/nav3'
-                element={<Manufacturing subPage='nav3' />}
+                element={
+                  <ProtectedRoute permission='manufacturing'>
+                    <Manufacturing subPage='nav3' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='manufacturing/nav4'
-                element={<Manufacturing subPage='nav4' />}
+                element={
+                  <ProtectedRoute permission='manufacturing'>
+                    <Manufacturing subPage='nav4' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='manufacturing/nav5'
-                element={<Manufacturing subPage='nav5' />}
+                element={
+                  <ProtectedRoute permission='manufacturing'>
+                    <Manufacturing subPage='nav5' />
+                  </ProtectedRoute>
+                }
               />
-              <Route path='inventory' element={<Inventory />} />
-              <Route path='shipping' element={<Shipping />} />
+              <Route
+                path='inventory'
+                element={
+                  <ProtectedRoute permission='inventory'>
+                    <Inventory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='shipping'
+                element={
+                  <ProtectedRoute permission='shipping'>
+                    <Shipping />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path='approval/nav1'
-                element={<ApprovalDashboard subPage='nav1' />}
+                element={
+                  <ProtectedRoute permission='approval'>
+                    <ApprovalDashboard subPage='nav1' />
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path='approval/nav2'
-                element={<ApprovalDashboard subPage='nav2' />}
+                element={
+                  <ProtectedRoute permission='approval'>
+                    <ApprovalDashboard subPage='nav2' />
+                  </ProtectedRoute>
+                }
               />
-              <Route path='label' element={<Label />} />
-              <Route path='user/nav1' element={<UserManagement subPage='nav1' />} />
-              <Route path='user/nav2' element={<UserManagement subPage='nav2' />} />
+              <Route
+                path='label'
+                element={
+                  <ProtectedRoute permission='label'>
+                    <Label />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='user/nav1'
+                element={
+                  <ProtectedRoute permission='user'>
+                    <UserManagement subPage='nav1' />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='user/nav2'
+                element={
+                  <ProtectedRoute permission='user'>
+                    <UserManagement subPage='nav2' />
+                  </ProtectedRoute>
+                }
+              />
               <Route path='mypage' element={<Mypage />} />
             </Route>
           </>
