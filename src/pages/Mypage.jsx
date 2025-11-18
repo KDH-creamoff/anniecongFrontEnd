@@ -71,32 +71,37 @@ const Mypage = () => {
 
   // 이메일 인증번호 전송
   const handleSendVerificationCode = async () => {
-    if (!verificationEmail) return alert("이메일을 입력해주세요.");
-    if (verificationEmail !== user?.email) return alert("등록된 이메일과 일치하지 않습니다.");
+    if (!verificationEmail) return alert('이메일을 입력해주세요.');
+    if (verificationEmail !== user?.email) return alert('등록된 이메일과 일치하지 않습니다.');
 
     setIsSendingCode(true);
-    setVerificationMessage("인증번호 전송 중입니다...");
+    setVerificationMessage('인증번호 전송 중입니다...');
 
-    // TODO: 실제 API 연동 시 교체
-    // 임시로 setTimeout 사용
+    // 백엔드 이메일 인증 API 연동 필요
+    // const response = await authAPI.sendVerificationCode({ email: verificationEmail });
+    
+    // 임시 처리 (백엔드 API 준비 전까지)
     setTimeout(() => {
       setIsSendingCode(false);
       setIsCodeSent(true);
-      setVerificationMessage("인증번호가 전송되었습니다. 이메일을 확인해주세요.");
+      setVerificationMessage('인증번호가 전송되었습니다. 이메일을 확인해주세요.');
     }, 1500);
   };
 
   // 인증번호 확인
   const handleVerifyCode = () => {
-    if (!verificationCode) return alert("인증번호를 입력해주세요.");
+    if (!verificationCode) return alert('인증번호를 입력해주세요.');
 
-    // TODO: 실제 API 연동 시 교체
-    // 임시로 인증번호 123456 사용
-    if (verificationCode === "123456") {
+    // 백엔드 이메일 인증 확인 API 연동 필요
+    // const response = await authAPI.verifyCode({ email: verificationEmail, code: verificationCode });
+
+    
+    // 임시 처리 (백엔드 API 준비 전까지)
+    if (verificationCode === '123456') {
       setIsVerified(true);
-      setVerificationMessage("인증이 완료되었습니다.");
+      setVerificationMessage('인증이 완료되었습니다.');
     } else {
-      alert("인증번호가 일치하지 않습니다.");
+      alert('인증번호가 일치하지 않습니다.');
     }
   };
 

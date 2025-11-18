@@ -17,6 +17,21 @@ const Login = () => {
     remember: false
   });
 
+  // 임시 자동 로그인 (로컬 Mock 사용)
+  useEffect(() => {
+    if (!user && !loading) {
+      // 로컬 스토리지에서 직접 사용자 정보 가져와서 Redux에 저장
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const mockUser = users.find(u => u.email === 'admin@kitae.com');
+      
+      if (mockUser) {
+        const { password, ...userWithoutPassword } = mockUser;
+        localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+        dispatch(login.success({ user: userWithoutPassword }));
+      }
+    }
+  }, [dispatch, user, loading]);
+
   // 로그인 성공 시 대시보드로 이동
   useEffect(() => {
     if (user) {

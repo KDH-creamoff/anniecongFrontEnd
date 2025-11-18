@@ -15,6 +15,7 @@ import {
   changePosition,
   updatePermissions
 } from './actions';
+import { authAPI } from '../../../api';
 
 // ==================== 초기 사용자 데이터 설정 ====================
 // 앱 시작 시 임시 사용자 데이터 생성
@@ -283,8 +284,13 @@ const mockAPI = {
 
 function* loginSaga(action) {
   try {
-    const response = yield call(mockAPI.login, action.payload);
+    // 백엔드 API 사용
+    const response = yield call(authAPI.login, action.payload);
     yield put(login.success(response.data));
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockAPI.login, action.payload);
+    // yield put(login.success(response.data));
   } catch (error) {
     yield put(login.failure(error.response?.data?.message || '로그인에 실패했습니다.'));
   }
@@ -292,9 +298,13 @@ function* loginSaga(action) {
 
 function* logoutSaga() {
   try {
-    yield call(mockAPI.logout);
-
+    // 백엔드 API 사용
+    yield call(authAPI.logout);
     yield put(logout.success());
+    
+    // 로컬 Mock API (주석처리)
+    // yield call(mockAPI.logout);
+    // yield put(logout.success());
   } catch (error) {
     yield put(logout.success());
   }
@@ -302,12 +312,14 @@ function* logoutSaga() {
 
 function* signupSaga(action) {
   try {
-    const response = yield call(mockAPI.signup, action.payload);
-
+    // 백엔드 API 사용
+    const response = yield call(authAPI.signup, action.payload);
     yield put(signup.success(response.data));
-
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockAPI.signup, action.payload);
+    // yield put(signup.success(response.data));
   } catch (error) {
-    // 3. 실패 액션 디스패치
     yield put(signup.failure(error.response?.data?.message || '회원가입에 실패했습니다.'));
   }
 }
@@ -317,8 +329,13 @@ function* signupSaga(action) {
  */
 function* getMeSaga() {
   try {
-    const response = yield call(mockAPI.getMe);
+    // 백엔드 API 사용
+    const response = yield call(authAPI.getMe);
     yield put(getMe.success(response.data));
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockAPI.getMe);
+    // yield put(getMe.success(response.data));
   } catch (error) {
     yield put(getMe.failure(error.response?.data?.message || '사용자 정보를 불러오는데 실패했습니다.'));
   }
@@ -329,8 +346,13 @@ function* getMeSaga() {
  */
 function* changePasswordSaga(action) {
   try {
-    const response = yield call(mockAPI.changePassword, action.payload);
+    // 백엔드 API 사용
+    const response = yield call(authAPI.changePassword, action.payload);
     yield put(changePassword.success(response.data));
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockAPI.changePassword, action.payload);
+    // yield put(changePassword.success(response.data));
   } catch (error) {
     yield put(changePassword.failure(error.response?.data?.message || '비밀번호 변경에 실패했습니다.'));
   }
@@ -342,12 +364,17 @@ function* changePasswordSaga(action) {
  */
 function* changePositionSaga(action) {
   try {
+    // 백엔드 API 사용
     const { userId, position } = action.payload;
-    const response = yield call(mockAPI.updateUser, userId, { position });
-
+    const response = yield call(authAPI.changePosition, { userId, position });
     yield put(changePosition.success(response.data));
-
     yield put(getMe.request());
+    
+    // 로컬 Mock API (주석처리)
+    // const { userId, position } = action.payload;
+    // const response = yield call(mockAPI.updateUser, userId, { position });
+    // yield put(changePosition.success(response.data));
+    // yield put(getMe.request());
   } catch (error) {
     yield put(changePosition.failure(error.response?.data?.message || '직급 변경에 실패했습니다.'));
   }
@@ -359,12 +386,17 @@ function* changePositionSaga(action) {
  */
 function* updatePermissionsSaga(action) {
   try {
+    // 백엔드 API 사용
     const { userId, permissions } = action.payload;
-    const response = yield call(mockAPI.updateUser, userId, { permissions });
-
+    const response = yield call(authAPI.updateUser, userId, { permissions });
     yield put(updatePermissions.success(response.data));
-
     yield put(getMe.request());
+    
+    // 로컬 Mock API (주석처리)
+    // const { userId, permissions } = action.payload;
+    // const response = yield call(mockAPI.updateUser, userId, { permissions });
+    // yield put(updatePermissions.success(response.data));
+    // yield put(getMe.request());
   } catch (error) {
     yield put(updatePermissions.failure(error.response?.data?.message || '권한 업데이트에 실패했습니다.'));
   }

@@ -5,6 +5,7 @@ import {
   fetchUsers,
   deleteUser,
 } from './actions';
+import { userAPI } from '../../../api';
 
 // ==================== Mock API (백엔드 배포 전 임시) ====================
 const mockUserAPI = {
@@ -40,8 +41,13 @@ const mockUserAPI = {
 // ==================== 사용자 목록 조회 ====================
 function* fetchUsersSaga(action) {
   try {
-    const response = yield call(mockUserAPI.getUsers, action.payload);
+    // 백엔드 API 사용
+    const response = yield call(userAPI.getUsers, action.payload);
     yield put(fetchUsers.success(response.data));
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockUserAPI.getUsers, action.payload);
+    // yield put(fetchUsers.success(response.data));
   } catch (error) {
     const errorMessage = error.response?.data?.message || '사용자 목록을 불러오는데 실패했습니다.';
     yield put(fetchUsers.failure(errorMessage));
@@ -51,11 +57,16 @@ function* fetchUsersSaga(action) {
 // ==================== 사용자 삭제 ====================
 function* deleteUserSaga(action) {
   try {
-    const response = yield call(mockUserAPI.deleteUser, action.payload);
+    // 백엔드 API 사용
+    const response = yield call(userAPI.deleteUser, action.payload);
     yield put(deleteUser.success(response.data));
-
     // 삭제 후 목록 다시 조회
     yield put(fetchUsers.request());
+    
+    // 로컬 Mock API (주석처리)
+    // const response = yield call(mockUserAPI.deleteUser, action.payload);
+    // yield put(deleteUser.success(response.data));
+    // yield put(fetchUsers.request());
   } catch (error) {
     const errorMessage = error.response?.data?.message || '사용자 삭제에 실패했습니다.';
     yield put(deleteUser.failure(errorMessage));

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
-  Bell,
   User,
   Settings,
   Factory,
@@ -79,15 +79,29 @@ const TopNavigation = () => {
     },  
   ];
 
-  // 로그인 상태 확인 (localStorage 사용)
+  // Redux에서 사용자 정보 가져오기
+  const { user: authUser } = useSelector((state) => state.auth);
+  
+  // 로그인 상태 확인 (Redux 사용)
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      const userData = JSON.parse(user);
+    if (authUser) {
       setIsLoggedIn(true);
-      setUserName(userData.name || userData.userId);
+      setUserName(authUser.name || authUser.id);
+    } else {
+      setIsLoggedIn(false);
+      setUserName('');
     }
-  }, []);
+  }, [authUser]);
+  
+  // 로컬 localStorage 사용
+  // useEffect(() => {
+  //   const user = localStorage.getItem('user');
+  //   if (user) {
+  //     const userData = JSON.parse(user);
+  //     setIsLoggedIn(true);
+  //     setUserName(userData.name || userData.userId);
+  //   }
+  // }, []);
 
   // 메뉴 외부 클릭 감지
   useEffect(() => {
@@ -168,26 +182,18 @@ const TopNavigation = () => {
         </div>
 
         {/* 우측: 알림 및 사용자 아이콘 */}
-        <div className='flex items-center space-x-2 min-w-[100px]'>
-          {/* 알림 아이콘 */}
-          <button className='relative rounded-full p-1.5 transition-colors hover:bg-gray-100'>
-            <Bell size={16} className='text-gray-600' />
-            <span className='absolute right-0.5 top-0.5 h-1.5 w-1.5 rounded-full bg-red-500'></span>
-          </button>
-
+        <div className='flex items-center space-x-2 min-w-[80px]'>
           {/* 사용자 메뉴 */}
           <div className='relative' ref={userMenuRef}>
             <button
               onClick={handleMyPage}
-              className='rounded-full p-1.5 transition-colors hover:bg-gray-100'
+              className='rounded-lg p-1.5 transition-colors hover:bg-gray-100'
             >
-              <User size={14} className='text-gray-600' />
+              <User size={14} className='flex mx-auto text-gray-600' />
               {isLoggedIn && (
-                <span className='text-xs text-gray-900'>{userName}</span>
+                <span className='text-xs text-gray-900 text-center'>{userName}</span>
               )}
             </button>
-
-            {/* 드롭다운 메뉴 */}
           </div>
         </div>
       </div>
