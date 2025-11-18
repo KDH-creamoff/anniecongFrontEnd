@@ -1,7 +1,7 @@
 import { Package, Calendar, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete }) => {
+const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete, isLoading = false }) => {
   const [receivingInputs, setReceivingInputs] = useState({});
 
   const handleInputChange = (id, field, value) => {
@@ -95,7 +95,20 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
-            {waitingData.map((item) => (
+            {isLoading ? (
+              <tr>
+                <td colSpan={7} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  로딩 중...
+                </td>
+              </tr>
+            ) : waitingData.length === 0 ? (
+              <tr>
+                <td colSpan={7} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  입고 대기 목록이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              waitingData.map((item) => (
               <tr key={item.id}>
                 <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                   {item.itemCode}
@@ -104,7 +117,7 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                   {item.itemName}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.expectedQuantity}
+                  {item.expectedQuantity || item.quantity} {item.unit || ''}
                 </td>
                 <td className='px-4 py-4'>
                   <input
@@ -131,7 +144,7 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                 <td className='px-4 py-4'>
                   <div className='flex items-center space-x-1 text-sm text-gray-700'>
                     <Calendar className='h-4 w-4 text-gray-500' />
-                    <span>{item.expectedDate}</span>
+                    <span>{item.expectedDate || item.scheduledDate || item.scheduled_date}</span>
                   </div>
                 </td>
                 <td className='flex gap-1 justify-center items-center px-4 py-4'>
@@ -150,7 +163,8 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

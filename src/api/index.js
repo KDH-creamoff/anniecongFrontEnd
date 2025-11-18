@@ -77,11 +77,15 @@ apiClient.interceptors.response.use(
 // ============================================
 export const labelAPI = {
   getPrinters: async () => {
-    const response = await apiClient.get('/label/printers');
+    const response = await axios.get('http://localhost:4310/printers');
+    return response;
+  },
+  printSavedLabelPdf: async (data) => {
+    const response = await apiClient.post('/label/pdf', data);
     return response;
   },
   printLabel: async (data) => {
-    const response = await apiClient.post('/label/print', data);
+    const response = await axios.post('http://localhost:4310/print', data);
     return response;
   },
   saveTemplate: async (data) => {
@@ -148,8 +152,8 @@ export const authAPI = {
     const response = await apiClient.get('/auth/me');
     return response;
   },
-  getUsers: async (params = {}) => {
-    const response = await apiClient.get('/auth/', { params });
+  getUsers: async () => {
+    const response = await apiClient.get('/auth/');
     return response;
   },
   getUser: async (id) => {
@@ -167,14 +171,6 @@ export const authAPI = {
   signup: async (data) => {
     return authAPI.join(data);
   },
-  changePassword: async (data) => {
-    const response = await apiClient.post('/auth/password', data);
-    return response;
-  },
-  changePosition: async (data) => {
-    const response = await apiClient.post('/auth/position', data);
-    return response;
-  },
 };
 
 // ============================================
@@ -182,7 +178,7 @@ export const authAPI = {
 // ============================================
 export const userAPI = {
   getUsers: async (params = {}) => {
-    return authAPI.getUsers(params);
+    return authAPI.getUsers();
   },
   getUserById: async (id) => {
     return authAPI.getUser(id);
@@ -195,12 +191,6 @@ export const userAPI = {
   },
   deleteUser: async (id) => {
     return authAPI.deleteUser(id);
-  },
-  changePassword: async (data) => {
-    return authAPI.changePassword(data);
-  },
-  changePosition: async (data) => {
-    return authAPI.changePosition(data);
   },
   getAccessLogs: async (params = {}) => {
     console.warn('getAccessLogs API는 문서에 정의되지 않았습니다.');
@@ -289,7 +279,8 @@ export const inventoryTransactionsAPI = {
 // ============================================
 export const plannedTransactionsAPI = {
   getPlannedTransactions: async (params = {}) => {
-    const response = await apiClient.get('/planned-transactions', { params });
+    const response = await apiClient.get('/planned-transactions');
+    console.log('planned-transactions response : ', response);
     return response;
   },
   getPlannedTransaction: async (id) => {
@@ -297,7 +288,7 @@ export const plannedTransactionsAPI = {
     return response;
   },
   getStats: async (params = {}) => {
-    const response = await apiClient.get('/planned-transactions/stats', { params });
+    const response = await apiClient.get('/planned-transactions/stats');
     return response;
   },
   createPlannedTransaction: async (data) => {
@@ -493,10 +484,6 @@ export const approvalAPI = {
     const response = await apiClient.get(`/approval/approvals/${id}`);
     return response;
   },
-  createDocument: async (data) => {
-    const response = await apiClient.post('/approval/approvals', data);
-    return response;
-  },
   approve: async (id, data = {}) => {
     const response = await apiClient.post(`/approval/approvals/${id}/approve`, data);
     return response;
@@ -508,7 +495,37 @@ export const approvalAPI = {
 };
 
 // ============================================
-// 14. Dashboard API (대시보드)
+// 14. Notifications API (알림)
+// ============================================
+export const notificationsAPI = {
+  getLowStock: async (params = {}) => {
+    const response = await apiClient.get('/notifications/low-stock', { params });
+    return response;
+  },
+  getExpiring: async (params = {}) => {
+    const response = await apiClient.get('/notifications/expiring', { params });
+    return response;
+  },
+  getExpired: async (params = {}) => {
+    const response = await apiClient.get('/notifications/expired', { params });
+    return response;
+  },
+  getSummary: async (params = {}) => {
+    const response = await apiClient.get('/notifications/summary', { params });
+    return response;
+  },
+  getFactoryAlerts: async () => {
+    const response = await apiClient.get('/notifications/factory-alerts');
+    return response;
+  },
+  getDailyReport: async () => {
+    const response = await apiClient.get('/notifications/daily-report');
+    return response;
+  },
+};
+
+// ============================================
+// 15. Dashboard API (대시보드)
 // ============================================
 export const dashboardAPI = {
   getDashboard: async (params = {}) => {
@@ -629,6 +646,27 @@ export const shippingAPI = {
     const response = await apiClient.get(`/shipping/download/${filename}`);
     return response;
   },
+  // 기존 출고 관련 API (호환성 유지)
+  getWaitingList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/waiting', { params });
+    return response;
+  },
+  getCompletedList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/completed', { params });
+    return response;
+  },
+  createShipping: async (data) => {
+    const response = await apiClient.post('/shipping', data);
+    return response;
+  },
+  confirmShipping: async (id, data = {}) => {
+    const response = await apiClient.put(`/shipping/${id}/confirm`, data);
+    return response;
+  },
+  cancelShipping: async (id) => {
+    const response = await apiClient.put(`/shipping/${id}/cancel`);
+    return response;
+  },
 };
 
 // ============================================
@@ -648,6 +686,7 @@ export default {
   warehouseTransfersAPI,
   workOrdersAPI,
   approvalAPI,
+  notificationsAPI,
   dashboardAPI,
   shippingAPI,
   apiClient,

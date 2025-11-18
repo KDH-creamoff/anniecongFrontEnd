@@ -1,6 +1,6 @@
 import { CheckCircle2, Printer, X } from 'lucide-react';
 
-const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
+const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint, isLoading = false }) => {
 
   return (
     <div className='rounded-xl border border-gray-200 bg-white shadow-sm'>
@@ -45,7 +45,20 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
-            {completedData.map((item) => (
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  로딩 중...
+                </td>
+              </tr>
+            ) : completedData.length === 0 ? (
+              <tr>
+                <td colSpan={6} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  입고 완료 목록이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              completedData.map((item) => (
               <tr key={item.id}>
                 <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                   {item.itemCode}
@@ -54,10 +67,12 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
                   {item.itemName}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.expectedQuantity}
+                  {item.expectedQuantity || item.quantity} {item.unit || ''}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.receivedQuantity}
+                  {typeof item.receivedQuantity === 'string' 
+                    ? item.receivedQuantity 
+                    : `${item.receivedQuantity || item.actualQuantity || item.quantity || 0} ${item.unit || ''}`}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
                   {item.unitCount}
@@ -81,7 +96,8 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

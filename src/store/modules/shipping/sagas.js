@@ -1,6 +1,5 @@
-import { /* call, */ put, takeLatest, delay } from 'redux-saga/effects';
-// import { shippingAPI } from '../../../api'; // TODO: 백엔드 준비 시 주석 해제 및 call import 활성화
-// API: /api/shipping/* (배송 관리 전용)
+import { call, put, takeLatest } from 'redux-saga/effects';
+import { plannedTransactionsAPI } from '../../../api';
 import {
   FETCH_SHIPPING_LIST,
   CREATE_SHIPPING,
@@ -18,220 +17,83 @@ import {
   fetchBC2Shippings,
 } from './actions';
 
-// 배송 목록 목데이터
-let mockShippingList = [
-  {
-    id: 1,
-    orderNumber: 'SHP-20251112-001',
-    orderDate: '2025-11-12',
-    product: '애니콩 프리미엄 오가닉 쿠키 초코칩 500g 대용량 패밀리팩',
-    productCode: 'PROD-001',
-    receiver: '김민수',
-    phone: '010-1234-5678',
-    postalCode: '06234',
-    address: '서울특별시 강남구 테헤란로 123 456호',
-    deliveryMessage: '문 앞에 놓아주세요. 부재시 경비실에 맡겨주시면 감사하겠습니다.',
-    quantity: 5,
-    unit: 'box',
-    status: '배송대기',
-    carrier: null,
-    trackingNumber: null,
-  },
-  {
-    id: 2,
-    orderNumber: 'SHP-20251111-002',
-    orderDate: '2025-11-11',
-    product: '애니콩 바닐라 쿠키',
-    productCode: 'PROD-002',
-    receiver: '이영희',
-    phone: '010-2345-6789',
-    postalCode: '13579',
-    address: '경기도 성남시 분당구 판교역로 235 1층',
-    deliveryMessage: '배송 전 연락 부탁드립니다',
-    quantity: 10,
-    unit: 'box',
-    status: '배송중',
-    carrier: 'CJ대한통운',
-    trackingNumber: '123456789012',
-    shippedDate: '2025-11-11',
-  },
-  {
-    id: 3,
-    orderNumber: 'SHP-20251110-003',
-    orderDate: '2025-11-10',
-    product: '애니콩 딸기 케이크 프리미엄 애디션 2kg 선물용 특별 포장',
-    productCode: 'PROD-003',
-    receiver: '박철수',
-    phone: '010-3456-7890',
-    postalCode: '12345',
-    address: '서울특별시 송파구 올림픽로 300 롯데월드타워 88층 스카이라운지',
-    deliveryMessage: '-',
-    quantity: 3,
-    unit: 'box',
-    status: '배송완료',
-    carrier: '한진택배',
-    trackingNumber: '987654321098',
-    shippedDate: '2025-11-10',
-    deliveredDate: '2025-11-11',
-  },
-  {
-    id: 4,
-    orderNumber: 'SHP-20251110-004',
-    orderDate: '2025-11-10',
-    product: '애니콩 초코 브라우니',
-    productCode: 'PROD-004',
-    receiver: '최지민',
-    phone: '010-4567-8901',
-    postalCode: '54321',
-    address: '부산광역시 해운대구 해운대해변로 264 3층 2002호',
-    deliveryMessage: '경비실 보관 불가능합니다. 반드시 직접 전달 부탁드려요.',
-    quantity: 7,
-    unit: 'box',
-    status: '배송대기',
-    carrier: null,
-    trackingNumber: null,
-  },
-  {
-    id: 5,
-    orderNumber: 'SHP-20251109-005',
-    orderDate: '2025-11-09',
-    product: '애니콩 마카롱 세트',
-    productCode: 'PROD-005',
-    receiver: '강서연',
-    phone: '010-5678-9012',
-    postalCode: '98765',
-    address: '인천광역시 중구 공항로 272',
-    deliveryMessage: '빠른 배송 부탁드립니다',
-    quantity: 2,
-    unit: 'box',
-    status: '배송완료',
-    carrier: '로젠택배',
-    trackingNumber: '456789123456',
-    shippedDate: '2025-11-09',
-    deliveredDate: '2025-11-10',
-  },
-];
+// 목데이터 제거됨 - 모든 데이터는 백엔드 API에서 가져옴
 
-// B2B 배송 목록 (대량 거래처 배송)
-const mockB2BShippings = [
-  {
-    id: 101,
-    orderNumber: 'B2B-20251112-001',
-    orderDate: '2025-11-12',
-    issueType: 'B2B',
-    product: '프리미엄 강아지 사료 대용량',
-    productCode: 'PROD-B2B-001',
-    receiver: '강아지 쿠키 주식회사',
-    contact: '담당자: 이사장',
-    phone: '02-1234-5678',
-    postalCode: '05551',
-    address: '서울특별시 송파구 올림픽로 400',
-    deliveryMessage: '정기 계약 건 - 1층 하역장 배송',
-    quantity: 200,
-    unit: 'box',
-    status: '배송대기',
-    carrier: null,
-    trackingNumber: null,
-    contractNumber: 'CT-2025-001',
-  },
-  {
-    id: 102,
-    orderNumber: 'B2B-20251111-002',
-    orderDate: '2025-11-11',
-    issueType: 'B2B',
-    product: '고양이 간식 세트',
-    productCode: 'PROD-B2B-002',
-    receiver: '온라인몰 유통센터',
-    contact: '담당자: 김부장',
-    phone: '031-1234-5678',
-    postalCode: '17379',
-    address: '경기도 이천시 부발읍 물류단지로 100',
-    deliveryMessage: '물류센터 A동',
-    quantity: 150,
-    unit: 'box',
-    status: '배송중',
-    carrier: 'CJ대한통운',
-    trackingNumber: 'B2B123456789',
-    contractNumber: 'CT-2025-002',
-    shippedDate: '2025-11-11',
-  },
-];
-
-// BC2 배송 목록 
-const mockBC2Shippings = [
-  {
-    id: 201,
-    orderNumber: 'BC2-20251112-001',
-    orderDate: '2025-11-12',
-    issueType: 'BC2',
-    product: '반제품 - 쿠키 반죽',
-    productCode: 'SEMI-001',
-    fromFactory: '1공장 (의성)',
-    toFactory: '2공장 (상주)',
-    quantity: 800,
-    unit: 'kg',
-    status: '운송대기',
-    driver: null,
-    vehicleNumber: null,
-    scheduledDate: '2025-11-13',
-    deliveryMessage: '생산 계획에 따른 이동',
-  },
-  {
-    id: 202,
-    orderNumber: 'BC2-20251111-002',
-    orderDate: '2025-11-11',
-    issueType: 'BC2',
-    product: '원재료 - 닭가슴살',
-    productCode: 'RAW-021',
-    fromFactory: '1공장 (의성)',
-    toFactory: '2공장 (상주)',
-    quantity: 500,
-    unit: 'kg',
-    status: '운송완료',
-    driver: '김기사',
-    vehicleNumber: '12가3456',
-    scheduledDate: '2025-11-11',
-    completedDate: '2025-11-11',
-    deliveryMessage: '',
-  },
-];
-
-// 배송 주문 목록 조회
+// 배송 주문 목록 조회 (출고 목록)
 function* fetchShippingListSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.getOrders, action.payload);
-    // yield put(fetchShippingList.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    yield put(fetchShippingList.success(mockShippingList));
+    // plannedTransactionsAPI.getPlannedTransactions 사용 (transactionType: 'ISSUE')
+    const params = {
+      transactionType: 'ISSUE',
+      ...action.payload,
+    };
+    const response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+    
+    // 백엔드 응답 형식: { ok: true, data: { items: [...], meta: {...} } }
+    const plannedData = response.data?.data || response.data || {};
+    const items = plannedData.items || plannedData.data || [];
+    const itemsArray = Array.isArray(items) ? items : [];
+    
+    // 백엔드 데이터를 프론트엔드 형식으로 변환
+    const transformedItems = itemsArray.map((item) => {
+      const plannedItem = item.item || item.Item || {};
+      const factory = item.factory || item.Factory || {};
+      
+      return {
+        id: item.id,
+        orderNumber: `SHP-${item.id}`,
+        orderDate: item.scheduledDate || item.scheduled_date || '',
+        product: plannedItem.name || item.item_name || '',
+        productCode: plannedItem.code || item.item_code || '',
+        receiver: item.customerName || item.customer_name || '',
+        phone: item.recipientPhone || item.recipient_phone || '',
+        postalCode: '',
+        address: item.shippingAddress || item.shipping_address || '',
+        deliveryMessage: item.notes || item.note || '',
+        quantity: item.quantity || 0,
+        unit: item.unit || '',
+        status: item.status === 'COMPLETED' ? '배송완료' : item.status === 'APPROVED' ? '배송중' : '배송대기',
+        carrier: item.shippingCompany || item.shipping_company || null,
+        trackingNumber: item.trackingNumber || item.tracking_number || null,
+        shippedDate: item.completedAt || item.completed_at || null,
+        deliveredDate: null,
+      };
+    });
+    
+    yield put(fetchShippingList.success(transformedItems));
   } catch (error) {
     yield put(fetchShippingList.failure(error.response?.data?.message || '배송 목록을 불러오지 못했습니다.'));
   }
 }
 
-// 배송 주문 생성
+// 배송 주문 생성 (출고 예정 생성)
 function* createShippingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.createOrder, action.payload);
-    // yield put(createShipping.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const newShipping = {
-      id: mockShippingList.length + 1,
-      orderDate: new Date().toISOString().split('T')[0],
-      orderNumber: `SHP-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${String(mockShippingList.length + 1).padStart(3, '0')}`,
-      status: '배송대기',
-      carrier: null,
-      trackingNumber: null,
-      shippedDate: null,
-      ...action.payload,
+    // plannedTransactionsAPI.createPlannedTransaction 사용
+    const payload = action.payload;
+    const transactionData = {
+      transactionType: 'ISSUE',
+      itemId: payload.itemId,
+      itemCode: payload.itemCode,
+      factoryId: payload.factoryId,
+      quantity: payload.quantity,
+      unit: payload.unit,
+      scheduledDate: payload.scheduledDate || payload.orderDate,
+      customerName: payload.receiver || payload.customerName,
+      issueType: payload.issueType || 'SHIPPING',
+      shippingAddress: payload.address || payload.shippingAddress,
+      notes: payload.deliveryMessage || payload.notes || '',
     };
-    mockShippingList = [newShipping, ...mockShippingList];
-    yield put(createShipping.success(newShipping));
+    
+    const response = yield call(plannedTransactionsAPI.createPlannedTransaction, transactionData);
+    
+    // 백엔드 응답 형식: { ok: true, data: { planned: {...} } }
+    const newTransaction = response.data?.data?.planned || response.data?.data || response.data;
+    
+    yield put(createShipping.success(newTransaction));
+    
+    // 목록 새로고침
+    yield put(fetchShippingList.request({ status: 'PENDING' }));
   } catch (error) {
     yield put(createShipping.failure(error.response?.data?.message || '배송 주문 생성에 실패했습니다.'));
   }
@@ -240,20 +102,16 @@ function* createShippingSaga(action) {
 // 배송 정보 수정
 function* updateShippingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.updateOrder, action.payload.id, action.payload.data);
-    // yield put(updateShipping.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const updatedShipping = {
-      ...mockShippingList.find(item => item.id === action.payload.id),
-      ...action.payload.data,
-    };
-    mockShippingList = mockShippingList.map(item =>
-      item.id === action.payload.id ? updatedShipping : item
-    );
-    yield put(updateShipping.success(updatedShipping));
+    // plannedTransactionsAPI.updatePlannedTransaction 사용
+    const { id, data } = action.payload;
+    const response = yield call(plannedTransactionsAPI.updatePlannedTransaction, id, data);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    yield put(updateShipping.success(response.data?.data || response.data));
+    
+    // 목록 새로고침
+    yield put(fetchShippingList.request({ status: 'PENDING' }));
+    yield put(fetchShippingList.request({ status: 'COMPLETED' }));
   } catch (error) {
     yield put(updateShipping.failure(error.response?.data?.message || '배송 정보 수정에 실패했습니다.'));
   }
@@ -262,69 +120,141 @@ function* updateShippingSaga(action) {
 // 배송 주문 삭제
 function* deleteShippingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // yield call(shippingAPI.deleteOrder, action.payload);
-    // yield put(deleteShipping.success(action.payload));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    mockShippingList = mockShippingList.filter(item => item.id !== action.payload);
+    // plannedTransactionsAPI.deletePlannedTransaction 사용
+    yield call(plannedTransactionsAPI.deletePlannedTransaction, action.payload);
     yield put(deleteShipping.success(action.payload));
+    
+    // 목록 새로고침
+    yield put(fetchShippingList.request({ status: 'PENDING' }));
+    yield put(fetchShippingList.request({ status: 'COMPLETED' }));
   } catch (error) {
     yield put(deleteShipping.failure(error.response?.data?.message || '배송 주문 삭제에 실패했습니다.'));
   }
 }
 
-// 배송 확정 (배송 시작)
+// 배송 확정 (출고 완료 처리)
 function* confirmShippingSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.confirmShipping, action.payload);
-    // yield put(confirmShipping.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const confirmedShipping = {
-      ...mockShippingList.find(item => item.id === action.payload.id),
-      status: '배송중',
-      carrier: action.payload.carrier || 'CJ대한통운',
-      trackingNumber: action.payload.trackingNumber || Math.random().toString().substring(2, 14),
-      shippedDate: new Date().toISOString().split('T')[0],
+    // plannedTransactionsAPI.completeIssue 사용
+    const { id, data } = action.payload;
+    const completeData = {
+      actualQuantity: data.actualQuantity || data.quantity,
+      transferType: data.transferType || 'CUSTOMER',
+      shippingInfo: {
+        recipientName: data.receiver || data.recipientName,
+        recipientAddress: data.address || data.recipientAddress,
+      },
+      note: data.note || '',
+      labelSize: data.labelSize,
+      labelQuantity: data.labelQuantity,
     };
-    mockShippingList = mockShippingList.map(item =>
-      item.id === action.payload.id ? confirmedShipping : item
-    );
-    yield put(confirmShipping.success(confirmedShipping));
+    
+    const response = yield call(plannedTransactionsAPI.completeIssue, id, completeData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    yield put(confirmShipping.success(response.data?.data || response.data));
+    
+    // 목록 새로고침
+    yield put(fetchShippingList.request({ status: 'PENDING' }));
+    yield put(fetchShippingList.request({ status: 'COMPLETED' }));
   } catch (error) {
     yield put(confirmShipping.failure(error.response?.data?.message || '배송 확정에 실패했습니다.'));
   }
 }
 
 // B2B 배송 목록 조회
-function* fetchB2BShippingsSaga(/* action */) {
+function* fetchB2BShippingsSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.getOrders, { ...action.payload, issueType: 'B2B' });
-    // yield put(fetchB2BShippings.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    yield put(fetchB2BShippings.success(mockB2BShippings));
+    // plannedTransactionsAPI.getPlannedTransactions 사용 (transactionType: 'ISSUE', issueType: 'B2B')
+    const params = {
+      transactionType: 'ISSUE',
+      issueType: 'B2B',
+      ...action.payload,
+    };
+    const response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+    
+    // 백엔드 응답 형식: { ok: true, data: { items: [...], meta: {...} } }
+    const plannedData = response.data?.data || response.data || {};
+    const items = plannedData.items || plannedData.data || [];
+    const itemsArray = Array.isArray(items) ? items : [];
+    
+    // 백엔드 데이터를 프론트엔드 형식으로 변환
+    const transformedItems = itemsArray.map((item) => {
+      const plannedItem = item.item || item.Item || {};
+      const factory = item.factory || item.Factory || {};
+      
+      return {
+        id: item.id,
+        orderNumber: `B2B-${item.id}`,
+        orderDate: item.scheduledDate || item.scheduled_date || '',
+        issueType: 'B2B',
+        product: plannedItem.name || item.item_name || '',
+        productCode: plannedItem.code || item.item_code || '',
+        receiver: item.customerName || item.customer_name || '',
+        contact: item.contact || '',
+        phone: item.recipientPhone || item.recipient_phone || '',
+        postalCode: '',
+        address: item.shippingAddress || item.shipping_address || '',
+        deliveryMessage: item.notes || item.note || '',
+        quantity: item.quantity || 0,
+        unit: item.unit || '',
+        status: item.status === 'COMPLETED' ? '배송완료' : item.status === 'APPROVED' ? '배송중' : '배송대기',
+        carrier: item.shippingCompany || item.shipping_company || null,
+        trackingNumber: item.trackingNumber || item.tracking_number || null,
+        contractNumber: item.contractNumber || item.contract_number || '',
+        shippedDate: item.completedAt || item.completed_at || null,
+      };
+    });
+    
+    yield put(fetchB2BShippings.success(transformedItems));
   } catch (error) {
     yield put(fetchB2BShippings.failure(error.response?.data?.message || 'B2B 배송 목록을 불러오지 못했습니다.'));
   }
 }
 
 // BC2 공장간 운송 목록 조회
-function* fetchBC2ShippingsSaga(/* action */) {
+function* fetchBC2ShippingsSaga(action) {
   try {
-    // TODO: 백엔드 준비 시 아래 코드로 교체
-    // const response = yield call(shippingAPI.getOrders, { ...action.payload, issueType: 'BC2' });
-    // yield put(fetchBC2Shippings.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    yield put(fetchBC2Shippings.success(mockBC2Shippings));
+    // plannedTransactionsAPI.getPlannedTransactions 사용 (transactionType: 'ISSUE', issueType: 'BC2')
+    const params = {
+      transactionType: 'ISSUE',
+      issueType: 'BC2',
+      ...action.payload,
+    };
+    const response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+    
+    // 백엔드 응답 형식: { ok: true, data: { items: [...], meta: {...} } }
+    const plannedData = response.data?.data || response.data || {};
+    const items = plannedData.items || plannedData.data || [];
+    const itemsArray = Array.isArray(items) ? items : [];
+    
+    // 백엔드 데이터를 프론트엔드 형식으로 변환
+    const transformedItems = itemsArray.map((item) => {
+      const plannedItem = item.item || item.Item || {};
+      const fromFactory = item.fromFactory || item.FromFactory || {};
+      const toFactory = item.toFactory || item.ToFactory || item.factory || item.Factory || {};
+      
+      return {
+        id: item.id,
+        orderNumber: `BC2-${item.id}`,
+        orderDate: item.scheduledDate || item.scheduled_date || '',
+        issueType: 'BC2',
+        product: plannedItem.name || item.item_name || '',
+        productCode: plannedItem.code || item.item_code || '',
+        fromFactory: fromFactory.name || item.from_factory_name || '',
+        toFactory: toFactory.name || item.to_factory_name || item.factory_name || '',
+        quantity: item.quantity || 0,
+        unit: item.unit || '',
+        status: item.status === 'COMPLETED' ? '운송완료' : '운송대기',
+        driver: item.driver || item.driver_name || null,
+        vehicleNumber: item.vehicleNumber || item.vehicle_number || null,
+        scheduledDate: item.scheduledDate || item.scheduled_date || '',
+        completedDate: item.completedAt || item.completed_at || null,
+        deliveryMessage: item.notes || item.note || '',
+      };
+    });
+    
+    yield put(fetchBC2Shippings.success(transformedItems));
   } catch (error) {
     yield put(fetchBC2Shippings.failure(error.response?.data?.message || '공장간 운송 목록을 불러오지 못했습니다.'));
   }

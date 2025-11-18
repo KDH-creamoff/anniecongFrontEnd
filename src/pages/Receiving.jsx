@@ -13,6 +13,17 @@ import LabelPrintModal from '../components/receiving/LabelPrintModal';
 import AlertModal from '../components/common/AlertModal';
 import { getItemByName } from '../data/items';
 
+
+import {
+  fetchReceivingList,
+  createReceiving,
+  deleteReceiving,
+  confirmReceiving,
+} from '../store/modules/receiving/actions';
+import {
+  selectReceivingList,
+  selectReceivingListLoading,
+} from '../store/modules/receiving/selectors';
 import {
   fetchIssuingList,
   createIssuing,
@@ -28,6 +39,14 @@ import {
 const Receiving = ({ subPage = 'nav1' }) => {
   // Redux 설정
   const dispatch = useDispatch();
+
+  // 입고 관련 Redux 상태
+  const receivingList = useSelector(selectReceivingList) || [];
+  const receivingListLoading = useSelector(selectReceivingListLoading);
+
+  useEffect(() => {
+    console.log('불러온 데이터 : ', receivingList);
+  }, [receivingList]); 
 
   // 출고 관련 Redux 상태
   const issuingListLoading = useSelector(selectIssuingListLoading);
@@ -67,55 +86,36 @@ const Receiving = ({ subPage = 'nav1' }) => {
     });
   };
 
-  // 입고 대기 목록 상태
-  const [waitingData, setWaitingData] = useState([
-    {
-      id: 1,
-      itemCode: 'RAW001',
-      itemName: '닭고기 (가슴살)',
-      expectedQuantity: '50Kg',
-      expectedDate: '2025-10-24',
-      supplier: '신선식품',
-    },
-    {
-      id: 2,
-      itemCode: 'RAW002',
-      itemName: '소고기(등심)',
-      expectedQuantity: '70Kg',
-      expectedDate: '2025-10-24',
-      supplier: '프리미엄육가공',
-    },
-    {
-      id: 3,
-      itemCode: 'RAW003',
-      itemName: '당근',
-      expectedQuantity: '30Kg',
-      expectedDate: '2025-10-25',
-      supplier: '유기농산물',
-    },
-    {
-      id: 4,
-      itemCode: 'RAW004',
-      itemName: '고구마',
-      expectedQuantity: '40Kg',
-      expectedDate: '2025-10-25',
-      supplier: '유기농산물',
-    },
-  ]);
+  // 입고 대기/완료 목록은 Redux에서 가져옴
+  const waitingData = receivingList.filter(item => item.status === 'PENDING' || item.status === 'pending' || item.statusName === '대기');
+  const completedData = receivingList.filter(item => item.status === 'COMPLETED' || item.status === 'completed' || item.statusName === '완료');
 
-  // 입고 완료 목록 상태
-  const [completedData, setCompletedData] = useState([]);
+  // 입고 대기/완료 목록 로드 - Redux 사용
+  useEffect(() => {
+    if (subPage === 'nav1') {
+      // Redux 액션으로 입고 대기 목록 조회
+      console.log('입고 대기 목록 조회 요청');
+      dispatch(fetchReceivingList.request({ status: 'PENDING' }));
+      // 입고 완료 목록 조회 (0.5초 후 호출하여 상태 업데이트 충돌 방지)
+      const timer = setTimeout(() => {
+        console.log('입고 완료 목록 조회 요청');
+        dispatch(fetchReceivingList.request({ status: 'COMPLETED' }));
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [subPage, dispatch]);
 
-  // 출고 관련 상태는 Redux로 관리됨 (pendingIssuings, completedIssuings)
-  // 출고 대기 목록 로드 - Redux 사용
+  // 출고 대기/완료 목록 로드 - Redux 사용
   useEffect(() => {
     if (subPage === 'nav2') {
-      // Redux 액션으로 출고 대기 목록 조회
-      dispatch(fetchIssuingList.request({ status: '대기' }));
-      // 출고 완료 목록 조회 (0.1초 후 호출하여 상태 업데이트 충돌 방지)
+      // Redux 액션으로 출고 대기 목록 조회 (영문 status 사용)
+      console.log('출고 대기 목록 조회 요청');
+      dispatch(fetchIssuingList.request({ status: 'PENDING' }));
+      // 출고 완료 목록 조회 (0.5초 후 호출하여 상태 업데이트 충돌 방지)
       const timer = setTimeout(() => {
-        dispatch(fetchIssuingList.request({ status: '완료' }));
-      }, 100);
+        console.log('출고 완료 목록 조회 요청');
+        dispatch(fetchIssuingList.request({ status: 'COMPLETED' }));
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [subPage, dispatch]);
@@ -131,14 +131,24 @@ const Receiving = ({ subPage = 'nav1' }) => {
   // 대기 목록 추가
   const handleSubmitReceiving = async (formData) => {
     try {
-      // 백엔드 API를 통해 입고 대기 항목 저장
-      await receivingAPI.createReceiving(formData);
+      // Redux 액션으로 입고 대기 항목 생성
+      const receivingData = {
+        itemId: parseInt(formData.selectedItemId) || parseInt(formData.itemId),
+        itemCode: formData.itemCode,
+        itemName: formData.itemName,
+        factoryId: formData.factoryId || 1, // 기본값
+        quantity: parseFloat(formData.expectedQuantity),
+        unit: formData.unit,
+        scheduledDate: formData.expectedDate,
+        status: 'PENDING',
+      };
+      
+      dispatch(createReceiving.request(receivingData));
       
       showAlert('입고 대기 목록에 추가되었습니다.', 'success');
       setIsModalOpen(false);
       
-      // 목록 새로고침 (입고 대기 목록 로드 함수가 있다면 호출)
-      // loadReceivingWaitingList(); // 필요시 구현
+      // Redux에서 자동으로 목록 업데이트됨
     } catch (error) {
       console.error('입고 목록 추가 실패:', error);
       showAlert(
@@ -161,59 +171,81 @@ const Receiving = ({ subPage = 'nav1' }) => {
   };
 
   // 입고 처리 확정 (대기 목록 -> 완료 목록)
-  const handleConfirmReceive = () => {
+  const handleConfirmReceive = async () => {
     if (!selectedItem) return;
 
-    // 대기 목록에서 제거
-    setWaitingData(waitingData.filter((data) => data.id !== selectedItem.id));
-
-    // 완료 목록에 추가
-    const completedItem = {
-      id: Date.now(),
-      itemCode: selectedItem.itemCode,
-      itemName: selectedItem.itemName,
-      expectedQuantity: selectedItem.expectedQuantity,
-      receivedQuantity: `${selectedItem.receivedQuantity}Kg`,
-      unitCount: selectedItem.unitCount,
-      receivedDate: new Date().toISOString().split('T')[0],
-      status: '정상',
-    };
-
-    setCompletedData([completedItem, ...completedData]);
-    showAlert('입고가 완료되었습니다.', 'success');
-    handleCloseConfirmModal();
+    try {
+      // Redux 액션으로 입고 확정
+      const confirmData = {
+        itemId: selectedItem.itemId || selectedItem.id,
+        factoryId: selectedItem.factoryId || 1,
+        actualQuantity: parseFloat(selectedItem.receivedQuantity) || parseFloat(selectedItem.quantity),
+        quantity: parseFloat(selectedItem.receivedQuantity) || parseFloat(selectedItem.quantity),
+        receivedAt: new Date().toISOString().split('T')[0],
+        firstReceivedAt: new Date().toISOString().split('T')[0],
+        unit: selectedItem.unit || 'EA',
+        labelSize: selectedItem.labelSize || 'medium',
+        labelQuantity: parseInt(selectedItem.unitCount) || 1,
+        printLabel: true,
+        note: selectedItem.note || '',
+      };
+      
+      dispatch(confirmReceiving.request({ id: selectedItem.id, data: confirmData }));
+      
+      showAlert('입고가 완료되었습니다.', 'success');
+      handleCloseConfirmModal();
+      
+      // Redux에서 자동으로 목록 업데이트됨
+    } catch (error) {
+      console.error('입고 확정 실패:', error);
+      showAlert(
+        error.response?.data?.message || '입고 확정에 실패했습니다.',
+        'error'
+      );
+    }
   };
 
   // 입고 대기 목록에서 삭제
-  const handleDeleteReceiving = (id) => {
+  const handleDeleteReceiving = async (id) => {
     if (!confirm('입고 대기 목록에서 삭제하시겠습니까?')) return;
 
-    setWaitingData(waitingData.filter((data) => data.id !== id));
-    showAlert('입고 대기 목록에서 삭제되었습니다.', 'info');
+    try {
+      // Redux 액션으로 입고 삭제
+      dispatch(deleteReceiving.request(id));
+      
+      showAlert('입고 대기 목록에서 삭제되었습니다.', 'info');
+      
+      // Redux에서 자동으로 목록 업데이트됨
+    } catch (error) {
+      console.error('입고 삭제 실패:', error);
+      showAlert(
+        error.response?.data?.message || '입고 삭제에 실패했습니다.',
+        'error'
+      );
+    }
   };
 
   // 입고 취소 (완료 목록 -> 대기 목록)
-  const handleCancelReceiving = (id) => {
+  const handleCancelReceiving = async (id) => {
     const item = completedData.find((data) => data.id === id);
     if (!item) return;
 
     if (!confirm('입고를 취소하시겠습니까? 대기 목록으로 돌아갑니다.')) return;
 
-    // 완료 목록에서 제거
-    setCompletedData(completedData.filter((data) => data.id !== id));
-
-    // 대기 목록에 다시 추가
-    const waitingItem = {
-      id: Date.now(),
-      itemCode: item.itemCode,
-      itemName: item.itemName,
-      expectedQuantity: item.expectedQuantity,
-      expectedDate: new Date().toISOString().split('T')[0],
-      supplier: '공급업체',
-    };
-
-    setWaitingData([...waitingData, waitingItem]);
-    showAlert('입고가 취소되었습니다.', 'info');
+    try {
+      // Redux 액션으로 입고 삭제 (취소)
+      dispatch(deleteReceiving.request(id));
+      
+      showAlert('입고가 취소되었습니다.', 'info');
+      
+      // Redux에서 자동으로 목록 업데이트됨
+    } catch (error) {
+      console.error('입고 취소 실패:', error);
+      showAlert(
+        error.response?.data?.message || '입고 취소에 실패했습니다.',
+        'error'
+      );
+    }
   };
 
   // 라벨 프린트 모달 열기
@@ -233,20 +265,35 @@ const Receiving = ({ subPage = 'nav1' }) => {
     if (subPage === 'nav1') {
       // 입고 처리
       if (selectedItem?.receivedQuantity && selectedItem?.unitCount) {
-        setWaitingData(waitingData.filter((data) => data.id !== selectedItem.id));
-        const completedItem = {
-          id: Date.now(),
-          itemCode: selectedItem.itemCode,
-          itemName: selectedItem.itemName,
-          expectedQuantity: selectedItem.expectedQuantity,
-          receivedQuantity: `${selectedItem.receivedQuantity}`,
-          unitCount: selectedItem.unitCount,
-          receivedDate: new Date().toISOString().split('T')[0],
-          status: '정상',
-        };
-        setCompletedData([completedItem, ...completedData]);
-        showAlert('라벨 프린트 및 입고가 완료되었습니다.', 'success');
-        handleCloseConfirmModal();
+        try {
+          // Redux 액션으로 입고 확정
+          const confirmData = {
+            itemId: selectedItem.itemId || selectedItem.id,
+            factoryId: selectedItem.factoryId || 1,
+            actualQuantity: parseFloat(selectedItem.receivedQuantity) || parseFloat(selectedItem.quantity),
+            quantity: parseFloat(selectedItem.receivedQuantity) || parseFloat(selectedItem.quantity),
+            receivedAt: new Date().toISOString().split('T')[0],
+            firstReceivedAt: new Date().toISOString().split('T')[0],
+            unit: selectedItem.unit || 'EA',
+            labelSize: selectedItem.labelSize || 'medium',
+            labelQuantity: parseInt(selectedItem.unitCount) || 1,
+            printLabel: true,
+            note: selectedItem.note || '',
+          };
+          
+          dispatch(confirmReceiving.request({ id: selectedItem.id, data: confirmData }));
+          
+          showAlert('라벨 프린트 및 입고가 완료되었습니다.', 'success');
+          handleCloseConfirmModal();
+          
+          // Redux에서 자동으로 목록 업데이트됨
+        } catch (error) {
+          console.error('입고 확정 실패:', error);
+          showAlert(
+            error.response?.data?.message || '입고 확정에 실패했습니다.',
+            'error'
+          );
+        }
       } else {
         showAlert('라벨을 프린트했습니다.', 'success');
       }
@@ -403,6 +450,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
               onAddReceiving={handleAddReceiving}
               onReceive={handleReceive}
               onDelete={handleDeleteReceiving}
+              isLoading={receivingListLoading}
             />
           </div>
 
@@ -412,6 +460,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
               completedData={completedData}
               onCancel={handleCancelReceiving}
               onLabelPrint={handleLabelPrint}
+              isLoading={receivingListLoading}
             />
           </div>
 

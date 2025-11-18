@@ -91,12 +91,16 @@ const AddReceivingModal = ({ isOpen, onClose, onSubmit }) => {
     try {
       // 백엔드 API를 통해 입고 대기 항목 저장
       const receivingData = {
+        selectedItemId: formData.selectedItemId,
+        itemId: parseInt(formData.selectedItemId),
         itemCode: formData.itemCode,
         itemName: formData.itemName,
         expectedQuantity: parseFloat(formData.expectedQuantity),
+        quantity: parseFloat(formData.expectedQuantity),
         unit: formData.unit,
         expectedDate: formData.expectedDate,
-        status: 'pending', // 대기 상태
+        scheduledDate: formData.expectedDate,
+        status: 'PENDING', // 대기 상태
       };
 
       await onSubmit(receivingData);

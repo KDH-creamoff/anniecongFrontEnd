@@ -284,13 +284,18 @@ const mockAPI = {
 
 function* loginSaga(action) {
   try {
-    // 백엔드 API 사용
-    const response = yield call(authAPI.login, action.payload);
-    yield put(login.success(response.data));
+    // 백엔드 API 형식에 맞게 데이터 변환
+    // 백엔드: { username, password }
+    const loginData = {
+      username: action.payload.userId || action.payload.username || action.payload.email,
+      password: action.payload.password,
+    };
     
-    // 로컬 Mock API (주석처리)
-    // const response = yield call(mockAPI.login, action.payload);
-    // yield put(login.success(response.data));
+    const response = yield call(authAPI.login, loginData);
+    
+    // 백엔드 응답 형식: { ok: true, data: { id, username } }
+    const userData = response.data?.data || response.data;
+    yield put(login.success({ user: userData }));
   } catch (error) {
     yield put(login.failure(error.response?.data?.message || '로그인에 실패했습니다.'));
   }
@@ -312,13 +317,24 @@ function* logoutSaga() {
 
 function* signupSaga(action) {
   try {
-    // 백엔드 API 사용
-    const response = yield call(authAPI.signup, action.payload);
-    yield put(signup.success(response.data));
+    // 백엔드 API 형식에 맞게 데이터 변환
+    // 백엔드: { full_name, phone_number, email, hire_date, position, department, role, username, password }
+    const signupData = {
+      full_name: action.payload.name,
+      phone_number: action.payload.phone,
+      email: action.payload.email,
+      hire_date: action.payload.hireDate || new Date().toISOString().split('T')[0],
+      position: action.payload.position || '',
+      department: action.payload.department || '',
+      role: action.payload.role || 1,
+      username: action.payload.userId || action.payload.email,
+      password: action.payload.password,
+    };
     
-    // 로컬 Mock API (주석처리)
-    // const response = yield call(mockAPI.signup, action.payload);
-    // yield put(signup.success(response.data));
+    const response = yield call(authAPI.signup, signupData);
+    
+    // 백엔드 응답 형식: { ok: true, data: { id, profile_id } }
+    yield put(signup.success(response.data));
   } catch (error) {
     yield put(signup.failure(error.response?.data?.message || '회원가입에 실패했습니다.'));
   }
@@ -331,11 +347,24 @@ function* getMeSaga() {
   try {
     // 백엔드 API 사용
     const response = yield call(authAPI.getMe);
-    yield put(getMe.success(response.data));
     
-    // 로컬 Mock API (주석처리)
-    // const response = yield call(mockAPI.getMe);
-    // yield put(getMe.success(response.data));
+    // 백엔드 응답 형식: { ok: true, data: { id, username, UserProfile: {...} } }
+    const userData = response.data?.data || response.data;
+    
+    // 프론트엔드 형식으로 변환 (UserProfile 중첩 객체 평탄화)
+    const transformedUser = {
+      id: userData.id,
+      username: userData.username,
+      name: userData.UserProfile?.full_name || userData.name || '',
+      email: userData.UserProfile?.email || userData.email || '',
+      phone: userData.UserProfile?.phone_number || userData.phone || '',
+      position: userData.UserProfile?.position || userData.position || '',
+      department: userData.UserProfile?.department || userData.department || '',
+      joinDate: userData.UserProfile?.hire_date || userData.hire_date || userData.joinDate || '',
+      UserProfile: userData.UserProfile,
+    };
+    
+    yield put(getMe.success({ user: transformedUser }));
   } catch (error) {
     yield put(getMe.failure(error.response?.data?.message || '사용자 정보를 불러오는데 실패했습니다.'));
   }
@@ -365,16 +394,15 @@ function* changePasswordSaga(action) {
 function* changePositionSaga(action) {
   try {
     // 백엔드 API 사용
+    // PUT /auth/:id { position: string }
     const { userId, position } = action.payload;
-    const response = yield call(authAPI.changePosition, { userId, position });
-    yield put(changePosition.success(response.data));
-    yield put(getMe.request());
+    const response = yield call(authAPI.updateUser, userId, { position });
     
-    // 로컬 Mock API (주석처리)
-    // const { userId, position } = action.payload;
-    // const response = yield call(mockAPI.updateUser, userId, { position });
-    // yield put(changePosition.success(response.data));
-    // yield put(getMe.request());
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    yield put(changePosition.success(response.data));
+    
+    // 사용자 정보 다시 조회
+    yield put(getMe.request());
   } catch (error) {
     yield put(changePosition.failure(error.response?.data?.message || '직급 변경에 실패했습니다.'));
   }

@@ -1,6 +1,5 @@
-import { /* call, */ put, takeLatest, delay } from 'redux-saga/effects';
-import { inventoryAPI } from '../../../api'; 
-// API: POST /inventories/issue, GET /inventory-transactions?type=ISSUE
+import { call, put, takeLatest } from 'redux-saga/effects';
+import { plannedTransactionsAPI, inventoryTransactionsAPI, inventoryAPI } from '../../../api';
 import {
   FETCH_ISSUING_LIST,
   CREATE_ISSUING,
@@ -16,194 +15,140 @@ import {
   fetchIssuingStats,
 } from './actions';
 
-// ==================== 목데이터 ====================
-// 출고 대기 목록 (출고 예정)
-let mockPendingIssuings = [
-  {
-    id: 1,
-    itemCode: 'PROD-001',
-    itemName: '콩부장 쿠키',
-    orderQuantity: 500,
-    issuedQuantity: 0,
-    availableQuantity: 600,
-    scheduledDate: '2025-11-15',
-    unit: 'kg',
-    unitCount: 50,
-    factory: '상주생산창고',
-    factoryId: 'fac_P2',
-    toCustomer: '강아지 쿠키 주식회사',
-    status: '대기',
-    note: '긴급 출고 요청',
-  },
-  {
-    id: 2,
-    itemCode: 'PROD-002',
-    itemName: '참치 츄르',
-    orderQuantity: 300,
-    issuedQuantity: 0,
-    availableQuantity: 350,
-    scheduledDate: '2025-11-14',
-    unit: 'kg',
-    unitCount: 30,
-    factory: '상주생산창고',
-    factoryId: 'fac_P2',
-    toCustomer: '고양이 간식 유통',
-    status: '대기',
-    note: '',
-  },
-  {
-    id: 3,
-    itemCode: 'RAW-001',
-    itemName: '밀가루',
-    orderQuantity: 200,
-    issuedQuantity: 0,
-    availableQuantity: 3000,
-    scheduledDate: '2025-11-13',
-    unit: 'kg',
-    unitCount: 20,
-    factory: '의성생산창고',
-    factoryId: 'fac_P1',
-    toCustomer: '생산라인1',
-    status: '대기',
-    note: '생산 투입 예정',
-  },
-];
-
-// 출고 완료 목록
-let mockCompletedIssuings = [
-  {
-    id: 101,
-    itemCode: 'PROD-003',
-    itemName: '강아지 사료 A',
-    orderQuantity: 1000,
-    issuedQuantity: 1000,
-    availableQuantity: 1200,
-    scheduledDate: '2025-11-12',
-    completedDate: '2025-11-12',
-    unit: 'kg',
-    unitCount: 100,
-    factory: '상주생산창고',
-    factoryId: 'fac_P2',
-    toCustomer: '펫푸드 마켓',
-    transactionNumber: 'ISSUE-20251112-001',
-    manager: '김철수',
-    status: '완료',
-    note: '정상 출고 완료',
-  },
-  {
-    id: 102,
-    itemCode: 'PROD-004',
-    itemName: '닭가슴살 져키',
-    orderQuantity: 200,
-    issuedQuantity: 200,
-    availableQuantity: 850,
-    scheduledDate: '2025-11-11',
-    completedDate: '2025-11-11',
-    unit: 'kg',
-    unitCount: 20,
-    factory: '상주자재창고',
-    factoryId: 'fac_P2',
-    toCustomer: '애견용품 도매',
-    transactionNumber: 'ISSUE-20251111-001',
-    manager: '이영희',
-    status: '완료',
-    note: '',
-  },
-  {
-    id: 103,
-    itemCode: 'SEMI-001',
-    itemName: '반죽',
-    orderQuantity: 150,
-    issuedQuantity: 150,
-    availableQuantity: 150,
-    scheduledDate: '2025-11-10',
-    completedDate: '2025-11-10',
-    unit: 'kg',
-    unitCount: 15,
-    factory: '상주생산창고',
-    factoryId: 'fac_P2',
-    toCustomer: '생산라인2',
-    transactionNumber: 'ISSUE-20251110-001',
-    manager: '박민수',
-    status: '완료',
-    note: '생산 투입 완료',
-  },
-  {
-    id: 104,
-    itemCode: 'PROD-005',
-    itemName: '고양이 간식 세트',
-    orderQuantity: 150,
-    issuedQuantity: 150,
-    availableQuantity: 150,
-    scheduledDate: '2025-11-09',
-    completedDate: '2025-11-09',
-    unit: 'kg',
-    unitCount: 15,
-    factory: '상주생산창고',
-    factoryId: 'fac_P2',
-    toCustomer: '펫샵 체인본부',
-    transactionNumber: 'ISSUE-20251109-001',
-    manager: '최동욱',
-    status: '완료',
-    note: '신규 거래처',
-  },
-];
-
-const mockIssuingStats = {
-  totalPending: 3,
-  totalCompleted: 4,
-  pendingQuantity: 1000,
-  completedQuantity: 1500,
-  byFactory: {
-    '상주생산창고': 1200,
-    '의성생산창고': 200,
-    '상주자재창고': 200,
-  },
-};
+// 목데이터 제거됨 - 모든 데이터는 백엔드 API에서 가져옴
 
 // ==================== 출고 목록 조회 ====================
 function* fetchIssuingListSaga(action) {
   try {
-    // const response = yield call(inventoryAPI.getMovements, {
-    //   ...action.payload,
-    //   type: 'ISSUE'
-    // });
-    // yield put(fetchIssuingList.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
     const { status } = action.payload || {};
 
-    if (status === '대기') {
-      yield put(fetchIssuingList.success(mockPendingIssuings));
-    } else if (status === '완료') {
-      yield put(fetchIssuingList.success(mockCompletedIssuings));
+    let response;
+    let itemsArray = [];
+    
+    if (status === '대기' || status === 'PENDING' || status === 'pending' || !status) {
+      // 대기 목록: 예정 트랜잭션에서 조회
+      const params = {
+        transactionType: 'ISSUE',
+        status: 'PENDING',
+      };
+      // action.payload에서 status 제외하고 나머지 파라미터만 추가
+      Object.keys(action.payload || {}).forEach(key => {
+        if (key !== 'status') {
+          params[key] = action.payload[key];
+        }
+      });
+      console.log('출고 대기 목록 조회 파라미터:', params);
+      response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+      console.log('출고 대기 목록 응답:', response.data);
+      
+      // 백엔드 응답 형식: { ok: true, data: [...], meta: {...} }
+      const plannedData = response.data?.data || response.data || [];
+      itemsArray = Array.isArray(plannedData) ? plannedData : [];
+    } else if (status === '완료' || status === 'COMPLETED' || status === 'completed') {
+      // 완료 목록: 예정 트랜잭션에서 COMPLETED 상태로 조회
+      const params = {
+        transactionType: 'ISSUE',
+        status: 'COMPLETED',
+      };
+      // action.payload에서 status 제외하고 나머지 파라미터만 추가
+      Object.keys(action.payload || {}).forEach(key => {
+        if (key !== 'status') {
+          params[key] = action.payload[key];
+        }
+      });
+      console.log('출고 완료 목록 조회 파라미터:', params);
+      response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+      console.log('출고 완료 목록 응답:', response.data);
+      
+      // 백엔드 응답 형식: { ok: true, data: [...], meta: {...} }
+      const completedData = response.data?.data || response.data || [];
+      itemsArray = Array.isArray(completedData) ? completedData : [];
     } else {
-      // 전체 목록
-      yield put(fetchIssuingList.success([...mockPendingIssuings, ...mockCompletedIssuings]));
+      // 전체 목록: 예정 트랜잭션에서 모든 상태 조회
+      const params = {
+        transactionType: 'ISSUE',
+      };
+      // action.payload에서 status 제외하고 나머지 파라미터만 추가
+      Object.keys(action.payload || {}).forEach(key => {
+        if (key !== 'status') {
+          params[key] = action.payload[key];
+        }
+      });
+      const response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
+      const allData = response.data?.data || response.data || [];
+      itemsArray = Array.isArray(allData) ? allData : [];
     }
+    
+    // 백엔드 데이터를 프론트엔드 형식으로 변환
+    const transformedItems = itemsArray.map((item) => {
+      // API 응답 구조: { id, transactionType, status, statusName, item: {...}, factory: {...}, quantity, unit, scheduledDate, completedAt, customerName, ... }
+      const itemData = item.item || {};
+      const factoryData = item.factory || {};
+      
+      // status 변환: "PENDING" -> "대기", "COMPLETED" -> "완료", "CANCELLED" -> "취소"
+      const itemStatus = item.status || 'PENDING';
+      const statusKorean = item.statusName || (itemStatus === 'PENDING' ? '대기' : itemStatus === 'COMPLETED' ? '완료' : itemStatus === 'CANCELLED' ? '취소' : '대기');
+      
+      return {
+        id: item.id,
+        itemId: itemData.id || item.itemId,
+        itemCode: itemData.code || item.itemCode || '',
+        itemName: itemData.name || item.itemName || '',
+        category: itemData.category || item.category || '',
+        orderQuantity: item.quantity || 0,
+        issuedQuantity: item.quantity || 0,
+        availableQuantity: 0,
+        scheduledDate: item.scheduledDate || item.scheduled_date || '',
+        completedDate: item.completedAt || item.completed_at || '',
+        unit: item.unit || '',
+        unitCount: item.labelQuantity || item.label_quantity || 0,
+        factory: factoryData.name || item.factoryName || '',
+        factoryId: factoryData.id || item.factoryId || '',
+        toCustomer: item.customerName || item.customer_name || '',
+        status: statusKorean, // "대기", "완료", "취소"
+        statusName: statusKorean,
+        transactionNumber: item.transactionNumber || item.transaction_number || item.id?.toString() || '',
+        manager: item.requestedBy?.name || item.manager || item.manager_name || '',
+        note: item.notes || item.note || '',
+        transactionType: item.transactionType || 'ISSUE',
+      };
+    });
+    
+    yield put(fetchIssuingList.success(transformedItems));
   } catch (error) {
-    yield put(fetchIssuingList.failure(error.response?.data?.message || '출고 목록을 불러오지 못했습니다.'));
+    console.error('출고 목록 조회 실패:', error);
+    console.error('에러 상세:', error.response?.data || error.message);
+    yield put(fetchIssuingList.failure(error.response?.data?.message || error.message || '출고 목록을 불러오지 못했습니다.'));
   }
 }
 
 // ==================== 출고 생성 (대기 목록에 추가) ====================
 function* createIssuingSaga(action) {
   try {
-    // const response = yield call(inventoryAPI.issueInventory, action.payload);
-    // yield put(createIssuing.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const newIssuing = {
-      id: mockPendingIssuings.length + 1,
-      issuedQuantity: 0,
-      scheduledDate: new Date().toISOString().split('T')[0],
-      status: '대기',
-      ...action.payload,
+    // plannedTransactionsAPI.createPlannedTransaction 사용
+    const payload = action.payload;
+    const transactionData = {
+      transactionType: 'ISSUE',
+      itemId: payload.itemId,
+      itemCode: payload.itemCode,
+      factoryId: payload.factoryId,
+      quantity: payload.orderQuantity || payload.quantity,
+      unit: payload.unit,
+      scheduledDate: payload.scheduledDate,
+      customerName: payload.toCustomer || payload.customerName,
+      issueType: payload.issueType || 'SHIPPING',
+      notes: payload.note || payload.notes || '',
     };
-    mockPendingIssuings = [newIssuing, ...mockPendingIssuings];
-    yield put(createIssuing.success(newIssuing));
+    
+    const response = yield call(plannedTransactionsAPI.createPlannedTransaction, transactionData);
+    
+    // 백엔드 응답 형식: { ok: true, data: { planned: {...} } }
+    const newTransaction = response.data?.data?.planned || response.data?.data || response.data;
+    
+    yield put(createIssuing.success(newTransaction));
+    
+    // 목록 새로고침
+    yield put(fetchIssuingList.request({ status: '대기' }));
   } catch (error) {
     yield put(createIssuing.failure(error.response?.data?.message || '출고 생성에 실패했습니다.'));
   }
@@ -212,30 +157,16 @@ function* createIssuingSaga(action) {
 // ==================== 출고 수정 ====================
 function* updateIssuingSaga(action) {
   try {
-    // const response = yield call(inventoryAPI.updateInventory, action.payload.id, action.payload.data);
-    // yield put(updateIssuing.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-
-    // 대기 목록에서 찾기
-    let foundInPending = false;
-    mockPendingIssuings = mockPendingIssuings.map(item => {
-      if (item.id === action.payload.id) {
-        foundInPending = true;
-        return { ...item, ...action.payload.data };
-      }
-      return item;
-    });
-
-    // 완료 목록에서 찾기
-    if (!foundInPending) {
-      mockCompletedIssuings = mockCompletedIssuings.map(item =>
-        item.id === action.payload.id ? { ...item, ...action.payload.data } : item
-      );
-    }
-
-    yield put(updateIssuing.success({ ...action.payload.data, id: action.payload.id }));
+    // plannedTransactionsAPI.updatePlannedTransaction 사용
+    const { id, data } = action.payload;
+    const response = yield call(plannedTransactionsAPI.updatePlannedTransaction, id, data);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    yield put(updateIssuing.success(response.data?.data || response.data));
+    
+    // 목록 새로고침
+    yield put(fetchIssuingList.request({ status: '대기' }));
+    yield put(fetchIssuingList.request({ status: '완료' }));
   } catch (error) {
     yield put(updateIssuing.failure(error.response?.data?.message || '출고 수정에 실패했습니다.'));
   }
@@ -244,14 +175,13 @@ function* updateIssuingSaga(action) {
 // ==================== 출고 삭제 ====================
 function* deleteIssuingSaga(action) {
   try {
-    // yield call(inventoryAPI.deleteInventory, action.payload);
-    // yield put(deleteIssuing.success(action.payload));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    mockPendingIssuings = mockPendingIssuings.filter(item => item.id !== action.payload);
-    mockCompletedIssuings = mockCompletedIssuings.filter(item => item.id !== action.payload);
+    // plannedTransactionsAPI.deletePlannedTransaction 사용
+    yield call(plannedTransactionsAPI.deletePlannedTransaction, action.payload);
     yield put(deleteIssuing.success(action.payload));
+    
+    // 목록 새로고침
+    yield put(fetchIssuingList.request({ status: '대기' }));
+    yield put(fetchIssuingList.request({ status: '완료' }));
   } catch (error) {
     yield put(deleteIssuing.failure(error.response?.data?.message || '출고 삭제에 실패했습니다.'));
   }
@@ -260,51 +190,105 @@ function* deleteIssuingSaga(action) {
 // ==================== 일괄 출고 (대기 → 완료 전환) ====================
 function* batchIssueSaga(action) {
   try {
-    // const response = yield call(inventoryAPI.batchIssue, action.payload);
-    // yield put(batchIssue.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(1000); // 일괄 처리는 시간이 더 걸림
-    const { ids } = action.payload; // 출고 처리할 ID 배열
-
-    // 대기 목록에서 제거하고 완료 목록으로 이동
-    const processedItems = [];
-    mockPendingIssuings = mockPendingIssuings.filter(item => {
-      if (ids.includes(item.id)) {
-        const completedItem = {
-          ...item,
-          id: mockCompletedIssuings.length + processedItems.length + 101,
-          issuedQuantity: item.orderQuantity,
-          completedDate: new Date().toISOString().split('T')[0],
-          transactionNumber: `ISSUE-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${String(processedItems.length + 1).padStart(3, '0')}`,
-          status: '완료',
-          manager: '시스템',
+    const { ids, data } = action.payload; // 출고 처리할 ID 배열
+    
+    // 일괄 출고 API 사용
+    if (ids.length > 1 || data?.useBatch) {
+      const transactions = ids.map((id) => {
+        const item = data?.items?.find(i => i.id === id) || data;
+        return {
+          itemId: item.itemId || id,
+          factoryId: item.factoryId || data?.factoryId || 1,
+          quantity: item.quantity || data?.actualQuantity || data?.quantity,
+          unit: item.unit || data?.unit || 'EA',
+          recipientName: item.receiver || item.recipientName || data?.receiver || data?.recipientName || '',
+          recipientPhone: item.recipientPhone || data?.recipientPhone || '',
+          recipientAddress: item.address || item.recipientAddress || data?.address || data?.recipientAddress || '',
+          shippingCompany: item.shippingCompany || data?.shippingCompany || '',
+          trackingNumber: item.trackingNumber || data?.trackingNumber || '',
+          note: item.note || data?.note || '',
         };
-        processedItems.push(completedItem);
-        return false;
+      });
+      
+      const response = yield call(inventoryTransactionsAPI.batchIssue, { transactions });
+      yield put(batchIssue.success(response.data?.data || response.data));
+    } else {
+      // 단일 출고 처리
+      const processedItems = [];
+      for (const id of ids) {
+        try {
+          // 먼저 예정 트랜잭션 완료 시도
+          try {
+            const completeData = {
+              actualQuantity: data?.actualQuantity || data?.quantity,
+              transferType: data?.transferType || 'CUSTOMER',
+              shippingInfo: data?.shippingInfo || {
+                recipientName: data?.receiver || data?.recipientName,
+                recipientAddress: data?.address || data?.recipientAddress,
+              },
+              note: data?.note || '',
+              labelSize: data?.labelSize,
+              labelQuantity: data?.labelQuantity,
+            };
+            
+            const response = yield call(plannedTransactionsAPI.completeIssue, id, completeData);
+            const completedItem = response.data?.data || response.data;
+            processedItems.push(completedItem);
+          } catch (plannedError) {
+            // 예정 트랜잭션이 아니면 직접 issue 호출
+            console.log('예정 트랜잭션 완료 실패, 직접 출고 처리 시도:', plannedError);
+            
+            const issueData = {
+              itemId: data?.itemId || id,
+              factoryId: data?.factoryId || 1,
+              quantity: data?.actualQuantity || data?.quantity,
+              unit: data?.unit || 'EA',
+              issueType: data?.issueType || 'SHIPPING',
+              shippingInfo: data?.shippingInfo || {
+                recipientName: data?.receiver || data?.recipientName || '',
+                recipientPhone: data?.recipientPhone || '',
+                recipientAddress: data?.address || data?.recipientAddress || '',
+                shippingCompany: data?.shippingCompany || '',
+                trackingNumber: data?.trackingNumber || '',
+              },
+              note: data?.note || '',
+            };
+            
+            const response = yield call(inventoryTransactionsAPI.issue, issueData);
+            const completedItem = response.data?.data || response.data;
+            processedItems.push(completedItem);
+          }
+        } catch (error) {
+          console.error(`출고 처리 실패 (ID: ${id}):`, error);
+          console.error('에러 상세:', error.response?.data || error.message);
+        }
       }
-      return true;
-    });
-
-    mockCompletedIssuings = [...processedItems, ...mockCompletedIssuings];
-    yield put(batchIssue.success({ count: processedItems.length, items: processedItems }));
+      
+      yield put(batchIssue.success({ count: processedItems.length, items: processedItems }));
+    }
+    
+    // 목록 새로고침
+    yield put(fetchIssuingList.request({ status: '대기' }));
+    yield put(fetchIssuingList.request({ status: '완료' }));
   } catch (error) {
-    yield put(batchIssue.failure(error.response?.data?.message || '일괄 출고에 실패했습니다.'));
+    console.error('일괄 출고 실패:', error);
+    console.error('에러 상세:', error.response?.data || error.message);
+    yield put(batchIssue.failure(error.response?.data?.message || error.message || '일괄 출고에 실패했습니다.'));
   }
 }
 
 // ==================== 출고 통계 ====================
 function* fetchIssuingStatsSaga(action) {
   try {
-    // const response = yield call(inventoryAPI.getTransactionStats, {
-    //   ...action.payload,
-    //   type: 'ISSUE'
-    // });
-    // yield put(fetchIssuingStats.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    yield put(fetchIssuingStats.success(mockIssuingStats));
+    // plannedTransactionsAPI.getStats 사용
+    const params = {
+      transactionType: 'ISSUE',
+      ...action.payload,
+    };
+    const response = yield call(plannedTransactionsAPI.getStats, params);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    yield put(fetchIssuingStats.success(response.data?.data || response.data));
   } catch (error) {
     yield put(fetchIssuingStats.failure(error.response?.data?.message || '출고 통계를 불러오지 못했습니다.'));
   }

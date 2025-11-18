@@ -56,9 +56,10 @@ const StorageTemperature = () => {
     // 현재 보관 조건 찾기
     const currentStorage = storageConditions.find((s) => s.id === currentStorageId);
     if (currentStorage) {
+      const currentItems = Array.isArray(currentStorage.items) ? currentStorage.items : [];
       const updatedStorage = {
         ...currentStorage,
-        items: [...currentStorage.items, newItem.trim()],
+        items: [...currentItems, newItem.trim()],
       };
 
       // 리덕스 액션 dispatch
@@ -75,9 +76,10 @@ const StorageTemperature = () => {
     // 해당 보관 조건 찾기
     const currentStorage = storageConditions.find((s) => s.id === storageId);
     if (currentStorage) {
+      const currentItems = Array.isArray(currentStorage.items) ? currentStorage.items : [];
       const updatedStorage = {
         ...currentStorage,
-        items: currentStorage.items.filter((_, index) => index !== itemIndex),
+        items: currentItems.filter((_, index) => index !== itemIndex),
       };
 
       // 리덕스 액션 dispatch
@@ -104,7 +106,7 @@ const StorageTemperature = () => {
           <div key={storage.id} className='rounded-xl bg-white p-6 shadow-sm'>
             <div className='mb-4 flex items-center gap-2'>
               <Thermometer className='h-5 w-5 text-[#674529]' />
-              <h2 className='text-base text-[#674529]'>{storage.title}</h2>
+              <h2 className='text-base text-[#674529]'>{storage.name || storage.title || ''}</h2>
             </div>
 
             <div className='space-y-4'>
@@ -114,7 +116,7 @@ const StorageTemperature = () => {
                   온도 범위
                 </label>
                 <div className='rounded-xl bg-gray-100 px-4 py-2.5 text-sm text-gray-900'>
-                  {storage.temperature}
+                  {storage.temperature_range || storage.temperature || ''}
                 </div>
               </div>
 
@@ -124,7 +126,7 @@ const StorageTemperature = () => {
                   습도 범위
                 </label>
                 <div className='rounded-xl bg-gray-100 px-4 py-2.5 text-sm text-gray-900'>
-                  {storage.humidity}
+                  {storage.humidity_range || storage.humidity || ''}
                 </div>
               </div>
 
@@ -134,18 +136,25 @@ const StorageTemperature = () => {
                   적용 품목
                 </label>
                 <div className='flex flex-wrap items-center gap-2'>
-                  {storage.items.map((item, index) => (
-                    <span
-                      key={index}
-                      className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'
-                    >
-                      {item}
-                      <X
-                        className='h-3 w-3 cursor-pointer hover:opacity-80'
-                        onClick={() => handleRemoveItem(storage.id, index)}
-                      />
-                    </span>
-                  ))}
+                  {(Array.isArray(storage.items) ? storage.items : []).map((item, index) => {
+                    // item이 객체인 경우 name, code, itemName 추출
+                    const itemName = typeof item === 'string' 
+                      ? item 
+                      : item?.name || item?.code || item?.itemName || '';
+                    
+                    return (
+                      <span
+                        key={index}
+                        className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'
+                      >
+                        {itemName}
+                        <X
+                          className='h-3 w-3 cursor-pointer hover:opacity-80'
+                          onClick={() => handleRemoveItem(storage.id, index)}
+                        />
+                      </span>
+                    );
+                  })}
                   <button
                     onClick={() => handleOpenModal(storage.id)}
                     className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'

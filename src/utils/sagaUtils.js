@@ -22,7 +22,8 @@ export function* createApiSaga(apiFunc, actions) {
  * @param {string} type - 액션 타입 베이스 이름
  * @returns {Object} REQUEST, SUCCESS, FAILURE 액션 타입
  */
-export const createRequestTypes = (type) => ({
+export const createRequestTypes = (type) => (
+  console.log("createRequestTypes : ", type),{
   REQUEST: `${type}_REQUEST`,
   SUCCESS: `${type}_SUCCESS`,
   FAILURE: `${type}_FAILURE`,

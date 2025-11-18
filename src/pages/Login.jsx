@@ -64,9 +64,10 @@ const Login = () => {
     }
 
     // Redux Saga를 통한 로그인 처리
-    // API는 email을 받지만, 프론트에서는 userId로 표시
+    // 백엔드 API는 username을 받음
     dispatch(login.request({
-      email: formData.userId, // userId를 email 필드로 전송
+      userId: formData.userId, // username으로 변환됨
+      username: formData.userId, // 백엔드 API 형식
       password: formData.password,
       remember: formData.remember
     }));

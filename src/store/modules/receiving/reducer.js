@@ -27,9 +27,30 @@ const receivingReducer = (state = initialState, action) => {
   switch (action.type) {
     // 입고 목록 조회
     case FETCH_RECEIVING_LIST.REQUEST:
+      console.log("c")
       return { ...state, receivingList: { ...state.receivingList, loading: true, error: null } };
     case FETCH_RECEIVING_LIST.SUCCESS:
-      return { ...state, receivingList: { data: action.payload, loading: false, error: null } };
+      console.log("b")
+      // 기존 데이터와 새 데이터 병합 (중복 제거)
+      const existingData = state.receivingList.data || [];
+      const newData = action.payload || [];
+      const newDataArray = Array.isArray(newData) ? newData : [];
+      const mergedData = [...existingData];
+
+      newDataArray.forEach((newItem) => {
+        const existingIndex = mergedData.findIndex((item) => item.id === newItem.id);
+        if (existingIndex >= 0) {
+          // 기존 항목 업데이트
+          mergedData[existingIndex] = newItem;
+        } else {
+          // 새 항목 추가
+          mergedData.push(newItem);
+        }
+      });
+
+      console.log('입고 목록 업데이트:', { 기존: existingData.length, 신규: newDataArray.length, 병합: mergedData.length });
+
+      return { ...state, receivingList: { data: mergedData, loading: false, error: null } };
     case FETCH_RECEIVING_LIST.FAILURE:
       return { ...state, receivingList: { ...state.receivingList, loading: false, error: action.error } };
 

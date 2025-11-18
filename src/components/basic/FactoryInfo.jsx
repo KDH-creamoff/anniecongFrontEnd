@@ -56,9 +56,14 @@ const FactoryInfo = () => {
     // 현재 공장 찾기
     const currentFactory = factories.find((f) => f.id === currentFactoryId);
     if (currentFactory) {
+      const currentProcesses = Array.isArray(currentFactory.processes) 
+        ? currentFactory.processes 
+        : Array.isArray(currentFactory.Processes) 
+        ? currentFactory.Processes 
+        : [];
       const updatedFactory = {
         ...currentFactory,
-        processes: [...currentFactory.processes, newProcess.trim()],
+        processes: [...currentProcesses, newProcess.trim()],
       };
 
       // 리덕스 액션 dispatch
@@ -75,9 +80,14 @@ const FactoryInfo = () => {
     // 해당 공장 찾기
     const currentFactory = factories.find((f) => f.id === factoryId);
     if (currentFactory) {
+      const currentProcesses = Array.isArray(currentFactory.processes) 
+        ? currentFactory.processes 
+        : Array.isArray(currentFactory.Processes) 
+        ? currentFactory.Processes 
+        : [];
       const updatedFactory = {
         ...currentFactory,
-        processes: currentFactory.processes.filter((_, index) => index !== processIndex),
+        processes: currentProcesses.filter((_, index) => index !== processIndex),
       };
 
       // 리덕스 액션 dispatch
@@ -105,7 +115,7 @@ const FactoryInfo = () => {
             <div className='mb-6 flex items-center gap-2'>
               <Factory className='h-5 w-5 text-[#674529]' />
               <h2 className='text-base text-[#674529]'>
-                {factory.id === 1 ? '1공장 (전처리)' : '2공장 (제조)'}
+                {factory.name || (factory.id === 1 ? '1공장 (전처리)' : '2공장 (제조)')}
               </h2>
             </div>
 
@@ -118,7 +128,7 @@ const FactoryInfo = () => {
                 </label>
                 <input
                   type='text'
-                  value={factory.address}
+                  value={factory.address || factory.Address?.address || ''}
                   readOnly
                   className='w-full rounded-xl bg-gray-100 px-4 py-2.5 text-gray-900'
                 />
@@ -130,22 +140,29 @@ const FactoryInfo = () => {
                   담당 공정
                 </label>
                 <div className='flex flex-wrap items-center gap-2'>
-                  {factory.processes.map((process, index) => (
-                    <span
-                      key={index}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                        factory.id === 1
-                          ? 'bg-[#a3c478] text-[#fff]'
-                          : 'bg-[#f9b679] text-[#fff]'
-                      }`}
-                    >
-                      {process}
-                      <X
-                        className='h-3 w-3 cursor-pointer hover:opacity-80'
-                        onClick={() => handleRemoveProcess(factory.id, index)}
-                      />
-                    </span>
-                  ))}
+                  {(Array.isArray(factory.processes) ? factory.processes : factory.Processes || []).map((process, index) => {
+                    // process가 객체인 경우 name 또는 processName 추출
+                    const processName = typeof process === 'string' 
+                      ? process 
+                      : process?.name || process?.processName || process?.Name || '';
+                    
+                    return (
+                      <span
+                        key={index}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
+                          factory.id === 1
+                            ? 'bg-[#a3c478] text-[#fff]'
+                            : 'bg-[#f9b679] text-[#fff]'
+                        }`}
+                      >
+                        {processName}
+                        <X
+                          className='h-3 w-3 cursor-pointer hover:opacity-80'
+                          onClick={() => handleRemoveProcess(factory.id, index)}
+                        />
+                      </span>
+                    );
+                  })}
                   <button
                     onClick={() => handleOpenModal(factory.id)}
                     className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
