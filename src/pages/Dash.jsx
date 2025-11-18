@@ -1,21 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import ManufacturingManagement from '../components/dashboard/ManufacturingManagement';
 import MainModule from '../components/dashboard/MainModule';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 
 const Dash = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleNavigate = (nav) => {
     const navMap = {
       대시보드: '/dash',
       기초정보: '/basic',
-      '기초정보-품목등록': '/basic',
-      '기초정보-공정정보': '/basic',
-      '기초정보-BOM관리': '/basic',
-      입출고관리: '/receiving',
       '입출고관리-nav1': '/receiving/nav1',
       '입출고관리-nav2': '/receiving/nav2',
       '제조관리-nav1': '/manufacturing/nav1',

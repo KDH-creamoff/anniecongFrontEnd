@@ -12,7 +12,10 @@ import {
   Save,
   X,
   CheckCircle,
-  Users,
+  Signature,
+  Upload,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { getMe, changePassword, changePosition, logout } from "../store/modules/auth/actions";
 
@@ -25,11 +28,14 @@ const Mypage = () => {
 
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingPosition, setIsEditingPosition] = useState(false);
+  const [isEditingStamp, setIsEditingStamp] = useState(false);
   const [passwordData, setPasswordData] = useState({
     newPassword: "",
     confirmPassword: "",
   });
   const [newPosition, setNewPosition] = useState("");
+  const [stampImage, setStampImage] = useState(null);
+  const [stampPreview, setStampPreview] = useState("");
 
   // 이메일 인증 관련 상태
   const [verificationEmail, setVerificationEmail] = useState("");
@@ -175,6 +181,55 @@ const Mypage = () => {
     navigate("/login");
   };
 
+  // 도장 이미지 업로드 핸들러
+  const handleStampImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('파일 크기는 5MB 이하여야 합니다.');
+        return;
+      }
+      setStampImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setStampPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 도장 이미지 제거
+  const handleRemoveStampImage = () => {
+    setStampImage(null);
+    setStampPreview("");
+  };
+
+  // 도장 저장
+  const handleStampSubmit = () => {
+    // 백엔드 API 연동 필요
+    // const formData = new FormData();
+    // if (stampImage) formData.append('stamp', stampImage);
+    // if (signatureImage) formData.append('signature', signatureImage);
+    // await authAPI.updateStampAndSignature(user?.id, formData);
+    
+    alert('도장이 저장되었습니다.');
+    setIsEditingStamp(false);
+    // 저장 후 사용자 정보 다시 조회
+    dispatch(getMe.request());
+  };
+
+  const handleStampCancel = () => {
+    setStampImage(null);
+    setStampPreview("");
+    setSignatureImage(null);
+    setSignaturePreview("");
+    setIsEditingStamp(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f9f6f2" }}>
@@ -253,6 +308,25 @@ const Mypage = () => {
                 )}
               </div>
             </div>
+            <div>
+              <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
+                <Signature className="h-4 w-4" />
+                <span>도장</span>
+              </label>
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="text" 
+                  value={user?.stampImage || user?.signatureImage ? "등록됨" : "미등록"} 
+                  disabled 
+                  className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" 
+                />
+                {!isEditingStamp && (
+                  <button onClick={() => setIsEditingStamp(true)} className="rounded bg-[#674529] px-3 py-2 text-sm text-white transition-colors hover:bg-[#543620]">
+                    {user.signatureImage ? "변경" : "등록"}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -286,6 +360,66 @@ const Mypage = () => {
               >
                 <Save className="h-4 w-4" />
                 <span>저장</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isEditingStamp && (
+          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-[#674529]">도장 수정</h2>
+            <div className="space-y-6">
+                {/* 도장 이미지 업로드 */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">도장 이미지</label>
+                  <div className="space-y-3">
+                    {(stampPreview || user?.stampImage) && (
+                      <div className="relative">
+                        <div className="flex h-40 items-center justify-center rounded-lg border-2 border-gray-300 bg-gray-50">
+                          <img
+                            src={stampPreview || user?.stampImage}
+                            alt="도장 미리보기"
+                            className="h-40 w-full object-contain p-4"
+                          />
+                        </div>
+                        <button
+                          onClick={handleRemoveStampImage}
+                          className="absolute right-2 top-2 rounded-full bg-red-500 p-1.5 text-white transition-colors hover:bg-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                    <label className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 transition-colors hover:bg-gray-100">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleStampImageChange}
+                        className="hidden"
+                      />
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Upload className="h-5 w-5" />
+                        <span>도장 이미지 {stampPreview || user?.stampImage ? '변경' : '업로드'}</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+            <div className="mt-6 flex justify-end space-x-2">
+              <button
+                onClick={handleStampCancel}
+                className="flex items-center space-x-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                <X className="h-4 w-4" />
+                <span>취소</span>
+              </button>
+              <button
+                onClick={handleStampSubmit}
+                className="flex items-center space-x-2 rounded bg-[#674529] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#543620]"
+              >
+                <Save className="h-4 w-4" />
+                <span>완료</span>
               </button>
             </div>
           </div>

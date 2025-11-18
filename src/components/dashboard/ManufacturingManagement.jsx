@@ -110,7 +110,7 @@ const ManufacturingManagement = () => {
                 <h3 className='mb-2 text-3xl font-bold text-gray-900'>
                   {stat.value}
                 </h3>
-                <div className='flex items-center text-sm'>
+                {/* <div className='flex items-center text-sm'>
                   {stat.isPositive ? (
                     <TrendingUp size={16} className='mr-1 text-green-600' />
                   ) : (
@@ -123,7 +123,7 @@ const ManufacturingManagement = () => {
                   >
                     {stat.change}
                   </span>
-                </div>
+                </div> */}
               </div>
               <div
                 className={`${stat.bgColor} flex items-center justify-center rounded-xl p-3`}
