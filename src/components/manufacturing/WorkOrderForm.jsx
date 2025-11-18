@@ -3,6 +3,8 @@ import { useState } from 'react';
 const WorkOrderForm = () => {
   const [selectedManager, setSelectedManager] = useState('');
   const [selectedManagerBom, setSelectedManagerBom] = useState('');
+  const [selectedFactory, setSelectedFactory] = useState('');
+  const [selectedFactoryBom, setSelectedFactoryBom] = useState('');
 
   // BOM 선택 옵션
   const bomOptions = ['콩부장 쿠키', '맛있는 닭기슴살', '강아지 간식', '단호박과자'];
@@ -29,6 +31,18 @@ const WorkOrderForm = () => {
           <h4 className="text-base font-semibold text-[#674529] mb-4 text-center">작업 내용</h4>
 
           <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <label className="w-24 text-sm text-gray-700">공장</label>
+              <select
+                value={selectedFactory}
+                onChange={(e) => setSelectedFactory(e.target.value)}
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+              >
+                <option value="" disabled hidden>공장 선택</option>
+                <option>1공장</option>
+                <option>2공장</option>
+              </select>
+            </div>
             <div className="flex items-center gap-4">
               <label className="w-24 text-sm text-gray-700">제목</label>
               <input
@@ -118,6 +132,19 @@ const WorkOrderForm = () => {
           <h4 className="text-base font-semibold text-[#674529] mb-4 text-center">BOM</h4>
 
           <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <label className="w-24 text-sm text-gray-700">공장</label>
+              <select
+                value={selectedFactoryBom}
+                onChange={(e) => setSelectedFactoryBom(e.target.value)}
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+              >
+                <option value="" disabled hidden>공장 선택</option>
+                <option>1공장</option>
+                <option>2공장</option>
+              </select>
+            </div>
+            
             <div className="flex items-center gap-4">
               <label className="w-24 text-sm text-gray-700">제목</label>
               <input

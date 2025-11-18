@@ -52,9 +52,33 @@ const WorkOrderList = () => {
                     <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
                     <p className="text-sm text-gray-600">{order.product}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-1">작업자: {order.manager}</p>
-                  </div>
+                                      <div className="text-right space-y-2">
+                        <div className="flex space-x-4">
+                            <p className="text-sm text-gray-700">
+                                <span className="text-gray-500">작업자:</span> {order.worker || ''}
+                            </p>
+                            <p className="text-sm">
+                                <span className="text-gray-500">현재 상태:</span>{' '}
+                                <span className={`font-medium ${
+                                    order.status === 'waiting' ? 'text-blue-600' :
+                                    order.status === 'in_progress' ? 'text-orange-600' :
+                                    'text-green-600'
+                                }`}>
+                                    {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}
+                                </span>
+                            </p>
+                        </div>
+                        {order.status === 'waiting' && (
+                            <button className="w-[100px] px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                                시작
+                            </button>
+                        )}
+                        {order.status === 'in_progress' && (
+                            <button className="w-[100px] px-4 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                                완료
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">

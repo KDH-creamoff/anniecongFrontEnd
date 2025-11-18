@@ -6,6 +6,14 @@ import { selectFactory2Orders, selectFactory2OrdersLoading } from "../../store/m
 const Factory2OrderList = () => {
     const dispatch = useDispatch();
     const [filterType, setFilterType] = useState('전체');
+    const [showCompletionModal, setShowCompletionModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [completionData, setCompletionData] = useState({
+        damage: '',
+        temperature: '',
+        duration: '',
+        note: ''
+    });
 
     // Redux에서 2공장 주문 목록 가져오기
     const factory2OrdersFromRedux = useSelector(selectFactory2Orders);
@@ -18,11 +26,63 @@ const Factory2OrderList = () => {
 
     const workOrders = factory2OrdersFromRedux || [];
 
+    // 시작 버튼 핸들러
+    const handleStart = (orderId) => {
+        console.log('작업 시작:', orderId);
+        // TODO: 상태 변경 액션 디스패치
+    };
+
+    // 완료 버튼 핸들러
+    const handleComplete = (order) => {
+        setSelectedOrder(order);
+        setShowCompletionModal(true);
+    };
+
+    // 완료 폼 제출
+    const handleSubmitCompletion = () => {
+        if (!completionData.damage || !completionData.temperature || !completionData.duration) {
+            alert('파손량, 온도, 소요시간은 필수 입력 항목입니다.');
+            return;
+        }
+
+        const completedQuantity = selectedOrder.quantity - parseInt(completionData.damage);
+        console.log('작업 완료:', {
+            orderId: selectedOrder.id,
+            completedQuantity,
+            ...completionData
+        });
+
+        // TODO: 완료 액션 디스패치
+
+        // 모달 닫기 및 초기화
+        setShowCompletionModal(false);
+        setSelectedOrder(null);
+        setCompletionData({
+            damage: '',
+            temperature: '',
+            duration: '',
+            note: ''
+        });
+    };
+
+    // 모달 닫기
+    const handleCloseModal = () => {
+        setShowCompletionModal(false);
+        setSelectedOrder(null);
+        setCompletionData({
+            damage: '',
+            temperature: '',
+            duration: '',
+            note: ''
+        });
+    };
+
     return (
+    <>
     <div>
         <div className="mx-auto">
         <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl text-[#674529]">제조 지시서 목록</h3>
+            <h3 className="text-xl text-[#674529]">작업 지시서 목록</h3>
             {loading && (
                 <span className="text-sm text-gray-500">로딩 중...</span>
             )}
@@ -42,19 +102,49 @@ const Factory2OrderList = () => {
         <div className="space-y-6">
             {workOrders.length === 0 && !loading ? (
                 <div className="text-center py-8 text-gray-500">
-                    제조 지시서가 없습니다.
+                    작업 지시서가 없습니다.
                 </div>
             ) : (
                 workOrders.map((order) => (
                 <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
                     <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h4 className="text-base font-semibold text-gray-900 mb-1">{order.product}</h4>
-                        <p className="text-sm text-gray-600">주문코드: {order.orderCode}</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-xs text-gray-500 mb-1">상태: {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}</p>
-                    </div>
+                        <div>
+                            <h4 className="text-base font-semibold text-gray-900 mb-1">{order.product}</h4>
+                            <p className="text-sm text-gray-600">주문코드: {order.orderCode}</p>
+                        </div>
+                        <div className="text-right space-y-2">
+                            <div className="flex space-x-4">
+                                <p className="text-sm text-gray-700">
+                                    <span className="text-gray-500">작업자:</span> {order.worker || ''}
+                                </p>
+                                <p className="text-sm">
+                                    <span className="text-gray-500">현재 상태:</span>{' '}
+                                    <span className={`font-medium ${
+                                        order.status === 'waiting' ? 'text-blue-600' :
+                                        order.status === 'in_progress' ? 'text-orange-600' :
+                                        'text-green-600'
+                                    }`}>
+                                        {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}
+                                    </span>
+                                </p>
+                            </div>
+                            {order.status === 'waiting' && (
+                                <button
+                                    onClick={() => handleStart(order.id)}
+                                    className="w-[100px] px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    시작
+                                </button>
+                            )}
+                            {order.status === 'in_progress' && (
+                                <button
+                                    onClick={() => handleComplete(order)}
+                                    className="w-[100px] px-4 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                                >
+                                    완료
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
@@ -81,6 +171,114 @@ const Factory2OrderList = () => {
         </div>
     </div>
     </div>
+
+    {/* 작업 완료 모달 */}
+    {showCompletionModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 w-[500px] max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-semibold text-[#674529]">작업 완료</h3>
+                    <button
+                        onClick={handleCloseModal}
+                        className="text-gray-400 hover:text-gray-600"
+                    >
+                        ✕
+                    </button>
+                </div>
+
+                <div className="mb-4 p-4 bg-gray-50 rounded">
+                    <p className="text-sm text-gray-600 mb-1">제품명: <span className="font-medium text-gray-900">{selectedOrder.product}</span></p>
+                    <p className="text-sm text-gray-600">작업량: <span className="font-medium text-gray-900">{selectedOrder.quantity}개</span></p>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            파손량 <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                min="0"
+                                value={completionData.damage}
+                                onChange={(e) => setCompletionData({ ...completionData, damage: e.target.value })}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="0"
+                            />
+                            <span className="text-sm text-gray-600">개</span>
+                        </div>
+                        {completionData.damage && (
+                            <p className="mt-1 text-xs text-gray-500">
+                                완료된 수량: {selectedOrder.quantity - parseInt(completionData.damage || 0)}개
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            온도 <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                value={completionData.temperature}
+                                onChange={(e) => setCompletionData({ ...completionData, temperature: e.target.value })}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="20"
+                            />
+                            <span className="text-sm text-gray-600">°C</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            소요 시간 <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                min="0"
+                                value={completionData.duration}
+                                onChange={(e) => setCompletionData({ ...completionData, duration: e.target.value })}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="60"
+                            />
+                            <span className="text-sm text-gray-600">분</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            비고
+                        </label>
+                        <textarea
+                            value={completionData.note}
+                            onChange={(e) => setCompletionData({ ...completionData, note: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            rows="3"
+                            placeholder="특이사항을 입력하세요"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                    <button
+                        onClick={handleCloseModal}
+                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors"
+                    >
+                        취소
+                    </button>
+                    <button
+                        onClick={handleSubmitCompletion}
+                        className="flex-1 px-4 py-2 bg-[#674529] text-white rounded hover:bg-[#553821] transition-colors"
+                    >
+                        완료 처리
+                    </button>
+                </div>
+            </div>
+        </div>
+    )}
+    </>
     );
 }
 
