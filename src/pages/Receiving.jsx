@@ -44,10 +44,6 @@ const Receiving = ({ subPage = 'nav1' }) => {
   const receivingList = useSelector(selectReceivingList) || [];
   const receivingListLoading = useSelector(selectReceivingListLoading);
 
-  useEffect(() => {
-    console.log('불러온 데이터 : ', receivingList);
-  }, [receivingList]); 
-
   // 출고 관련 Redux 상태
   const issuingListLoading = useSelector(selectIssuingListLoading);
   const pendingIssuings = useSelector(selectPendingIssuings);
@@ -87,18 +83,41 @@ const Receiving = ({ subPage = 'nav1' }) => {
   };
 
   // 입고 대기/완료 목록은 Redux에서 가져옴
-  const waitingData = receivingList.filter(item => item.status === 'PENDING' || item.status === 'pending' || item.statusName === '대기');
-  const completedData = receivingList.filter(item => item.status === 'COMPLETED' || item.status === 'completed' || item.statusName === '완료');
+  // status가 'PENDING'이거나 statusName이 '대기'인 항목
+  const waitingData = (receivingList || []).filter(item => {
+    const status = item.status || '';
+    const statusName = item.statusName || '';
+    return status === 'PENDING' || status === 'pending' || statusName === '대기' || statusName === 'pending';
+  });
+  
+  // status가 'COMPLETED'이거나 statusName이 '완료'인 항목
+  const completedData = (receivingList || []).filter(item => {
+    const status = item.status || '';
+    const statusName = item.statusName || '';
+    return status === 'COMPLETED' || status === 'completed' || statusName === '완료' || statusName === 'completed';
+  });
+
+  // 디버깅용 useEffect - waitingData와 completedData 정의 이후에 위치
+  useEffect(() => {
+    console.log('불러온 입고 데이터:', {
+      전체: receivingList?.length || 0,
+      대기: waitingData.length,
+      완료: completedData.length,
+      데이터: receivingList,
+    });
+  }, [receivingList, waitingData, completedData]);
 
   // 입고 대기/완료 목록 로드 - Redux 사용
   useEffect(() => {
     if (subPage === 'nav1') {
       // Redux 액션으로 입고 대기 목록 조회
-      console.log('입고 대기 목록 조회 요청');
-      dispatch(fetchReceivingList.request({ status: 'PENDING' }));
+      console.log('📤 입고 대기 목록 조회 요청 디스패치');
+      const action = fetchReceivingList.request({ status: 'PENDING' });
+      console.log('📤 디스패치할 액션:', action);
+      dispatch(action);
       // 입고 완료 목록 조회 (0.5초 후 호출하여 상태 업데이트 충돌 방지)
       const timer = setTimeout(() => {
-        console.log('입고 완료 목록 조회 요청');
+        console.log('📤 입고 완료 목록 조회 요청 디스패치');
         dispatch(fetchReceivingList.request({ status: 'COMPLETED' }));
       }, 500);
       return () => clearTimeout(timer);
@@ -446,7 +465,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
           {/* 입고 대기 목록 */}
           <div className='mb-6'>
             <ReceivingWaitingList
-              waitingData={waitingData}
+              waitingData={waitingData || []}
               onAddReceiving={handleAddReceiving}
               onReceive={handleReceive}
               onDelete={handleDeleteReceiving}
@@ -457,7 +476,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
           {/* 입고 완료 목록 */}
           <div>
             <ReceivingCompletedList
-              completedData={completedData}
+              completedData={completedData || []}
               onCancel={handleCancelReceiving}
               onLabelPrint={handleLabelPrint}
               isLoading={receivingListLoading}
@@ -485,7 +504,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
           {/* 출고 대기 목록 */}
           <div className='mb-6'>
             <ShippingWaitingList
-              waitingData={pendingIssuings}
+              waitingData={pendingIssuings || []}
               onAddShipping={handleAddShipping}
               onShip={handleShip}
               onDelete={handleDeleteShipping}
@@ -496,7 +515,7 @@ const Receiving = ({ subPage = 'nav1' }) => {
           {/* 출고 완료 목록 */}
           <div>
             <ShippingCompletedList
-              completedData={completedIssuings}
+              completedData={completedIssuings || []}
               onCancel={handleCancelShipping}
               onLabelPrint={handleLabelPrint}
               isLoading={issuingListLoading}

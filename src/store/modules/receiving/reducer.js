@@ -27,10 +27,8 @@ const receivingReducer = (state = initialState, action) => {
   switch (action.type) {
     // 입고 목록 조회
     case FETCH_RECEIVING_LIST.REQUEST:
-      console.log("c")
       return { ...state, receivingList: { ...state.receivingList, loading: true, error: null } };
     case FETCH_RECEIVING_LIST.SUCCESS:
-      console.log("b")
       // 기존 데이터와 새 데이터 병합 (중복 제거)
       const existingData = state.receivingList.data || [];
       const newData = action.payload || [];
@@ -40,7 +38,7 @@ const receivingReducer = (state = initialState, action) => {
       newDataArray.forEach((newItem) => {
         const existingIndex = mergedData.findIndex((item) => item.id === newItem.id);
         if (existingIndex >= 0) {
-          // 기존 항목 업데이트
+          // 기존 항목 업데이트 (새 데이터로 덮어쓰기)
           mergedData[existingIndex] = newItem;
         } else {
           // 새 항목 추가
@@ -48,7 +46,13 @@ const receivingReducer = (state = initialState, action) => {
         }
       });
 
-      console.log('입고 목록 업데이트:', { 기존: existingData.length, 신규: newDataArray.length, 병합: mergedData.length });
+      console.log('입고 목록 업데이트:', { 
+        기존: existingData.length, 
+        신규: newDataArray.length, 
+        병합: mergedData.length,
+        대기: mergedData.filter(item => item.status === 'PENDING' || item.statusName === '대기').length,
+        완료: mergedData.filter(item => item.status === 'COMPLETED' || item.statusName === '완료').length,
+      });
 
       return { ...state, receivingList: { data: mergedData, loading: false, error: null } };
     case FETCH_RECEIVING_LIST.FAILURE:

@@ -18,8 +18,8 @@ import {
 // ==================== 입고 목록 조회 ====================
 function* fetchReceivingListSaga(action) {
   try {
+    console.log('🔵 fetchReceivingListSaga 시작:', action.payload);
     const { status } = action.payload || {};
-    console.log("b")
     let response;
     let itemsArray = [];
     
@@ -72,7 +72,7 @@ function* fetchReceivingListSaga(action) {
           params[key] = action.payload[key];
         }
       });
-      const response = yield call(plannedTransactionsAPI.getPlannedTransactions);
+      const response = yield call(plannedTransactionsAPI.getPlannedTransactions, params);
       const allData = response.data?.data || response.data || [];
       itemsArray = Array.isArray(allData) ? allData : [];
     }
@@ -109,10 +109,15 @@ function* fetchReceivingListSaga(action) {
       };
     });
     
+    console.log('🟢 변환된 데이터:', transformedItems.length, '개');
+    console.log('🟢 변환된 데이터 샘플:', transformedItems.slice(0, 2));
+    
     yield put(fetchReceivingList.success(transformedItems));
+    console.log('✅ fetchReceivingList.success 액션 디스패치 완료');
   } catch (error) {
-    console.error('입고 목록 조회 실패:', error);
-    console.error('에러 상세:', error.response?.data || error.message);
+    console.error('❌ 입고 목록 조회 실패:', error);
+    console.error('❌ 에러 상세:', error.response?.data || error.message);
+    console.error('❌ 에러 스택:', error.stack);
     yield put(fetchReceivingList.failure(error.response?.data?.message || error.message || '입고 목록을 불러오지 못했습니다.'));
   }
 }
@@ -243,6 +248,7 @@ function* printLabelSaga(action) {
 
 // ==================== Root Saga ====================
 export default function* receivingSaga() {
+  console.log('🟣 receivingSaga 등록 완료');
   yield takeLatest(FETCH_RECEIVING_LIST.REQUEST, fetchReceivingListSaga);
   yield takeLatest(CREATE_RECEIVING.REQUEST, createReceivingSaga);
   yield takeLatest(UPDATE_RECEIVING.REQUEST, updateReceivingSaga);

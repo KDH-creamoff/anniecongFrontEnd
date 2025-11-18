@@ -76,6 +76,10 @@ apiClient.interceptors.response.use(
 // 1. Label API (라벨)
 // ============================================
 export const labelAPI = {
+  getAllLabels: async () => {
+    const response = await apiClient.get('/label/templates');
+    return response;
+  },
   getPrinters: async () => {
     const response = await axios.get('http://localhost:4310/printers');
     return response;
