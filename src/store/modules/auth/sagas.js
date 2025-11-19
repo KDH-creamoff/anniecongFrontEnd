@@ -43,8 +43,38 @@ function* loginSaga(action) {
     // UserProfile 중첩 객체 평탄화
     // role_id는 profile.role_id 또는 profile.role에서 가져올 수 있음
     const roleId = profile.role_id || userData?.role_id || profile.role || userData?.role || null;
-    // permissions는 Role 객체에서 가져올 수 있음 (나중에 Role 정보를 조회해서 매핑)
-    const permissions = userData?.permissions || profile?.permissions || userData?.profile?.permissions || null;
+    
+    // Role 정보를 가져와서 permissions 매핑
+    let permissions = null;
+    if (roleId) {
+      try {
+        const roleResponse = yield call(roleAPI.getRoleById, roleId);
+        const role = roleResponse.data?.data || roleResponse.data;
+        if (role) {
+          // 백엔드 Role 권한 필드를 프론트엔드 permissions 객체로 변환
+          permissions = {
+            basic: role.can_basic_info || false,
+            receiving: role.can_receiving || false,
+            manufacturing: role.can_plant1_preprocess || role.can_plant_transfer || role.can_plant2_manufacture || false,
+            inventory: role.can_inventory || false,
+            shipping: role.can_shipping || false,
+            label: role.can_label || false,
+            quality: role.can_quality || false,
+            user: role.can_user_management || false,
+            dash: true, // 대시보드는 항상 허용 (백엔드 권한 없음)
+            approval: true, // 전자결재는 항상 허용 (백엔드 권한 없음)
+          };
+        }
+      } catch (roleError) {
+        console.warn('⚠️ Role 정보 조회 실패:', roleError);
+        // Role 조회 실패 시 기본값 사용
+      }
+    }
+    
+    // Role에서 가져온 permissions가 없으면 기존 방식 사용
+    if (!permissions) {
+      permissions = userData?.permissions || profile?.permissions || userData?.profile?.permissions || null;
+    }
     
     const transformedUser = {
       id: userData.id || userData.username,
@@ -124,8 +154,38 @@ function* getMeSaga() {
     // 프론트엔드 형식으로 변환 (UserProfile 중첩 객체 평탄화)
     // role_id는 profile.role_id 또는 profile.role에서 가져올 수 있음
     const roleId = profile.role_id || userData?.role_id || profile.role || userData?.role || null;
-    // permissions는 Role 객체에서 가져올 수 있음 (나중에 Role 정보를 조회해서 매핑)
-    const permissions = userData?.permissions || profile?.permissions || userData?.profile?.permissions || null;
+    
+    // Role 정보를 가져와서 permissions 매핑
+    let permissions = null;
+    if (roleId) {
+      try {
+        const roleResponse = yield call(roleAPI.getRoleById, roleId);
+        const role = roleResponse.data?.data || roleResponse.data;
+        if (role) {
+          // 백엔드 Role 권한 필드를 프론트엔드 permissions 객체로 변환
+          permissions = {
+            basic: role.can_basic_info || false,
+            receiving: role.can_receiving || false,
+            manufacturing: role.can_plant1_preprocess || role.can_plant_transfer || role.can_plant2_manufacture || false,
+            inventory: role.can_inventory || false,
+            shipping: role.can_shipping || false,
+            label: role.can_label || false,
+            quality: role.can_quality || false,
+            user: role.can_user_management || false,
+            dash: true, // 대시보드는 항상 허용 (백엔드 권한 없음)
+            approval: true, // 전자결재는 항상 허용 (백엔드 권한 없음)
+          };
+        }
+      } catch (roleError) {
+        console.warn('⚠️ Role 정보 조회 실패:', roleError);
+        // Role 조회 실패 시 기본값 사용
+      }
+    }
+    
+    // Role에서 가져온 permissions가 없으면 기존 방식 사용
+    if (!permissions) {
+      permissions = userData?.permissions || profile?.permissions || userData?.profile?.permissions || null;
+    }
     
     const transformedUser = {
       id: userData.id || userData.username,
@@ -230,84 +290,16 @@ function* changePositionSaga(action) {
  */
 function* updatePermissionsSaga(action) {
   try {
-    const { userId, roleId: providedRoleId, permissions: frontendPermissions } = action.payload;
-    console.log('🔐 권한 업데이트 요청:', { userId, providedRoleId, frontendPermissions });
-    
-    // 사용자 목록 가져오기
-    const usersState = yield select((state) => state.user.users);
-    const usersList = usersState?.data || [];
-    
-    console.log('📋 사용자 목록 상태:', { 
-      hasUsers: !!usersState, 
-      hasData: !!usersState?.data, 
-      usersCount: usersList.length,
-      allUsers: usersList.map(u => ({ 
-        id: u.id, 
-        name: u.name, 
-        roleId: u.roleId, 
-        role_id: u.role_id,
-        role: u.role 
-      }))
-    });
-    
-    // 선택한 사용자 찾기 (userId로 검색)
-    const selectedUser = usersList.find((u) => u.id === userId);
-    
-    if (!selectedUser) {
-      console.error('❌ 사용자를 찾을 수 없습니다:', { 
-        requestedUserId: userId, 
-        availableUserIds: usersList.map(u => u.id),
-        usersList: usersList.map(u => ({ id: u.id, name: u.name }))
-      });
-      throw new Error(`사용자를 찾을 수 없습니다. (userId: ${userId})`);
-    }
-    
-    console.log('✅ 선택한 사용자 찾음:', { 
-      userId: selectedUser.id, 
-      name: selectedUser.name, 
-      roleId: selectedUser.roleId,
-      role_id: selectedUser.role_id,
-      role: selectedUser.role,
-      UserProfile: selectedUser.UserProfile,
-    });
-    
-    // 현재 로그인한 사용자 정보 (혼동 방지)
-    const currentUser = yield select((state) => state.auth.user);
-    console.log('👤 현재 로그인한 사용자:', { 
-      id: currentUser?.id, 
-      name: currentUser?.name,
-      roleId: currentUser?.roleId,
-    });
-    
-    // role_id 확인: payload에서 제공된 roleId 우선, 없으면 사용자 정보에서 찾기
-    const roleId = providedRoleId || 
-                   selectedUser.roleId || 
-                   selectedUser.role_id || 
-                   selectedUser.profile_id || 
-                   selectedUser.UserProfile?.role_id || 
-                   selectedUser.profile?.role_id || 
-                   selectedUser.role || 
-                   selectedUser.UserProfile?.role;
+    const { userId, roleId, permissions: frontendPermissions } = action.payload;
     
     if (!roleId) {
-      console.error('❌ role_id를 찾을 수 없습니다:', { 
-        selectedUserId: selectedUser.id,
-        selectedUserName: selectedUser.name,
-        selectedUser: selectedUser,
-        UserProfile: selectedUser.UserProfile,
-        profile: selectedUser.profile,
-        providedRoleId
-      });
-      throw new Error(`사용자의 역할(role_id)을 찾을 수 없습니다. (userId: ${userId}, name: ${selectedUser.name})`);
+      throw new Error(`roleId가 전달되지 않았습니다. (userId: ${userId})`);
     }
     
-    console.log('✅ role_id 최종 확인:', { 
-      selectedUserId: selectedUser.id, 
-      selectedUserName: selectedUser.name, 
+    console.log('🔐 권한 업데이트 요청:', { 
+      userId, 
       roleId, 
-      providedRoleId,
-      fromUser: selectedUser.roleId || selectedUser.role_id || selectedUser.role,
-      willUpdateRoleId: roleId
+      permissionCount: Object.keys(frontendPermissions).length 
     });
     
     // 프론트엔드 권한 이름을 백엔드 권한 이름으로 매핑
@@ -351,12 +343,29 @@ function* updatePermissionsSaga(action) {
       backendPermissions.can_user_management = frontendPermissions.user;
     }
     
+    // quality → can_quality
+    if ('quality' in frontendPermissions) {
+      backendPermissions.can_quality = frontendPermissions.quality;
+    }
+    
     // dash, approval는 백엔드 권한에 없으므로 제외
     
     console.log('🔄 백엔드 권한 매핑:', { roleId, backendPermissions });
     
+    // roleId를 숫자로 변환
+    const finalRoleId = Number(roleId);
+    if (isNaN(finalRoleId)) {
+      throw new Error(`유효하지 않은 roleId입니다: ${roleId} (숫자가 아님)`);
+    }
+    
+    console.log('🚀 API 호출:', {
+      endpoint: `/api/roles/${finalRoleId}/permissions`,
+      roleId: finalRoleId,
+      userId: userId
+    });
+    
     // PUT /api/roles/:roleId/permissions 호출
-    const response = yield call(roleAPI.updatePermissions, roleId, backendPermissions);
+    const response = yield call(roleAPI.updatePermissions, finalRoleId, backendPermissions);
     console.log('✅ 권한 업데이트 응답:', response.data);
     
     // 백엔드 응답 확인
@@ -374,7 +383,7 @@ function* updatePermissionsSaga(action) {
     console.log(`✅ 권한이 업데이트되었습니다. (${permissionCount}/${totalCount} 권한 활성화)`);
     
     // 현재 사용자의 권한을 변경한 경우 getMe로 현재 사용자 정보 갱신
-    // (위에서 이미 currentUser를 선언했으므로 재사용)
+    const currentUser = yield select((state) => state.auth.user);
     if (currentUser && currentUser.id === userId) {
       yield put(getMe.request());
     }

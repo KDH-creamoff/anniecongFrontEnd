@@ -1,11 +1,13 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Plus } from 'lucide-react';
-import { createItem } from '../../store/modules/basic/actions';
+import { createItem, fetchStorageConditions } from '../../store/modules/basic/actions';
 import {
   selectItemOperation,
   selectItemOperationLoading,
   selectItemOperationError,
+  selectStorageConditions,
+  selectStorageConditionsLoading,
 } from '../../store/modules/basic/selectors';
 
 const BasicNewItem = () => {
@@ -15,6 +17,8 @@ const BasicNewItem = () => {
   const itemOperation = useSelector(selectItemOperation);
   const itemOperationLoading = useSelector(selectItemOperationLoading);
   const itemOperationError = useSelector(selectItemOperationError);
+  const storageConditions = useSelector(selectStorageConditions) || [];
+  const storageConditionsLoading = useSelector(selectStorageConditionsLoading);
 
   const [formData, setFormData] = useState({
     code: '',
@@ -22,6 +26,7 @@ const BasicNewItem = () => {
     category: '',
     factoryId: '',
     storageConditionId: '',
+    storageTemp: '', // 보관 조건 name 저장
     shelfLife: '',
     shortage: '',
     unit: '',
@@ -33,7 +38,11 @@ const BasicNewItem = () => {
     { id: 1, name: '1공장' },
     { id: 2, name: '2공장' },
   ];
-  const storageOptions = ['냉동', '냉장', '실온'];
+
+  // 컴포넌트 마운트 시 보관 조건 목록 조회
+  useEffect(() => {
+    dispatch(fetchStorageConditions.request());
+  }, [dispatch]);
 
   useEffect(() => {
     if (itemOperationError) {
@@ -42,7 +51,17 @@ const BasicNewItem = () => {
   }, [itemOperationError]);
 
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    // 보관 조건 선택 시 id와 name을 모두 저장
+    if (field === 'storageConditionId') {
+      const selectedStorage = storageConditions.find((sc) => sc.id === Number(value));
+      setFormData((prev) => ({ 
+        ...prev, 
+        storageConditionId: value,
+        storageTemp: selectedStorage?.name || '',
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
@@ -85,7 +104,8 @@ const BasicNewItem = () => {
         name: formData.name.trim(),
         category: formData.category,
         factoryId: Number(formData.factoryId),
-        storageConditionId: formData.storageConditionId,
+        storage_condition_id: Number(formData.storageConditionId), // 보관 조건 id
+        storage_temp: formData.storageTemp, // 보관 조건 name
         shelfLife: Number(formData.shelfLife),
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
@@ -102,6 +122,7 @@ const BasicNewItem = () => {
         category: '',
         factoryId: '',
         storageConditionId: '',
+        storageTemp: '',
         shelfLife: '',
         shortage: '',
         unit: '',
@@ -127,14 +148,18 @@ const BasicNewItem = () => {
     return (
       <>
         <option value="" disabled hidden>보관조건 선택</option>
-        {storageOptions.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {storageConditionsLoading ? (
+          <option value="" disabled>불러오는 중...</option>
+        ) : (
+          storageConditions.map((condition) => (
+            <option key={condition.id} value={condition.id}>
+              {condition.name || condition.title || '-'}
+            </option>
+          ))
+        )}
       </>
     );
-  }, [storageOptions]);
+  }, [storageConditions, storageConditionsLoading]);
 
   return (
     <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">

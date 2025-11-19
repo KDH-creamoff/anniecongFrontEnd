@@ -156,7 +156,7 @@ let mockItems = [
 function* fetchItemsSaga(action) {
   try {
     const response = yield call(itemsAPI.getItems, action.payload);
-    
+    console.log('fetchItemsSaga response:', response.data);
     // 백엔드 응답 형식: { ok: true, data: [...] }
     const items = response.data?.data || response.data || [];
     const itemsArray = Array.isArray(items) ? items : [];

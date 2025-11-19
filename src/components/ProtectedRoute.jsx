@@ -24,11 +24,6 @@ const ProtectedRoute = ({ permission, children }) => {
     return children;
   }
 
-  // 대표는 모든 권한 허용
-  if (user.position === '대표') {
-    return children;
-  }
-
   // permissions 객체가 없는 경우 - 접근 거부
   if (!user.permissions || typeof user.permissions !== 'object') {
     console.error('❌ ProtectedRoute: permissions 정보가 없습니다. 접근을 거부합니다.', {

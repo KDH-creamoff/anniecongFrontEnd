@@ -62,7 +62,7 @@ const BasicItemList = () => {
       category: item.category,
       factoryId: item.factoryId || item.Factory?.id || '',
       storageConditionId: item.storageConditionId || item.StorageCondition?.name || '',
-      shelfLife: item.shelfLife || item.shelf_life || '',
+      shelfLife: item.expiration_date || item.shelfLife || item.shelf_life || '',
       wholesalePrice: item.wholesalePrice ?? item.wholesale_price ?? '',
       unit: item.unit,
     });
@@ -257,7 +257,7 @@ const BasicItemList = () => {
                           disabled={itemOperationLoading}
                         />
                       ) : (
-                        item.shelfLife || item.shelf_life || '-'
+                        item.expiration_date || item.shelfLife || item.shelf_life || '-'
                       )}
                     </td>
                     {/* 도매가 */}
