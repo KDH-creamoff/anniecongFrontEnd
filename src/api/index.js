@@ -52,7 +52,14 @@ apiClient.interceptors.response.use(
       console.error(`❌ API 오류 [${status}]:`, message);
       if (status === 401) {
         console.warn('⚠️ 인증이 만료되었습니다. 로그인 페이지로 이동합니다.');
-        window.location.href = '/login';
+        // localStorage 초기화
+        // 세션 기반 인증: 쿠키는 백엔드에서 제거됨
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('users'); // 임시 데이터 정리
+        // 로그인 페이지로 강제 리다이렉트
+        if (window.location.pathname !== '/login') {
+          window.location.replace('/login');
+        }
       }
       if (status === 403) {
         console.error('❌ 접근 권한이 없습니다.');
@@ -174,6 +181,54 @@ export const authAPI = {
   },
   signup: async (data) => {
     return authAPI.join(data);
+  },
+  changePassword: async (data) => {
+    // 비밀번호 변경은 사용자 정보 수정 API를 통해 처리
+    // 현재 사용자 ID를 알아야 하므로, data에 userId가 포함되어야 함
+    const { userId, newPassword } = data;
+    const response = await apiClient.put(`/auth/${userId}`, { password: newPassword });
+    return response;
+  },
+};
+
+// ============================================
+// 3-1. Role API (역할/권한 관리)
+// ============================================
+export const roleAPI = {
+  // 모든 역할 목록 조회
+  getAllRoles: async () => {
+    const response = await apiClient.get('/roles');
+    return response;
+  },
+  // 역할 상세 조회
+  getRoleById: async (id) => {
+    const response = await apiClient.get(`/roles/${id}`);
+    return response;
+  },
+  // 역할 생성
+  createRole: async (data) => {
+    const response = await apiClient.post('/roles', data);
+    return response;
+  },
+  // 역할 수정
+  updateRole: async (id, data) => {
+    const response = await apiClient.put(`/roles/${id}`, data);
+    return response;
+  },
+  // 역할 삭제
+  deleteRole: async (id) => {
+    const response = await apiClient.delete(`/roles/${id}`);
+    return response;
+  },
+  // 권한 단일 업데이트
+  updatePermission: async (roleId, permissionName, value) => {
+    const response = await apiClient.put(`/roles/${roleId}/permissions/${permissionName}`, { value });
+    return response;
+  },
+  // 권한 일괄 업데이트
+  updatePermissions: async (roleId, permissions) => {
+    const response = await apiClient.put(`/roles/${roleId}/permissions`, permissions);
+    return response;
   },
 };
 
@@ -412,6 +467,16 @@ export const storageConditionsAPI = {
   },
   deleteStorageCondition: async (id) => {
     const response = await apiClient.delete(`/storage-conditions/${id}`);
+    return response;
+  },
+};
+
+// ============================================
+// 16. Processes API (프로세스)
+// ============================================
+export const processesAPI = {
+  getProcesses: async () => {
+    const response = await apiClient.get('/processes');
     return response;
   },
 };

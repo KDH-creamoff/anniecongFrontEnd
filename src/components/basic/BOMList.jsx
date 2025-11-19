@@ -1,17 +1,37 @@
 import { useEffect, useMemo, useState, Fragment } from 'react';
 import { Package, Edit, Trash2, Search, Save, X } from 'lucide-react';
 import Pagination from '../common/Pagination';
-import { useDispatch } from 'react-redux';
-import { updateBom } from '../../store/modules/basic/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBomById, updateBom } from '../../store/modules/basic/actions';
 import { rawMaterialMaster } from '../../data/rawMaterialMaster';
 
 const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch, onExpand }) => {
   const dispatch = useDispatch();
+  const bomDetail = useSelector((state) => state.basic.bomDetail.data);
+  const bomDetailLoading = useSelector((state) => state.basic.bomDetail.loading);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm]   = useState('');
   const [selectedBOM, setSelectedBOM] = useState(null);
   const [editingBOM, setEditingBOM] = useState(null); // 수정 중인 BOM
   const itemsPerPage = 10;
+
+  // bomDetail이 변경되면 selectedBOM 업데이트
+  useEffect(() => {
+    if (bomDetail && selectedBOM?._loading) {
+      const materials = bomDetail.components || bomDetail.materials || [];
+      setSelectedBOM({ 
+        ...bomDetail, 
+        _loading: false,
+        materials: materials.map((c) => ({
+          id: c.id,
+          code: c.item?.code || c.itemCode || c.code,
+          name: c.item?.name || c.name,
+          amount: c.quantity || c.amount,
+          unit: c.unit,
+        }))
+      });
+    }
+  }, [bomDetail, selectedBOM]);
 
   useEffect(() => {
     const t = setTimeout(() => { onSearch && onSearch(searchTerm); }, 300);
@@ -48,12 +68,8 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
       return;
     }
     setSelectedBOM({ ...row, _loading: true, materials: [] });
-    try {
-      const detail = await onExpand?.(row.id);
-      setSelectedBOM({ ...(detail || row), _loading: false });
-    } catch {
-      setSelectedBOM({ ...row, _loading: false, materials: [] });
-    }
+    // Redux Saga를 통해 BOM 상세 정보 조회
+    dispatch(fetchBomById.request(row.id));
   };
 
   // 수정 버튼 클릭
@@ -219,7 +235,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                               {editingBOM?.id === bom.id ? '원재료 수정' : '등록된 원재료 목록'}
                             </h3>
 
-                            {selectedBOM?._loading ? (
+                            {selectedBOM?._loading || bomDetailLoading ? (
                               <div className="p-3 text-xs text-gray-500">상세 불러오는 중…</div>
                             ) : editingBOM?.id === bom.id ? (
                               <div className="overflow-x-auto">

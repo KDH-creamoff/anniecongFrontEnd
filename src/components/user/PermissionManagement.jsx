@@ -1,17 +1,37 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from 'lucide-react';
-import { updatePermissions } from '../../store/modules/auth/actions';
+import { updatePermissions, clearAuthError } from '../../store/modules/auth/actions';
 import { fetchUsers } from '../../store/modules/user/actions';
 
 const PermissionManagement = () => {
   const dispatch = useDispatch();
   const { users: userState } = useSelector((state) => state.user);
+  const { loading: updateLoading, error: updateError } = useSelector((state) => state.auth);
 
   useEffect(() => {
     // Redux를 통해 사용자 데이터 가져오기
     dispatch(fetchUsers.request());
   }, [dispatch]);
+
+  // 권한 업데이트 성공/실패 처리
+  const prevUpdateLoading = useRef(updateLoading);
+  
+  useEffect(() => {
+    // 이전에 로딩 중이었다가 완료된 경우
+    if (prevUpdateLoading.current && !updateLoading) {
+      if (updateError) {
+        // 에러 발생
+        console.error('권한 업데이트 에러:', updateError);
+        alert(`권한 업데이트 실패: ${updateError}`);
+      } else {
+        // 성공
+        console.log('✅ 권한 업데이트 성공');
+        // 목록은 saga에서 자동으로 새로고침됨
+      }
+    }
+    prevUpdateLoading.current = updateLoading;
+  }, [updateLoading, updateError]);
 
   const users = userState.data || [];
 
@@ -35,8 +55,28 @@ const PermissionManagement = () => {
 
   // 권한 토글 핸들러
   const handlePermissionToggle = (userId, permissionKey) => {
+    console.log('🔄 권한 토글 시작:', { userId, permissionKey, usersCount: users.length });
+    
+    // 선택한 사용자 찾기
     const user = users.find((u) => u.id === userId);
-    if (!user) return;
+    if (!user) {
+      console.error('❌ 사용자를 찾을 수 없습니다:', { 
+        userId, 
+        availableUserIds: users.map(u => ({ id: u.id, name: u.name })),
+        users 
+      });
+      alert(`사용자를 찾을 수 없습니다. (userId: ${userId})`);
+      return;
+    }
+
+    console.log('✅ 선택한 사용자 확인:', { 
+      userId: user.id, 
+      userName: user.name, 
+      roleId: user.roleId,
+      role_id: user.role_id,
+      role: user.role,
+      position: user.position 
+    });
 
     // 대표는 권한 변경 불가
     if (user.position === '대표') {
@@ -44,34 +84,73 @@ const PermissionManagement = () => {
       return;
     }
 
-    const updatedPermissions = {
-      ...user.permissions,
-      [permissionKey]: !user.permissions[permissionKey],
+    // roleId 확인
+    const roleId = user.roleId || user.role_id || user.role;
+    if (!roleId) {
+      console.error('❌ roleId를 찾을 수 없습니다:', user);
+      alert(`사용자의 역할(role_id)을 찾을 수 없습니다. (userId: ${userId}, name: ${user.name})`);
+      return;
+    }
+
+    // 업데이트 중이면 무시
+    if (updateLoading) {
+      console.log('권한 업데이트 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+
+    // 이전 에러 초기화
+    if (updateError) {
+      dispatch(clearAuthError());
+    }
+
+    // 권한이 없으면 기본값 설정
+    const currentPermissions = user.permissions || {
+      dash: false,
+      basic: false,
+      receiving: false,
+      manufacturing: false,
+      inventory: false,
+      shipping: false,
+      approval: false,
+      label: false,
+      user: false,
     };
 
-    // Redux를 통해 권한 업데이트
+    const updatedPermissions = {
+      ...currentPermissions,
+      [permissionKey]: !currentPermissions[permissionKey],
+    };
+
+    console.log('🔄 권한 토글 정보:', {
+      selectedUserId: userId,
+      selectedUserName: user.name,
+      selectedUserRoleId: roleId,
+      permissionKey,
+      currentValue: currentPermissions[permissionKey],
+      newValue: updatedPermissions[permissionKey],
+      allPermissions: updatedPermissions,
+    });
+
+    // Redux를 통해 권한 업데이트 (선택한 사용자의 userId와 roleId 전달)
     dispatch(updatePermissions.request({
-      userId: userId,
+      userId: userId, // 선택한 사용자의 ID
+      roleId: roleId, // 선택한 사용자의 roleId (명시적으로 전달)
       permissions: updatedPermissions,
     }));
-
-    // 권한 업데이트 후 목록 다시 조회
-    setTimeout(() => {
-      dispatch(fetchUsers.request());
-    }, 500);
   };
 
   // 권한 항목 컴포넌트
-  const PermissionItem = ({ title, isEnabled, onToggle }) => (
+  const PermissionItem = ({ title, isEnabled, onToggle, disabled }) => (
     <div className='flex items-center justify-between py-4 px-6 bg-gray-50 rounded-lg'>
       <div>
         <div className='font-medium text-gray-900'>{title}</div>
       </div>
       <button
         onClick={onToggle}
+        disabled={disabled || updateLoading}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#674529] focus:ring-offset-2 ${
           isEnabled ? 'bg-[#674529]' : 'bg-gray-300'
-        }`}
+        } ${disabled || updateLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         <span
           className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -119,26 +198,31 @@ const PermissionManagement = () => {
                 title='대시보드'
                 isEnabled={permissions.dash}
                 onToggle={() => handlePermissionToggle(user.id, 'dash')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='기초정보 관리'
                 isEnabled={permissions.basic}
                 onToggle={() => handlePermissionToggle(user.id, 'basic')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='입고 관리'
                 isEnabled={permissions.receiving}
                 onToggle={() => handlePermissionToggle(user.id, 'receiving')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='제조 관리'
                 isEnabled={permissions.manufacturing}
                 onToggle={() => handlePermissionToggle(user.id, 'manufacturing')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='재고 관리'
                 isEnabled={permissions.inventory}
                 onToggle={() => handlePermissionToggle(user.id, 'inventory')}
+                disabled={updateLoading}
               />
             </div>
 
@@ -148,21 +232,25 @@ const PermissionManagement = () => {
                 title='배송 관리'
                 isEnabled={permissions.shipping}
                 onToggle={() => handlePermissionToggle(user.id, 'shipping')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='전자결재'
                 isEnabled={permissions.approval}
                 onToggle={() => handlePermissionToggle(user.id, 'approval')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='라벨 관리'
                 isEnabled={permissions.label}
                 onToggle={() => handlePermissionToggle(user.id, 'label')}
+                disabled={updateLoading}
               />
               <PermissionItem
                 title='사용자 관리'
                 isEnabled={permissions.user}
                 onToggle={() => handlePermissionToggle(user.id, 'user')}
+                disabled={updateLoading}
               />
             </div>
           </div>

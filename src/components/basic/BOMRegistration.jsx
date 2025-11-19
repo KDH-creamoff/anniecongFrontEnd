@@ -1,8 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Trash2, X, Check } from 'lucide-react';
-import { rawMaterialMaster } from '../../data/rawMaterialMaster';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchItems } from '../../store/modules/basic/actions';
 
 const BOMRegistration = ({ onSave }) => {
+  const dispatch = useDispatch();
+  
+  // Redux에서 아이템 목록 가져오기
+  const { data: items, loading: itemsLoading } = useSelector((state) => state.basic.items);
+  
+  // 원재료/반재료만 필터링
+  const rawAndSemiMaterials = (items || []).filter(
+    (item) => item.category === '원재료' || item.category === '반재료'
+  );
+
+  // 컴포넌트 마운트 시 아이템 목록 조회
+  useEffect(() => {
+    dispatch(fetchItems.request({ category: '' })); // 전체 카테고리 조회
+  }, [dispatch]);
 
   // BOM 등록용 상태
   const [currentBOMName, setCurrentBOMName] = useState('');
@@ -25,13 +40,14 @@ const BOMRegistration = ({ onSave }) => {
   };
 
   // 원재료 선택 시
-  const handleMaterialChange = (selectedName) => {
-    const material = rawMaterialMaster.find((m) => m.name === selectedName);
+  const handleMaterialChange = (selectedCode) => {
+    const material = rawAndSemiMaterials.find((m) => m.code === selectedCode);
     if (material && newMaterial) {
       setNewMaterial({
         ...newMaterial,
         code: material.code,
         name: material.name,
+        unit: material.unit || 'g', // 아이템의 단위 사용, 없으면 기본값
       });
     }
   };
@@ -182,17 +198,21 @@ const BOMRegistration = ({ onSave }) => {
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>
                   <select
-                    value={newMaterial.name}
+                    value={newMaterial.code}
                     onChange={(e) => handleMaterialChange(e.target.value)}
                     className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    disabled={itemsLoading}
                   >
-                    <option value=''>원재료 선택</option>
-                    {rawMaterialMaster.map((material) => (
-                      <option key={material.code} value={material.name}>
-                        {material.name}
+                    <option value=''>원재료/반재료 선택</option>
+                    {rawAndSemiMaterials.map((material) => (
+                      <option key={material.code} value={material.code}>
+                        [{material.category}] {material.name} ({material.code})
                       </option>
                     ))}
                   </select>
+                  {itemsLoading && (
+                    <span className='text-xs text-gray-500'>로딩 중...</span>
+                  )}
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>
                   <input

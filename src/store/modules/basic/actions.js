@@ -17,6 +17,10 @@ export const CREATE_FACTORY = createRequestTypes('basic/CREATE_FACTORY');
 export const UPDATE_FACTORY = createRequestTypes('basic/UPDATE_FACTORY');
 export const DELETE_FACTORY = createRequestTypes('basic/DELETE_FACTORY');
 
+// 프로세스 관리
+export const FETCH_PROCESSES = createRequestTypes('basic/FETCH_PROCESSES');
+export const ADD_FACTORY_PROCESSES = createRequestTypes('basic/ADD_FACTORY_PROCESSES');
+
 // BOM 관리
 export const FETCH_BOMS = createRequestTypes('basic/FETCH_BOMS');
 export const FETCH_BOM_BY_ID = createRequestTypes('basic/FETCH_BOM_BY_ID');
@@ -66,6 +70,10 @@ export const fetchFactoryById = createAsyncActions(FETCH_FACTORY_BY_ID);
 export const createFactory = createAsyncActions(CREATE_FACTORY);
 export const updateFactory = createAsyncActions(UPDATE_FACTORY);
 export const deleteFactory = createAsyncActions(DELETE_FACTORY);
+
+// 프로세스 관리
+export const fetchProcesses = createAsyncActions(FETCH_PROCESSES);
+export const addFactoryProcesses = createAsyncActions(ADD_FACTORY_PROCESSES);
 
 // UI 액션 생성자
 export const setBasicFilter = (filter) => ({

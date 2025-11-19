@@ -1,5 +1,5 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { itemsAPI, bomsAPI, factoriesAPI, storageConditionsAPI } from '../../../api';
+import { itemsAPI, bomsAPI, factoriesAPI, storageConditionsAPI, processesAPI } from '../../../api';
 import {
   FETCH_ITEMS,
   FETCH_ITEM_BY_ID,
@@ -22,6 +22,8 @@ import {
   CREATE_FACTORY,
   UPDATE_FACTORY,
   DELETE_FACTORY,
+  FETCH_PROCESSES,
+  ADD_FACTORY_PROCESSES,
   fetchItems,
   fetchItemById,
   fetchItemByCode,
@@ -43,6 +45,8 @@ import {
   createFactory,
   updateFactory,
   deleteFactory,
+  fetchProcesses,
+  addFactoryProcesses,
 } from './actions';
 
 // ==================== 목데이터 ====================
@@ -623,6 +627,40 @@ function* deleteFactorySaga(action) {
   }
 }
 
+// ==================== 프로세스 관리 Saga ====================
+function* fetchProcessesSaga() {
+  try {
+    const response = yield call(processesAPI.getProcesses);
+    
+    // 백엔드 응답 형식: { ok: true, data: [...] }
+    const processes = response.data?.data || response.data || [];
+    const processesArray = Array.isArray(processes) ? processes : [];
+    
+    yield put(fetchProcesses.success(processesArray));
+  } catch (error) {
+    yield put(fetchProcesses.failure(error.response?.data?.message || '프로세스 목록을 불러오는데 실패했습니다.'));
+  }
+}
+
+function* addFactoryProcessesSaga(action) {
+  try {
+    const { factoryId, processIds } = action.payload;
+    
+    // 백엔드 API 형식: POST /api/factories/:id/processes { processIds: [...] }
+    const response = yield call(factoriesAPI.addProcesses, factoryId, { processIds });
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedFactory = response.data?.data || response.data;
+    
+    yield put(addFactoryProcesses.success(updatedFactory));
+    
+    // 공장 목록 새로고침
+    yield put(fetchFactories.request());
+  } catch (error) {
+    yield put(addFactoryProcesses.failure(error.response?.data?.message || '공정 추가에 실패했습니다.'));
+  }
+}
+
 export default function* basicSaga() {
   yield takeLatest(FETCH_ITEMS.REQUEST, fetchItemsSaga);
   yield takeLatest(FETCH_ITEM_BY_ID.REQUEST, fetchItemByIdSaga);
@@ -645,4 +683,6 @@ export default function* basicSaga() {
   yield takeLatest(CREATE_FACTORY.REQUEST, createFactorySaga);
   yield takeLatest(UPDATE_FACTORY.REQUEST, updateFactorySaga);
   yield takeLatest(DELETE_FACTORY.REQUEST, deleteFactorySaga);
+  yield takeLatest(FETCH_PROCESSES.REQUEST, fetchProcessesSaga);
+  yield takeLatest(ADD_FACTORY_PROCESSES.REQUEST, addFactoryProcessesSaga);
 }

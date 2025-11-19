@@ -20,6 +20,8 @@ import {
   CREATE_FACTORY,
   UPDATE_FACTORY,
   DELETE_FACTORY,
+  FETCH_PROCESSES,
+  ADD_FACTORY_PROCESSES,
   SET_BASIC_FILTER,
   CLEAR_BASIC_ERROR,
   RESET_BASIC_STATE,
@@ -39,6 +41,8 @@ const initialState = {
   factories: createAsyncState([]),
   factoryDetail: createAsyncState(null),
   factoryOperation: createAsyncState(null),
+  processes: createAsyncState([]),
+  factoryProcessOperation: createAsyncState(null),
   filter: {
     category: '',
     factoryId: '',
@@ -241,6 +245,31 @@ const basicReducer = (state = initialState, action) => {
     case DELETE_FACTORY.FAILURE:
       return { ...state, factoryOperation: { ...state.factoryOperation, loading: false, error: action.error } };
 
+    // 프로세스 목록 조회
+    case FETCH_PROCESSES.REQUEST:
+      return { ...state, processes: { ...state.processes, loading: true, error: null } };
+    case FETCH_PROCESSES.SUCCESS:
+      return { ...state, processes: { data: action.payload, loading: false, error: null } };
+    case FETCH_PROCESSES.FAILURE:
+      return { ...state, processes: { ...state.processes, loading: false, error: action.error } };
+
+    // 공장에 공정 추가
+    case ADD_FACTORY_PROCESSES.REQUEST:
+      return { ...state, factoryProcessOperation: { ...state.factoryProcessOperation, loading: true, error: null } };
+    case ADD_FACTORY_PROCESSES.SUCCESS:
+      return {
+        ...state,
+        factories: {
+          ...state.factories,
+          data: state.factories.data.map((factory) =>
+            factory.id === action.payload.id ? action.payload : factory
+          ),
+        },
+        factoryProcessOperation: { data: action.payload, loading: false, error: null }
+      };
+    case ADD_FACTORY_PROCESSES.FAILURE:
+      return { ...state, factoryProcessOperation: { ...state.factoryProcessOperation, loading: false, error: action.error } };
+
     // UI 상태 관리
     case SET_BASIC_FILTER:
       return { ...state, filter: { ...state.filter, ...action.payload } };
@@ -260,6 +289,8 @@ const basicReducer = (state = initialState, action) => {
         factories: { ...state.factories, error: null },
         factoryDetail: { ...state.factoryDetail, error: null },
         factoryOperation: { ...state.factoryOperation, error: null },
+        processes: { ...state.processes, error: null },
+        factoryProcessOperation: { ...state.factoryProcessOperation, error: null },
       };
 
     case RESET_BASIC_STATE:

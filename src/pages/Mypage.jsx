@@ -52,15 +52,24 @@ const Mypage = () => {
     }
   }, [user]);
 
-  // 에러 처리
+  // 에러 처리 - 401 에러 시 로그인 페이지로 리다이렉트
   useEffect(() => {
     if (error) {
-      if (error.includes("401") || error.includes("인증")) {
+      const errorString = String(error);
+      // 401 에러 또는 인증 관련 에러인 경우
+      if (errorString.includes("401") || errorString.includes("인증") || errorString.includes("Unauthorized") || errorString.includes("인증이")) {
+        console.log('⚠️ Mypage: 401 에러 감지, 로그인 페이지로 리다이렉트', error);
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        navigate("/login");
+        // localStorage 초기화
+        // 세션 기반 인증: 쿠키는 백엔드에서 제거됨
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('users'); // 임시 데이터 정리
+        // 로그인 페이지로 강제 리다이렉트
+        window.location.replace('/login');
+        return;
       }
     }
-  }, [error, navigate]);
+  }, [error]);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
