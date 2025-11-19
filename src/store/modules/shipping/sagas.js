@@ -1,6 +1,5 @@
-import { /* call, */ put, takeLatest, delay } from 'redux-saga/effects';
-// import { shippingAPI } from '../../../api'; // TODO: 백엔드 준비 시 주석 해제 및 call import 활성화
-// API: /api/shipping/* (배송 관리 전용)
+import { call, put, takeLatest, delay } from 'redux-saga/effects';
+import { shippingAPI } from '../../../api';
 import {
   FETCH_SHIPPING_LIST,
   CREATE_SHIPPING,
@@ -17,100 +16,6 @@ import {
   fetchB2BShippings,
   fetchBC2Shippings,
 } from './actions';
-
-// 배송 목록 목데이터
-let mockShippingList = [
-  {
-    id: 1,
-    orderNumber: 'SHP-20251112-001',
-    orderDate: '2025-11-12',
-    product: '애니콩 프리미엄 오가닉 쿠키 초코칩 500g 대용량 패밀리팩',
-    productCode: 'PROD-001',
-    receiver: '김민수',
-    phone: '010-1234-5678',
-    postalCode: '06234',
-    address: '서울특별시 강남구 테헤란로 123 456호',
-    deliveryMessage: '문 앞에 놓아주세요. 부재시 경비실에 맡겨주시면 감사하겠습니다.',
-    quantity: 5,
-    unit: 'box',
-    status: '배송대기',
-    carrier: null,
-    trackingNumber: null,
-  },
-  {
-    id: 2,
-    orderNumber: 'SHP-20251111-002',
-    orderDate: '2025-11-11',
-    product: '애니콩 바닐라 쿠키',
-    productCode: 'PROD-002',
-    receiver: '이영희',
-    phone: '010-2345-6789',
-    postalCode: '13579',
-    address: '경기도 성남시 분당구 판교역로 235 1층',
-    deliveryMessage: '배송 전 연락 부탁드립니다',
-    quantity: 10,
-    unit: 'box',
-    status: '배송중',
-    carrier: 'CJ대한통운',
-    trackingNumber: '123456789012',
-    shippedDate: '2025-11-11',
-  },
-  {
-    id: 3,
-    orderNumber: 'SHP-20251110-003',
-    orderDate: '2025-11-10',
-    product: '애니콩 딸기 케이크 프리미엄 애디션 2kg 선물용 특별 포장',
-    productCode: 'PROD-003',
-    receiver: '박철수',
-    phone: '010-3456-7890',
-    postalCode: '12345',
-    address: '서울특별시 송파구 올림픽로 300 롯데월드타워 88층 스카이라운지',
-    deliveryMessage: '-',
-    quantity: 3,
-    unit: 'box',
-    status: '배송완료',
-    carrier: '한진택배',
-    trackingNumber: '987654321098',
-    shippedDate: '2025-11-10',
-    deliveredDate: '2025-11-11',
-  },
-  {
-    id: 4,
-    orderNumber: 'SHP-20251110-004',
-    orderDate: '2025-11-10',
-    product: '애니콩 초코 브라우니',
-    productCode: 'PROD-004',
-    receiver: '최지민',
-    phone: '010-4567-8901',
-    postalCode: '54321',
-    address: '부산광역시 해운대구 해운대해변로 264 3층 2002호',
-    deliveryMessage: '경비실 보관 불가능합니다. 반드시 직접 전달 부탁드려요.',
-    quantity: 7,
-    unit: 'box',
-    status: '배송대기',
-    carrier: null,
-    trackingNumber: null,
-  },
-  {
-    id: 5,
-    orderNumber: 'SHP-20251109-005',
-    orderDate: '2025-11-09',
-    product: '애니콩 마카롱 세트',
-    productCode: 'PROD-005',
-    receiver: '강서연',
-    phone: '010-5678-9012',
-    postalCode: '98765',
-    address: '인천광역시 중구 공항로 272',
-    deliveryMessage: '빠른 배송 부탁드립니다',
-    quantity: 2,
-    unit: 'box',
-    status: '배송완료',
-    carrier: '로젠택배',
-    trackingNumber: '456789123456',
-    shippedDate: '2025-11-09',
-    deliveredDate: '2025-11-10',
-  },
-];
 
 // B2B 배송 목록 (대량 거래처 배송)
 const mockB2BShippings = [
@@ -155,6 +60,69 @@ const mockB2BShippings = [
     contractNumber: 'CT-2025-002',
     shippedDate: '2025-11-11',
   },
+  {
+    id: 103,
+    orderNumber: 'B2B-20251110-003',
+    orderDate: '2025-11-10',
+    issueType: 'B2B',
+    product: '애니콩 초코칩 쿠키 벌크',
+    productCode: 'PROD-B2B-003',
+    receiver: '대형마트 본사 물류센터',
+    contact: '담당자: 박과장',
+    phone: '02-9876-5432',
+    postalCode: '13494',
+    address: '경기도 성남시 분당구 황새울로 200',
+    deliveryMessage: '납품 계약서 동봉 필수',
+    quantity: 300,
+    unit: 'box',
+    status: '배송완료',
+    carrier: '한진택배',
+    trackingNumber: 'B2B987654321',
+    contractNumber: 'CT-2025-003',
+    shippedDate: '2025-11-10',
+    deliveredDate: '2025-11-11',
+  },
+  {
+    id: 104,
+    orderNumber: 'B2B-20251109-004',
+    orderDate: '2025-11-09',
+    issueType: 'B2B',
+    product: '프리미엄 수제 쿠키 믹스',
+    productCode: 'PROD-B2B-004',
+    receiver: '베이커리 체인점 본사',
+    contact: '담당자: 최대리',
+    phone: '042-123-4567',
+    postalCode: '34126',
+    address: '대전광역시 유성구 테크노2로 187',
+    deliveryMessage: '베이커리 센터 뒷문으로 입고',
+    quantity: 180,
+    unit: 'box',
+    status: '배송중',
+    carrier: '로젠택배',
+    trackingNumber: 'B2B555666777',
+    contractNumber: 'CT-2025-004',
+    shippedDate: '2025-11-09',
+  },
+  {
+    id: 105,
+    orderNumber: 'B2B-20251108-005',
+    orderDate: '2025-11-08',
+    issueType: 'B2B',
+    product: '애니콩 건강 간식 패키지',
+    productCode: 'PROD-B2B-005',
+    receiver: '펫샵 프랜차이즈 본사',
+    contact: '담당자: 정차장',
+    phone: '051-234-5678',
+    postalCode: '48058',
+    address: '부산광역시 해운대구 센텀중앙로 78',
+    deliveryMessage: '재고 관리팀 직접 인수',
+    quantity: 250,
+    unit: 'box',
+    status: '배송대기',
+    carrier: null,
+    trackingNumber: null,
+    contractNumber: 'CT-2025-005',
+  },
 ];
 
 // BC2 배송 목록 
@@ -193,6 +161,58 @@ const mockBC2Shippings = [
     scheduledDate: '2025-11-11',
     completedDate: '2025-11-11',
     deliveryMessage: '',
+  },
+  {
+    id: 203,
+    orderNumber: 'BC2-20251110-003',
+    orderDate: '2025-11-10',
+    issueType: 'BC2',
+    product: '원재료 - 유기농 밀가루',
+    productCode: 'RAW-005',
+    fromFactory: '1공장 (의성)',
+    toFactory: '2공장 (상주)',
+    quantity: 1200,
+    unit: 'kg',
+    status: '운송중',
+    driver: '이기사',
+    vehicleNumber: '34나5678',
+    scheduledDate: '2025-11-10',
+    deliveryMessage: '긴급 생산 건',
+  },
+  {
+    id: 204,
+    orderNumber: 'BC2-20251109-004',
+    orderDate: '2025-11-09',
+    issueType: 'BC2',
+    product: '반제품 - 초코칩 도우',
+    productCode: 'SEMI-002',
+    fromFactory: '2공장 (상주)',
+    toFactory: '1공장 (의성)',
+    quantity: 600,
+    unit: 'kg',
+    status: '운송완료',
+    driver: '박기사',
+    vehicleNumber: '56다7890',
+    scheduledDate: '2025-11-09',
+    completedDate: '2025-11-09',
+    deliveryMessage: '역방향 이동',
+  },
+  {
+    id: 205,
+    orderNumber: 'BC2-20251108-005',
+    orderDate: '2025-11-08',
+    issueType: 'BC2',
+    product: '원재료 - 고구마',
+    productCode: 'RAW-012',
+    fromFactory: '1공장 (의성)',
+    toFactory: '2공장 (상주)',
+    quantity: 950,
+    unit: 'kg',
+    status: '운송대기',
+    driver: null,
+    vehicleNumber: null,
+    scheduledDate: '2025-11-13',
+    deliveryMessage: '냉장 보관 필수',
   },
 ];
 
@@ -301,7 +321,7 @@ function* confirmShippingSaga(action) {
 }
 
 // B2B 배송 목록 조회
-function* fetchB2BShippingsSaga(/* action */) {
+function* fetchB2BShippingsSaga(action) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(shippingAPI.getOrders, { ...action.payload, issueType: 'B2B' });
@@ -316,7 +336,7 @@ function* fetchB2BShippingsSaga(/* action */) {
 }
 
 // BC2 공장간 운송 목록 조회
-function* fetchBC2ShippingsSaga(/* action */) {
+function* fetchBC2ShippingsSaga(action) {
   try {
     // TODO: 백엔드 준비 시 아래 코드로 교체
     // const response = yield call(shippingAPI.getOrders, { ...action.payload, issueType: 'BC2' });

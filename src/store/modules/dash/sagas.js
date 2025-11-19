@@ -190,13 +190,7 @@ const mockAPI = {
 
 function* getManufacturingStatsSaga() {
   try {
-    // ==================== TODO: 백엔드 준비 시 아래 주석 해제 ====================
-    // const response = yield call(dashboardAPI.getDashboard);
-    // yield put(getManufacturingStats.success(response.data));
-    // ===========================================================================
-
-    // 임시 Mock API 사용
-    const response = yield call(mockAPI.getManufacturingStats);
+    const response = yield call(dashboardAPI.getDashboard);
     yield put(getManufacturingStats.success(response.data));
 
   } catch (error) {
@@ -211,12 +205,9 @@ function* getManufacturingStatsSaga() {
  */
 function* getReceivingStatsSaga(action) {
   try {
-    // const response = yield call(dashboardAPI.getReceivingStats, action.payload);
-    // yield put(getReceivingStats.success(response.data));
-
-    // 임시 Mock API 사용
-    const response = yield call(mockAPI.getReceivingStats, action.payload);
+    const response = yield call(dashboardAPI.getReceivingStats, action.payload);
     yield put(getReceivingStats.success(response.data));
+
   } catch (error) {
     yield put(getReceivingStats.failure(
       error.response?.data?.message || '입고 통계 조회에 실패했습니다.'
@@ -229,11 +220,7 @@ function* getReceivingStatsSaga(action) {
  */
 function* getProductionStatsSaga(action) {
   try {
-    // const response = yield call(dashboardAPI.getProductionStats, action.payload);
-    // yield put(getProductionStats.success(response.data));
-
-    // 임시 Mock API 사용
-    const response = yield call(mockAPI.getProductionStats, action.payload);
+    const response = yield call(dashboardAPI.getProductionStats, action.payload);
     yield put(getProductionStats.success(response.data));
   } catch (error) {
     yield put(getProductionStats.failure(
@@ -247,7 +234,7 @@ function* getProductionStatsSaga(action) {
  */
 function* getShippingStatsSaga(action) {
   try {
-    const response = yield call(mockAPI.getShippingStats, action.payload);
+    const response = yield call(dashboardAPI.getShippingStats, action.payload);
     yield put(getShippingStats.success(response.data));
   } catch (error) {
     yield put(getShippingStats.failure(
@@ -259,9 +246,9 @@ function* getShippingStatsSaga(action) {
 /**
  * ==================== 재고 알람 목록 조회 Saga ====================
  */
-function* getInventoryAlertsSaga() {
+function* getInventoryAlertsSaga(action) {
   try {
-    const response = yield call(mockAPI.getInventoryAlerts);
+    const response = yield call(dashboardAPI.getInventoryAlerts);
     yield put(getInventoryAlerts.success(response.data));
   } catch (error) {
     yield put(getInventoryAlerts.failure(
@@ -275,7 +262,7 @@ function* getInventoryAlertsSaga() {
  */
 function* getExpiryAlertsSaga(action) {
   try {
-    const response = yield call(mockAPI.getExpiryAlerts, action.payload);
+    const response = yield call(dashboardAPI.getExpiryAlerts, action.payload);
     yield put(getExpiryAlerts.success(response.data));
   } catch (error) {
     yield put(getExpiryAlerts.failure(
@@ -287,9 +274,9 @@ function* getExpiryAlertsSaga(action) {
 /**
  * ==================== 승인 대기 목록 조회 Saga ====================
  */
-function* getPendingApprovalsSaga() {
+function* getPendingApprovalsSaga(action) {
   try {
-    const response = yield call(mockAPI.getPendingApprovals);
+    const response = yield call(dashboardAPI.getPendingApprovals, action.payload);
     yield put(getPendingApprovals.success(response.data));
   } catch (error) {
     yield put(getPendingApprovals.failure(

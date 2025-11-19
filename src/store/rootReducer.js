@@ -10,7 +10,7 @@ import manufacturingReducer from './modules/manufacturing/reducer';
 import labelReducer from './modules/label/reducer';
 import issuingReducer from './modules/issuing/reducer';
 import dashReducer from './modules/dash/reducer';
-// import shippingReducer from './modules/shipping/reducer';
+import shippingReducer from './modules/shipping/reducer';
 import approvalReducer from './modules/approval/reducer';
 
 const rootReducer = combineReducers({
@@ -24,7 +24,7 @@ const rootReducer = combineReducers({
   label: labelReducer,
   issuing: issuingReducer,
   dash: dashReducer,
-  // shipping: shippingReducer,
+  shipping: shippingReducer,
   approval: approvalReducer,
 });
 

@@ -9,6 +9,7 @@ const WorkOrderListView = () => {
   const dispatch = useDispatch();
   const [filterType, setFilterType] = useState('전체');
   const [factoryFilter, setFactoryFilter] = useState('전체');
+  const [statusFilter, setStatusFilter] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -30,11 +31,21 @@ const WorkOrderListView = () => {
   ];
 
   // 공장별 필터링
-  const filteredOrders = factoryFilter === '전체' 
-    ? allOrders 
+  let filteredOrders = factoryFilter === '전체'
+    ? allOrders
     : factoryFilter === '1공장'
     ? allOrders.filter(order => order.factoryId === 1)
     : allOrders.filter(order => order.factoryId === 2);
+
+  // 상태 필터링
+  if (statusFilter !== '전체') {
+    const statusMap = {
+      '대기': 'waiting',
+      '진행중': 'in_progress',
+      '완료': 'completed'
+    };
+    filteredOrders = filteredOrders.filter(order => order.status === statusMap[statusFilter]);
+  }
 
   // 상태별 개수 계산
   const statusCounts = {
@@ -53,42 +64,77 @@ const WorkOrderListView = () => {
   // 필터 변경 시 첫 페이지로 이동
   useEffect(() => {
     setCurrentPage(1);
-  }, [factoryFilter, filterType]);
+  }, [factoryFilter, filterType, statusFilter]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <StatusSummaryBar 
-        title="작업 지시서 관리"
-        inProgressCount={statusCounts.inProgress}
-        waitingCount={statusCounts.waiting}
-        completedCount={statusCounts.completed}
-        workerCount={3}
-      />
+      <h3 className="text-lg font-semibold text-[#674529] mb-6">작업 지시서 목록</h3>
 
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-[#674529]">작업 지시서 목록</h3>
-        <div className="flex items-center gap-4">
-          {loading && (
-            <span className="text-sm text-gray-500">로딩 중...</span>
-          )}
-          <select
-            value={factoryFilter}
-            onChange={(e) => setFactoryFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none"
-          >
-            <option value="전체">전체</option>
-            <option value="1공장">1공장</option>
-            <option value="2공장">2공장</option>
-          </select>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none"
-          >
-            <option value="전체">전체</option>
-            <option value="내 작업">내 작업</option>
-          </select>
+      {/* 필터 영역 */}
+      <div className="mb-6 space-y-4 flex flex-col md:flex-row md:items-center md:justify-evenly align-center">
+        {/* 공장 필터 */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700 min-w-[60px]">공장</span>
+          <div className="flex gap-2">
+            {['전체', '1공장', '2공장'].map((option) => (
+              <button
+                key={option}
+                onClick={() => setFactoryFilter(option)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  factoryFilter === option
+                    ? 'bg-[#674529] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* 작업 구분 필터 */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700 min-w-[60px]">작업</span>
+          <div className="flex gap-2">
+            {['전체', '내 작업'].map((option) => (
+              <button
+                key={option}
+                onClick={() => setFilterType(option)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  filterType === option
+                    ? 'bg-[#674529] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 상태 필터 */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700 min-w-[60px]">상태</span>
+          <div className="flex gap-2">
+            {['전체', '대기', '진행중', '완료'].map((option) => (
+              <button
+                key={option}
+                onClick={() => setStatusFilter(option)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    statusFilter === option
+                    ? 'bg-[#674529] text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading && (
+          <div className="text-sm text-gray-500">로딩 중...</div>
+        )}
       </div>
 
       <div className="mb-4 text-sm text-gray-600">

@@ -10,7 +10,7 @@ import manufacturingSaga from './modules/manufacturing/sagas';
 import issuingSaga from './modules/issuing/sagas';
 import dashSaga from './modules/dash/sagas';
 import receivingSaga from './modules/receiving/sagas';
-// import shippingSaga from './modules/shipping/sagas';
+import shippingSaga from './modules/shipping/sagas';
 import approvalSaga from './modules/approval/sagas';
 
 /**
@@ -28,7 +28,7 @@ export default function* rootSaga() {
     issuingSaga(),
     dashSaga(),
     receivingSaga(),
-    // shippingSaga(),
+    shippingSaga(),
     approvalSaga(),
   ]);
 }

@@ -23,6 +23,7 @@ const Manufacturing = ({ subPage }) => {
         // 1공장 전처리
         return (
           <div>
+            {/* <StatusSummaryBar /> */}
             <WorkOrderList />
           </div>
         );
@@ -44,6 +45,7 @@ const Manufacturing = ({ subPage }) => {
         // 2공장 제조
         return (
           <div>
+            {/* <StatusSummaryBar /> */}
             <Factory2OrderList />
           </div>
         );

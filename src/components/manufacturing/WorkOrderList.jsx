@@ -8,6 +8,7 @@ import StatusSummaryBar from './StatusSummaryBar';
 const WorkOrderList = () => {
   const dispatch = useDispatch();
   const [filterType, setFilterType] = useState('전체');
+  const [statusFilter, setStatusFilter] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [showCompletionModal, setShowCompletionModal] = useState(false);
@@ -18,6 +19,7 @@ const WorkOrderList = () => {
     duration: '',
     note: ''
   });
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
 
   // Redux에서 작업 지시서 목록 가져오기
   const workOrdersFromRedux = useSelector(selectWorkOrders);
@@ -29,7 +31,17 @@ const WorkOrderList = () => {
   }, [dispatch]);
 
   // 1공장 데이터만 필터링
-  const factory1Orders = (workOrdersFromRedux || []).filter(order => order.factoryId === 1);
+  let factory1Orders = (workOrdersFromRedux || []).filter(order => order.factoryId === 1);
+
+  // 상태 필터링
+  if (statusFilter !== '전체') {
+    const statusMap = {
+      '대기': 'waiting',
+      '진행중': 'in_progress',
+      '완료': 'completed'
+    };
+    factory1Orders = factory1Orders.filter(order => order.status === statusMap[statusFilter]);
+  }
 
   // 상태별 개수 계산
   const statusCounts = {
@@ -48,7 +60,7 @@ const WorkOrderList = () => {
   // 필터 변경 시 첫 페이지로 이동
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterType]);
+  }, [filterType, statusFilter]);
 
   // 시작 버튼 핸들러
   const handleStart = (orderId) => {
@@ -74,13 +86,20 @@ const WorkOrderList = () => {
     }
 
     const completedQuantity = selectedOrder.quantity - parseInt(completionData.damage);
-    console.log('작업 완료:', {
-      orderId: selectedOrder.id,
-      completedQuantity,
-      ...completionData
-    });
 
-    // TODO: 완료 액션 디스패치
+    // 완료 정보와 함께 상태 업데이트
+    dispatch(updateWorkOrderStatus.request({
+      id: selectedOrder.id,
+      status: 'completed',
+      completionInfo: {
+        completedQuantity,
+        damage: completionData.damage,
+        temperature: completionData.temperature,
+        duration: completionData.duration,
+        note: completionData.note,
+        completedAt: new Date().toISOString()
+      }
+    }));
 
     // 모달 닫기 및 초기화
     setShowCompletionModal(false);
@@ -105,11 +124,16 @@ const WorkOrderList = () => {
     });
   };
 
+  // 아코디언 토글
+  const toggleExpand = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
   return (
     <>
     <div>
       <div className="mx-auto">
-        <StatusSummaryBar 
+        <StatusSummaryBar
           title="1공장"
           inProgressCount={statusCounts.inProgress}
           waitingCount={statusCounts.waiting}
@@ -119,15 +143,34 @@ const WorkOrderList = () => {
 
         <h3 className="text-lg font-semibold text-[#674529] mb-4">작업 지시서 목록</h3>
 
-        <div className="mb-6">
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none"
-          >
-            <option value="전체">전체</option>
-            <option value="내 작업">내 작업</option>
-          </select>
+        <div className="mb-6 flex items-center gap-4">
+          {/* 작업 구분 필터 */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">작업:</label>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20 hover:border-[#674529]/50 transition-colors"
+            >
+              <option value="전체">전체</option>
+              <option value="내 작업">내 작업</option>
+            </select>
+          </div>
+
+          {/* 상태 필터 */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">상태:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20 hover:border-[#674529]/50 transition-colors"
+            >
+              <option value="전체">전체</option>
+              <option value="대기">대기</option>
+              <option value="진행중">진행중</option>
+              <option value="완료">완료</option>
+            </select>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -143,39 +186,52 @@ const WorkOrderList = () => {
                     <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
                     <p className="text-sm text-gray-600">{order.product}</p>
                   </div>
-                                      <div className="text-right space-y-2">
-                        <div className="flex space-x-4">
-                            <p className="text-sm text-gray-700">
-                                <span className="text-gray-500">작업자:</span> {order.worker || ''}
-                            </p>
-                            <p className="text-sm">
-                                <span className="text-gray-500">현재 상태:</span>{' '}
-                                <span className={`font-medium ${
-                                    order.status === 'waiting' ? 'text-blue-600' :
-                                    order.status === 'in_progress' ? 'text-orange-600' :
-                                    'text-green-600'
-                                }`}>
-                                    {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}
-                                </span>
-                            </p>
-                        </div>
-                        {order.status === 'waiting' && (
-                            <button
-                              onClick={() => handleStart(order.id)}
-                              className="w-[100px] px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                            >
-                                시작
-                            </button>
-                        )}
-                        {order.status === 'in_progress' && (
-                            <button
-                              onClick={() => handleComplete(order)}
-                              className="w-[100px] px-4 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                            >
-                                완료
-                            </button>
-                        )}
+                  <div className="text-right space-y-2">
+                    <div className="flex space-x-4">
+                      <p className="text-sm text-gray-700">
+                        <span className="text-gray-500">작업자:</span> {order.worker || ''}
+                      </p>
+                      <p className="text-sm">
+                        <span className="text-gray-500">현재 상태:</span>{' '}
+                        <span className={`font-medium ${
+                          order.status === 'waiting' ? 'text-blue-600' :
+                          order.status === 'in_progress' ? 'text-orange-600' :
+                          'text-green-600'
+                        }`}>
+                          {order.status === 'waiting' ? '대기' : order.status === 'in_progress' ? '진행중' : '완료'}
+                        </span>
+                      </p>
                     </div>
+                    {order.status === 'waiting' && (
+                      <button
+                        onClick={() => handleStart(order.id)}
+                        className="w-[104px] px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                      >
+                        시작
+                      </button>
+                    )}
+                    {order.status === 'in_progress' && (
+                      <button
+                        onClick={() => handleComplete(order)}
+                        className="w-[104px] px-4 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                      >
+                        완료
+                      </button>
+                    )}
+                    {order.status === 'completed' && order.completionInfo && (
+                      <div className='flex justify-end'>
+                        <button
+                          onClick={() => toggleExpand(order.id)}
+                          className="w-[104px] px-4 py-1.5 bg-[#674529] text-white text-sm rounded hover:bg-[#553821] transition-colors flex gap-2"
+                        >
+                          상세보기
+                          <span className={`w-2 transition-transform ${expandedOrderId === order.id ? 'rotate-180' : ''}`}>
+                            ▼
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-4 gap-x-8 gap-y-3 text-sm">
@@ -196,6 +252,65 @@ const WorkOrderList = () => {
                     <p className="text-gray-900 font-medium">{order.deadlineDate}</p>
                   </div>
                 </div>
+
+                {/* 완료 정보 */}
+                {order.status === 'completed' && order.completionInfo && expandedOrderId === order.id && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="bg-gradient-to-r from-[#674529]/5 to-[#674529]/10 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-1 h-5 bg-[#674529] rounded-full"></div>
+                        <h5 className="text-sm font-semibold text-[#674529]">작업 결과</h5>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-3 border border-[#674529]/20">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-[#674529]">완료 수량</span>
+                            <span className="text-base font-bold text-gray-700">
+                              {order.completionInfo.completedQuantity}kg
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-3 border border-[#674529]/20">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-[#674529]">파손량</span>
+                            <span className="text-base font-bold text-gray-700">
+                              {order.completionInfo.damage}kg
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg p-3 border border-[#674529]/20">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-[#674529]">소요 시간</span>
+                            <span className="text-base font-bold text-gray-700">
+                              {order.completionInfo.duration}분
+                            </span>
+                          </div>
+                        </div>
+
+                        {order.completionInfo.temperature && (
+                          <div className="bg-white rounded-lg p-3 border border-[#674529]/20">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-[#674529]">온도</span>
+                              <span className="text-base font-bold text-gray-700">
+                                {order.completionInfo.temperature}°C
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {order.completionInfo.note && (
+                        <div className="mt-3 bg-white rounded-lg p-3 border border-[#674529]/20">
+                          <span className="text-sm text-[#674529] block mb-1">비고</span>
+                          <p className="text-sm text-gray-700 leading-relaxed">{order.completionInfo.note}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}

@@ -32,6 +32,8 @@ const BasicNewItem = () => {
   const factoryOptions = [
     { id: 1, name: '1공장' },
     { id: 2, name: '2공장' },
+    { id: 3, name: '3창고' },
+    { id: 4, name: '4창고' },
   ];
   const storageOptions = ['냉동', '냉장', '실온'];
 
