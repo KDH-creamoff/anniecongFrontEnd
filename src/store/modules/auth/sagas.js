@@ -57,7 +57,6 @@ function* loginSaga(action) {
       joinDate: profile.hire_date || userData.hire_date || userData.joinDate || '',
       role: profile.role || userData.role || 1,
       roleId: roleId, // role_id 추가
-      signatureImageUrl: profile.signature_image_url || userData.signature_image_url || null,
       permissions: permissions, // permissions 정보 추가
       profile: profile,
       UserProfile: profile,
@@ -139,7 +138,6 @@ function* getMeSaga() {
       joinDate: profile.hire_date || userData.hire_date || userData.joinDate || '',
       role: profile.role || userData.role || 1,
       roleId: roleId, // role_id 추가
-      signatureImageUrl: profile.signature_image_url || userData.signature_image_url || null,
       permissions: permissions, // permissions 정보 추가
       profile: profile,
       UserProfile: profile,

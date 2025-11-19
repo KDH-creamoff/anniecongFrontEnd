@@ -41,7 +41,6 @@ function* fetchUsersSaga(action) {
         joinDate: profile.hire_date || user.hire_date || user.joinDate || '',
         role: profile.role || user.role || 1,
         roleId: roleId, // role_id 추가
-        signatureImageUrl: profile.signature_image_url || user.signature_image_url || null,
         permissions: permissions, // permissions 정보 추가
         profile: profile,
         UserProfile: profile,
