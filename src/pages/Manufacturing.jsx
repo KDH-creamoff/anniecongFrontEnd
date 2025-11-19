@@ -5,7 +5,6 @@ import TransferStatus from '../components/manufacturing/TransferStatus';
 import { ArrowRightLeft, Factory } from 'lucide-react';
 import ManufacturingHistoryView from '../components/manufacturing/ManufacturingHistoryView';
 import WorkOrderManagement from '../components/manufacturing/WorkOrderManagement';
-import Factory2WorkList from '../components/manufacturing/Factory2WorkList';
 import Factory2OrderList from '../components/manufacturing/Factory2OrderList';
 
 const Manufacturing = ({ subPage }) => {

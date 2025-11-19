@@ -110,7 +110,7 @@ const WorkOrderList = () => {
     <div>
       <div className="mx-auto">
         <StatusSummaryBar 
-          title="1공장 전처리 공정"
+          title="1공장"
           inProgressCount={statusCounts.inProgress}
           waitingCount={statusCounts.waiting}
           completedCount={statusCounts.completed}
@@ -137,7 +137,7 @@ const WorkOrderList = () => {
             </div>
           ) : (
             workOrders.map((order) => (
-              <div key={order.id} className="bg-white rounded-lg shadow-sm p-6">
+              <div key={order.id} className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h4 className="text-base font-semibold text-gray-900 mb-1">{order.title}</h4>
@@ -214,7 +214,7 @@ const WorkOrderList = () => {
     {/* 작업 완료 모달 */}
     {showCompletionModal && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-[500px] max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-xl p-6 w-[500px] max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-semibold text-[#674529]">작업 완료</h3>
                     <button
@@ -225,7 +225,7 @@ const WorkOrderList = () => {
                     </button>
                 </div>
 
-                <div className="mb-4 p-4 bg-gray-50 rounded">
+                <div className="mb-4 p-4 bg-gray-50 rounded-xl">
                     <p className="text-sm text-gray-600 mb-1">작업명: <span className="font-medium text-gray-900">{selectedOrder.title}</span></p>
                     <p className="text-sm text-gray-600 mb-1">제품명: <span className="font-medium text-gray-900">{selectedOrder.product}</span></p>
                     <p className="text-sm text-gray-600">작업량: <span className="font-medium text-gray-900">{selectedOrder.quantity}</span></p>
@@ -242,7 +242,7 @@ const WorkOrderList = () => {
                                 min="0"
                                 value={completionData.damage}
                                 onChange={(e) => setCompletionData({ ...completionData, damage: e.target.value })}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#674529]"
                                 placeholder="0"
                             />
                             <span className="text-sm text-gray-600">kg</span>
@@ -263,7 +263,7 @@ const WorkOrderList = () => {
                                 type="number"
                                 value={completionData.temperature}
                                 onChange={(e) => setCompletionData({ ...completionData, temperature: e.target.value })}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#674529]"
                                 placeholder="20"
                             />
                             <span className="text-sm text-gray-600">°C</span>
@@ -280,7 +280,7 @@ const WorkOrderList = () => {
                                 min="0"
                                 value={completionData.duration}
                                 onChange={(e) => setCompletionData({ ...completionData, duration: e.target.value })}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#674529]"
                                 placeholder="60"
                             />
                             <span className="text-sm text-gray-600">분</span>
@@ -294,7 +294,7 @@ const WorkOrderList = () => {
                         <textarea
                             value={completionData.note}
                             onChange={(e) => setCompletionData({ ...completionData, note: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#674529] resize-none"
                             rows="3"
                             placeholder="특이사항을 입력하세요"
                         />

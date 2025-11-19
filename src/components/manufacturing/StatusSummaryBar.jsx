@@ -1,6 +1,6 @@
 import { BarChart3, Clock, CheckCircle, Users } from "lucide-react";
 
-const StatusSummaryBar = ({ title = "1공장 전처리 공정", inProgressCount = 1, waitingCount = 1, completedCount = 1, workerCount = 3 }) => {
+const StatusSummaryBar = ({ title, inProgressCount, waitingCount, completedCount, workerCount }) => {
   const statusCards = [
     {
       label: "진행중 작업",
