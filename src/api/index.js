@@ -338,7 +338,7 @@ export const inventoryTransactionsAPI = {
 // ============================================
 export const plannedTransactionsAPI = {
   getPlannedTransactions: async (params = {}) => {
-    const response = await apiClient.get('/planned-transactions');
+    const response = await apiClient.get('/planned-transactions', {params});
     console.log('planned-transactions response : ', response);
     return response;
   },
