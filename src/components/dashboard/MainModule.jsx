@@ -108,11 +108,6 @@ const MainModule = ({ onNavigate }) => {
                 className={`p-4 ${module.color} relative rounded-xl text-white`}
               >
                 {module.icon}
-                {module.count && (
-                  <div className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs text-white'>
-                    {module.count}
-                  </div>
-                )}
               </div>
               <div className='text-center'>
                 <h3 className='mb-1 font-medium text-[#724323]'>
