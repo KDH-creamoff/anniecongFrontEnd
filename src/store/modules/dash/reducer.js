@@ -87,7 +87,7 @@ const dashReducer = (state = initialState, action) => {
       return {
         ...state,
         manufacturingStats: {
-          data: action.payload,
+          data: action.payload.data,
           loading: false,
           error: null
         }

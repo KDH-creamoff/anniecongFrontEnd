@@ -6,11 +6,11 @@ import userSaga from './modules/user/sagas';
 import inventorySaga from './modules/inventory/sagas';
 import basicSaga from './modules/basic/sagas';
 import manufacturingSaga from './modules/manufacturing/sagas';
-// import labelSaga from './modules/label/sagas'; // ⚠️ 미사용: Label 페이지에서 labelAPI를 직접 호출함
+// import labelSaga from './modules/label/sagas'; 
 import issuingSaga from './modules/issuing/sagas';
 import dashSaga from './modules/dash/sagas';
 import receivingSaga from './modules/receiving/sagas';
-// import shippingSaga from './modules/shipping/sagas';
+import shippingSaga from './modules/shipping/sagas';
 import approvalSaga from './modules/approval/sagas';
 
 /**
@@ -24,11 +24,11 @@ export default function* rootSaga() {
     inventorySaga(),
     basicSaga(),
     manufacturingSaga(),
-    // labelSaga(), // ⚠️ 비활성화: Label.jsx와 SavedLabelList.jsx에서 labelAPI 직접 호출
+    // labelSaga(), 
     issuingSaga(),
     dashSaga(),
     receivingSaga(),
-    // shippingSaga(),
+    shippingSaga(),
     approvalSaga(),
   ]);
 }

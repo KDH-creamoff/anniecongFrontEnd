@@ -118,17 +118,9 @@ const BOMRegistration = ({ onSave }) => {
 
   return (
     <div className='rounded-xl bg-white p-6 shadow-sm'>
-      <div className='mb-6 flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <Package className='h-5 w-5 text-[#674529]' />
-          <h2 className='text-base text-[#674529]'>BOM 등록</h2>
-        </div>
-        <button
-          onClick={handleSaveBOM}
-          className='flex items-center gap-2 rounded-xl bg-[#674529] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
-        >
-          BOM 저장
-        </button>
+      <div className='mb-6 flex items-center gap-2'>
+        <Package className='h-5 w-5 text-[#674529]' />
+        <h2 className='text-base text-[#674529]'>BOM 등록</h2>
       </div>
 
       {/* BOM 명 입력 */}
@@ -265,16 +257,27 @@ const BOMRegistration = ({ onSave }) => {
         </table>
       </div>
 
-      {/* BOM 추가 버튼 */}
+      {/* 재료 추가 버튼 */}
       <div className='mt-4 flex justify-end'>
         <button
           onClick={handleAddMaterial}
           disabled={newMaterial !== null}
-          className='flex items-center gap-2 rounded-xl bg-[#56331F] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95'
+          className='flex w-28 items-center gap-2 rounded-xl bg-[#56331F] px-7 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
         >
-          BOM 추가
+          재료 추가
         </button>
       </div>
+
+      {currentMaterials.length > 0 && (
+        <div className='mt-3 flex justify-end'>
+          <button
+            onClick={handleSaveBOM}
+            className='flex w-28 items-center gap-2 rounded-xl bg-[#10B981] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#059669] hover:shadow-md active:scale-95'
+          >
+            BOM 저장
+          </button>
+        </div>
+      )}
     </div>
   );
 };

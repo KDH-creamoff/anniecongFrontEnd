@@ -37,6 +37,8 @@ const BasicNewItem = () => {
   const factoryOptions = [
     { id: 1, name: '1공장' },
     { id: 2, name: '2공장' },
+    { id: 3, name: '3창고' },
+    { id: 4, name: '4창고' },
   ];
 
   // 컴포넌트 마운트 시 보관 조건 목록 조회

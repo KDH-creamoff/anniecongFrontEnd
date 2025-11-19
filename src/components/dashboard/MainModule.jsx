@@ -1,92 +1,84 @@
 import {
   Package,
-  ArrowRightLeft,
   BarChart3,
   Factory,
   Settings,
   Tags,
   Truck,
   Users,
+  FileText,
 } from 'lucide-react';
 
 const MainModule = ({ onNavigate }) => {
   const moduleButtons = [
     {
       id: 'basicInfo',
-      title: '기초정보 설정',
-      description: '품목등록, 공장정보, 바코드 템플릿',
+      title: '기초정보',
+      description: '',
       icon: <Settings className='h-6 w-6' />,
       nav: '기초정보',
       color: 'bg-[#724323]',
     },
     {
-      id: 'receiving',
-      title: '입고/검수',
-      description: '구매입고 스캔, 원재료 라벨프린트',
-      icon: <Truck className='h-6 w-6' />,
-      nav: '입출고관리-nav1',
+      id: 'inventory',
+      title: '재고관리',
+      description: '',
+      icon: <BarChart3 className='h-6 w-6' />,
+      nav: '재고관리',
       color: 'bg-[#A3C478]',
       count: 12,
     },
     {
-      id: 'plant1',
-      title: '1공장 전처리',
-      description: '공정시작 스캔, 전처리 산출',
-      icon: <Factory className='h-6 w-6' />,
-      nav: '제조관리-nav1',
+      id: 'receiving',
+      title: '입출고관리',
+      description: '입고 관리, 출고관리',
+      icon: <Package className='h-6 w-6' />,
+      nav: '입출고관리-nav1',
       color: 'bg-[#F9B679]',
       count: 8,
     },
     {
-      id: 'transfer',
-      title: '공장간 이동',
-      description: '1공장 출고 → 2공장 입고',
-      icon: <ArrowRightLeft className='h-6 w-6' />,
-      nav: '제조관리-nav2',
+      id: 'manufacturing',
+      title: '제조관리',
+      description: '제조이력 캘린더, 1공장, 공장간 이동, 2공장, 작업지시서 관리',
+      icon: <Factory className='h-6 w-6' />,
+      nav: '제조관리-nav1',
       color: 'bg-[#724323]',
       count: 3,
     },
     {
-      id: 'plant2',
-      title: '2공장 베이킹/포장',
-      description: 'MO발행, 베이킹 공정, 포장',
-      icon: <Factory className='h-6 w-6' />,
-      nav: '제조관리-nav3',
+      id: 'shipping',
+      title: '배송관리',
+      description: '',
+      icon: <Truck className='h-6 w-6' />,
+      nav: '배송관리',
       color: 'bg-[#A3C478]',
       count: 15,
     },
     {
-      id: 'shipping',
-      title: '배송관리',
-      description: 'B2B/B2C 피킹, FEFO 우선',
-      icon: <Truck className='h-6 w-6' />,
-      nav: '배송관리',
+      id: 'approval',
+      title: '전자결재',
+      description: '결재시스템, 문서보관함',
+      icon: <FileText className='h-6 w-6' />,
+      nav: '전자결재-nav1',
       color: 'bg-[#F9B679]',
       count: 6,
     },
     {
       id: 'label',
       title: '라벨 프린트',
-      description: 'ZPL 템플릿, 브라우저 출력',
+      description: '',
       icon: <Tags className='h-6 w-6' />,
       nav: '라벨관리',
       color: 'bg-[#724323]',
     },
     {
-      id: 'inventory',
-      title: '재고/이력 조회',
-      description: '로트별 추적, 유통기한 관리',
-      icon: <BarChart3 className='h-6 w-6' />,
-      nav: '재고관리',
-      color: 'bg-[#A3C478]',
-    },
-    {
       id: 'users',
-      title: '사용자/권한',
-      description: 'RBAC 기반 접근제어',
+      title: '사용자관리',
+      description: '직원 관리, 권한 관리',
       icon: <Users className='h-6 w-6' />,
-      nav: '사용자관리',
-      color: 'bg-[#F9B679]',
+      nav: '사용자관리-nav1',
+      color: 'bg-[#A3C478]',
     },
   ];
 
@@ -108,6 +100,11 @@ const MainModule = ({ onNavigate }) => {
                 className={`p-4 ${module.color} relative rounded-xl text-white`}
               >
                 {module.icon}
+                {/* {module.count && (
+                  <div className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs text-white'>
+                    {module.count}
+                  </div>
+                )} */}
               </div>
               <div className='text-center'>
                 <h3 className='mb-1 font-medium text-[#724323]'>

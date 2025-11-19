@@ -253,7 +253,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                1공장 전처리
+                1공장
               </button>
               <button
                 onClick={() => setActiveNav('제조관리-nav3')}
@@ -273,7 +273,7 @@ const Sidebar = ({ activeNav, setActiveNav }) => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                2공장 제조
+                2공장
               </button>
               <button
                 onClick={() => setActiveNav('제조관리-nav5')}

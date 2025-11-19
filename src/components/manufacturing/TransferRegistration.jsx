@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Plus, X } from 'lucide-react';
 import { items } from '../../data/items';
+import { fetchAvailableProducts } from '../../store/modules/manufacturing/action';
 
 const TransferRegistration = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     departureLocation: '1공장',
     arrivalLocation: '2공장',
@@ -11,10 +14,11 @@ const TransferRegistration = () => {
     rawMaterials: [{ code: '', name: '', quantity: '' }]
   });
 
-  const [availableProducts, setAvailableProducts] = useState([
-    { expiry: 'D-5', deadline: '2025-10-10', quantity: '100 kg' },
-    { expiry: 'D-8', deadline: '2025-10-21', quantity: '150 kg' },
-  ]);
+  const [selectedItemCode, setSelectedItemCode] = useState('');
+  
+  // Redux에서 출고가능품목 가져오기
+  const availableProducts = useSelector(state => state.manufacturing.availableProducts.data);
+  const loading = useSelector(state => state.manufacturing.availableProducts.loading);
 
   const handleAddRawMaterial = () => {
     setFormData({
@@ -32,11 +36,14 @@ const TransferRegistration = () => {
     const newRawMaterials = [...formData.rawMaterials];
     newRawMaterials[index][field] = value;
 
-    // 품목명이 변경되면 자동으로 품목코드 설정
+    // 품목명이 변경되면 자동으로 품목코드 설정 및 출고가능품목 조회
     if (field === 'name') {
       const item = items.find((item) => item.name === value);
       if (item) {
         newRawMaterials[index]['code'] = item.code;
+        // 선택된 품목코드 저장 및 출고가능품목 조회
+        setSelectedItemCode(item.code);
+        dispatch(fetchAvailableProducts.request({ itemCode: item.code }));
       }
     }
 
@@ -162,24 +169,47 @@ const TransferRegistration = () => {
           {/* 출고가능품목 */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h4 className="text-sm font-semibold text-gray-700 mb-3">출고가능품목</h4>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-300">
-                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">유통기간</th>
-                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">입고날짜</th>
-                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">수량</th>
-                </tr>
-              </thead>
-              <tbody>
-                {availableProducts.map((product, index) => (
-                  <tr key={index} className="border-b border-gray-200">
-                    <td className="py-2 px-3 text-xs">{product.expiry}</td>
-                    <td className="py-2 px-3 text-xs">{product.deadline}</td>
-                    <td className="py-2 px-3 text-xs">{product.quantity}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            
+            {!selectedItemCode ? (
+              <div className="text-center py-8 text-gray-500 text-sm">
+                이송 품목을 선택하면 출고가능품목이 표시됩니다.
+              </div>
+            ) : (
+              <>
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-300">
+                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">유통기간</th>
+                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">입고날짜</th>
+                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-700">수량</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="3" className="text-center py-4 text-sm text-gray-500">
+                          로딩 중...
+                        </td>
+                      </tr>
+                    ) : availableProducts && availableProducts.length > 0 ? (
+                      availableProducts.map((product) => (
+                        <tr key={product.id} className="border-b border-gray-200">
+                          <td className="py-2 px-3 text-xs">{product.expiry}</td>
+                          <td className="py-2 px-3 text-xs">{product.receiveDate}</td>
+                          <td className="py-2 px-3 text-xs">{product.quantity}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="3" className="text-center py-4 text-sm text-gray-500">
+                          출고가능한 품목이 없습니다.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -1,31 +1,31 @@
 import { BarChart3, Clock, CheckCircle, Users } from "lucide-react";
 
-const StatusSummaryBar = () => {
+const StatusSummaryBar = ({ title, inProgressCount, waitingCount, completedCount, workerCount }) => {
   const statusCards = [
     {
       label: "진행중 작업",
-      count: 1,
+      count: inProgressCount,
       icon: <BarChart3 className="w-5 h-5" />,
       iconBgColor: "bg-[#FDB572]",
       textColor: "text-gray-600"
     },
     {
       label: "대기 작업",
-      count: 1,
+      count: waitingCount,
       icon: <Clock className="w-5 h-5" />,
       iconBgColor: "bg-[#A8D08D]",
       textColor: "text-gray-600"
     },
     {
       label: "완료 작업",
-      count: 1,
+      count: completedCount,
       icon: <CheckCircle className="w-5 h-5" />,
       iconBgColor: "bg-[#674529]",
       textColor: "text-gray-600"
     },
     {
       label: "작업자",
-      count: 3,
+      count: workerCount,
       icon: <Users className="w-5 h-5" />,
       iconBgColor: "bg-yellow-700",
       textColor: "text-gray-600"
@@ -38,7 +38,7 @@ const StatusSummaryBar = () => {
         <div className="flex items-center">
         <BarChart3 className="w-5 h-5 text-[#674529] mr-2" />
           <h2 className="text-lg font-semibold text-[#674529]">
-            1공장 전처리 공정
+            {title}
           </h2>
         </div>
       </div>
