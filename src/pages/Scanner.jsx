@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from 'react';
-// react-qr-reader 설치 필요: npm install react-qr-reader
-import { QrReader } from 'react-qr-reader';
+import React, { useState, useEffect, useRef } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 // 모바일 판별
 const isMobile =
@@ -9,37 +8,88 @@ const isMobile =
     window.navigator.userAgent
   );
 
-const getMobileCameraConstraints = () => ({
-  facingMode: { exact: "environment" }
-});
-
 const Scanner = () => {
   const [scannedResult, setScannedResult] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [apiData, setApiData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [cameraError, setCameraError] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+  const html5QrCodeRef = useRef(null);
+  const scannerIdRef = useRef(null);
 
-  // QR코드/바코드 스캔 시
-  const handleResult = useCallback(
-    (result, error) => {
-      if (!!result && result?.text) {
-        setScannedResult(result.text);
-        fetchInfoFromBackend(result.text);
-      }
-      if (!!error && error.name !== 'NotFoundException') {
-        setErrorMessage('스캔 중 오류가 발생했습니다.');
-      }
-    },
-    [] // eslint-disable-line
-  );
+  // QR 코드 스캔 성공 핸들러
+  const onScanSuccess = (decodedText, decodedResult) => {
+    if (decodedText && !scannedResult) {
+      setScannedResult(decodedText);
+      stopScanning();
+      fetchInfoFromBackend(decodedText);
+    }
+  };
 
-  // 카메라 권한/접근 오류 처리
-  const handleCameraError = useCallback((err) => {
-    // err는 Error 객체 또는 string 가능. 상황에 따라 콘솔 로그 가능
-    setCameraError(
-      '카메라 접근이 불가능합니다. 카메라 권한을 허용해주세요.'
-    );
+  // 스캔 에러 핸들러
+  const onScanFailure = (error) => {
+    // NotFoundException은 정상적인 에러 (QR 코드를 찾지 못한 경우)
+    if (error && error !== 'NotFoundException') {
+      console.warn('스캔 에러:', error);
+    }
+  };
+
+  // 카메라 스캔 시작
+  const startScanning = async () => {
+    try {
+      setCameraError('');
+      setIsScanning(true);
+      
+      const html5QrCode = new Html5Qrcode(scannerIdRef.current);
+      html5QrCodeRef.current = html5QrCode;
+
+      // 모바일에서는 후면 카메라 사용
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+        videoConstraints: {
+          facingMode: isMobile ? { exact: "environment" } : "user"
+        }
+      };
+
+      await html5QrCode.start(
+        { facingMode: isMobile ? { exact: "environment" } : "user" },
+        config,
+        onScanSuccess,
+        onScanFailure
+      );
+    } catch (err) {
+      console.error('카메라 시작 실패:', err);
+      setCameraError('카메라 접근이 불가능합니다. 카메라 권한을 허용해주세요.');
+      setIsScanning(false);
+    }
+  };
+
+  // 스캔 중지
+  const stopScanning = async () => {
+    try {
+      if (html5QrCodeRef.current && isScanning) {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+        html5QrCodeRef.current = null;
+        setIsScanning(false);
+      }
+    } catch (err) {
+      console.error('스캔 중지 실패:', err);
+    }
+  };
+
+  // 컴포넌트 마운트 시 스캔 시작
+  useEffect(() => {
+    if (isMobile && !scannedResult && !loading) {
+      startScanning();
+    }
+    
+    return () => {
+      stopScanning();
+    };
   }, []);
 
   // 백엔드에서 정보 가져오기 예시 (실제 API엔드포인트로 바꿔야 함)
@@ -76,12 +126,17 @@ const Scanner = () => {
   };
 
   // 다시 스캔
-  const handleRescan = () => {
+  const handleRescan = async () => {
+    await stopScanning();
     setScannedResult('');
     setErrorMessage('');
     setApiData(null);
     setLoading(false);
     setCameraError('');
+    // 스캔 재시작
+    setTimeout(() => {
+      startScanning();
+    }, 100);
   };
 
   // 모바일이 아닌 경우
@@ -145,28 +200,16 @@ const Scanner = () => {
         {!scannedResult && !loading && (
           <div style={{ width: '100%', marginBottom: 16 }}>
             {!cameraError ? (
-              <QrReader
-                constraints={getMobileCameraConstraints()}
-                videoContainerStyle={{
+              <div
+                id="qr-reader"
+                ref={scannerIdRef}
+                style={{
                   borderRadius: 12,
                   width: '100%',
                   height: 280,
                   overflow: 'hidden',
-                  background:'#000'
-                }}
-                videoStyle={{
-                  borderRadius: 12,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                onResult={handleResult}
-                onError={handleCameraError}
-                containerStyle={{
-                  width: '100%',
-                  height: 280,
-                  borderRadius: 12,
-                  overflow: 'hidden'
+                  background: '#000',
+                  position: 'relative'
                 }}
               />
             ) : (
@@ -176,9 +219,28 @@ const Scanner = () => {
                 padding: "18px 10px",
                 borderRadius: 8,
                 textAlign: "center",
-                margin: "16px 0"
+                margin: "16px 0",
+                minHeight: 280,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 {cameraError}
+                <button
+                  onClick={startScanning}
+                  style={{
+                    marginTop: 12,
+                    padding: '8px 16px',
+                    background: '#674529',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontSize: 14
+                  }}
+                >
+                  다시 시도
+                </button>
               </div>
             )}
             <p style={{
@@ -192,7 +254,8 @@ const Scanner = () => {
             <p style={{
               color: "#c0322e",
               fontSize: 13,
-              marginTop: 2
+              marginTop: 2,
+              textAlign: 'center'
             }}>
               {/* iOS 사파리는 사파리 브라우저로 접속해야 카메라가 정상작동합니다. */}
               일부 브라우저에서 카메라 허용 안내 문구가 나올 수 있습니다. <br/>카메라 권한을 꼭 허용해 주세요.<br/>
