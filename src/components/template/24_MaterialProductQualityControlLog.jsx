@@ -79,76 +79,45 @@ const MaterialProductQualityControlLog = ({ pdfRef }) => {
         className="hidden"
       />
 
+      <div className="flex justify-end mb-6">
+        <table className="border-2 border-black border-collapse">
+          <tbody>
+            <tr>
+              <td className="h-8 border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+            </tr>
+            <tr>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div ref={contentRef} className="w-full max-w-[900px] mx-auto p-5 bg-white">
-        {/* 제목 및 결재란 */}
         <div className="border-2 border-black mb-4">
-          {/* 제목과 결재란을 가로로 배치 */}
           <div className="flex justify-between items-center">
             {/* 제목 */}
             <div className="flex-1 text-center text-2xl py-4">
               원료 및 제품 품질관리 대장(자가)
             </div>
           </div>
-        </div>
-
-        {/* 결재란 */}
-        <div className="flex mb-4 justify-end">
-          <table className="border-collapse border border-black">
-            <tbody>
-              <tr>
-                <td className="border border-black px-2 py-1 text-center font-medium whitespace-nowrap w-10" rowSpan="2">
-                  결<br />재
-                </td>
-                <td className="border border-black px-3 py-1 text-center font-medium text-xs w-16">
-                  담당
-                </td>
-                <td className="border border-black px-3 py-1 text-center font-medium text-xs w-16">
-                  팀장
-                </td>
-                <td className="border border-black px-3 py-1 text-center font-medium text-xs w-16">
-                  책임자
-                </td>
-              </tr>
-              <tr>
-                <td
-                  className="border border-black h-10 cursor-pointer hover:bg-gray-50"
-                  onClick={handleManagerClick}
-                >
-                  {managerImage ? (
-                    <img
-                      src={managerImage}
-                      alt="담당 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-                <td
-                  className="border border-black h-10 cursor-pointer hover:bg-gray-50"
-                  onClick={handleTeamLeaderClick}
-                >
-                  {teamLeaderImage ? (
-                    <img
-                      src={teamLeaderImage}
-                      alt="팀장 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-                <td
-                  className="border border-black h-10 cursor-pointer hover:bg-gray-50"
-                  onClick={handleSupervisorClick}
-                >
-                  {supervisorImage ? (
-                    <img
-                      src={supervisorImage}
-                      alt="책임자 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
 
         {/* 메인 테이블 */}

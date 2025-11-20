@@ -23,7 +23,7 @@ const EarlyDepartureApplication = ({ pdfRef }) => {
     detailReason: '',
     delegateApprover: '',
     urgentApprover: '',
-    noticeText: '상기 본인은 위와 같이 2024년도 조기퇴근을 신청하오니 처리하여 주시기 바랍니다.',
+    noticeText: '상기 본인은 위와 같이 2025년도 조기퇴근을 신청하오니 처리하여 주시기 바랍니다.',
     year: '20',
     month: '',
     day: '',

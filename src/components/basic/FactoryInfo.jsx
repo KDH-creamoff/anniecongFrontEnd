@@ -120,12 +120,16 @@ const FactoryInfo = () => {
   return (
     <>
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-        {factories.map((factory) => (
-          <div key={factory.id} className='rounded-xl bg-white p-6 shadow-sm'>
+        {factories.map((factory, index) => {
+          console.log("index : ", index);
+          console.log("factory.name : ", typeof factory.name);
+          return ( 
+            <>
+                   <div key={factory.id} className='rounded-xl bg-white p-6 shadow-sm'>
             <div className='mb-6 flex items-center gap-2'>
               <Factory className='h-5 w-5 text-[#674529]' />
               <h2 className='text-base text-[#674529]'>
-                {factory.name || (factory.id === 1 ? '1공장 (전처리)' : '2공장 (제조)')}
+                {factory.name}
               </h2>
             </div>
 
@@ -145,7 +149,8 @@ const FactoryInfo = () => {
               </div>
 
               {/* 담당 공정 */}
-              <div>
+              {
+                factory.name.includes("공장") && (   <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
                   담당 공정
                 </label>
@@ -182,10 +187,15 @@ const FactoryInfo = () => {
                     <Plus className='h-4 w-4 text-gray-600' />
                   </button>
                 </div>
-              </div>
+              </div>)
+              }
+           
             </div>
           </div>
-        ))}
+            </>
+          )
+   
+})}
       </div>
 
       {/* 공정 추가 모달 */}

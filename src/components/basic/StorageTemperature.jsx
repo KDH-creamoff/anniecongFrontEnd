@@ -120,16 +120,6 @@ const StorageTemperature = () => {
                 </div>
               </div>
 
-              {/* 습도 범위 */}
-              <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  습도 범위
-                </label>
-                <div className='rounded-xl bg-gray-100 px-4 py-2.5 text-sm text-gray-900'>
-                  {storage.humidity_range || storage.humidity || ''}
-                </div>
-              </div>
-
               {/* 적용 품목 */}
               <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
