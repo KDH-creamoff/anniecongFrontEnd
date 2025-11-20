@@ -26,7 +26,7 @@ export default function App() {
     <Routes>
       {
         isMobile ? (
-          <Route path='*' element={<Scanner />} />
+          <Route path='*' element={<>모바일 페이지입니다.</>} />
         ) : (
           <>
             <Route path='/login' element={<Login />} />
