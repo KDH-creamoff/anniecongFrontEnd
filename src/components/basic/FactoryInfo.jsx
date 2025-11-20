@@ -1,7 +1,7 @@
 import { Factory, X, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchFactories, fetchProcesses, addFactoryProcesses } from '../../store/modules/basic/actions';
+import { fetchFactories, fetchProcesses, addFactoryProcesses, removeFactoryProcess } from '../../store/modules/basic/actions';
 import {
   selectFactories,
   selectFactoriesLoading,
@@ -25,22 +25,34 @@ const FactoryInfo = () => {
     dispatch(fetchProcesses.request());
   }, [dispatch]);
 
-  // 공정 추가 성공 시 목록 다시 조회
+  // 공정 추가/제거 성공 시 목록 다시 조회
   useEffect(() => {
     if (factoryProcessOperation?.data) {
       dispatch(fetchFactories.request());
     }
   }, [factoryProcessOperation, dispatch]);
 
+  // 공정 제거 성공 시 목록 다시 조회
+  const removeProcessOperation = useSelector((state) => state.basic.removeFactoryProcess);
+  useEffect(() => {
+    if (removeProcessOperation?.data) {
+      dispatch(fetchFactories.request());
+    }
+  }, [removeProcessOperation, dispatch]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentFactoryId, setCurrentFactoryId] = useState(null);
   const [selectedProcessIds, setSelectedProcessIds] = useState([]);
+  const [processNamesInput, setProcessNamesInput] = useState('');
+  const [useProcessNames, setUseProcessNames] = useState(true); // 공정 이름 입력 방식 기본값
   const [error, setError] = useState('');
 
   const handleOpenModal = (factoryId) => {
     setCurrentFactoryId(factoryId);
     setIsModalOpen(true);
     setSelectedProcessIds([]);
+    setProcessNamesInput('');
+    setUseProcessNames(true);
     setError('');
   };
 
@@ -48,6 +60,8 @@ const FactoryInfo = () => {
     setIsModalOpen(false);
     setCurrentFactoryId(null);
     setSelectedProcessIds([]);
+    setProcessNamesInput('');
+    setUseProcessNames(true);
     setError('');
   };
 
@@ -62,49 +76,81 @@ const FactoryInfo = () => {
   };
 
   const handleAddProcess = () => {
-    if (selectedProcessIds.length === 0) {
-      setError('공정을 선택해주세요');
-      return;
-    }
-
-    // 현재 공장의 기존 공정 ID 가져오기
-    const currentFactory = factories.find((f) => f.id === currentFactoryId);
-    if (currentFactory) {
-      const currentProcesses = Array.isArray(currentFactory.processes) 
-        ? currentFactory.processes 
-        : Array.isArray(currentFactory.Processes) 
-        ? currentFactory.Processes 
-        : [];
-      
-      // 기존 공정 ID 추출
-      const existingProcessIds = currentProcesses
-        .map((p) => (typeof p === 'object' ? p.id : null))
-        .filter((id) => id != null);
-      
-      // 이미 추가된 공정 제외
-      const newProcessIds = selectedProcessIds.filter((id) => !existingProcessIds.includes(id));
-      
-      if (newProcessIds.length === 0) {
-        setError('이미 추가된 공정입니다');
+    if (useProcessNames) {
+      // 공정 이름 입력 방식
+      if (!processNamesInput.trim()) {
+        setError('공정 이름을 입력해주세요');
         return;
       }
 
-      // Redux Saga 액션 dispatch
+      // 쉼표로 구분된 공정 이름들을 배열로 변환
+      const processNames = processNamesInput
+        .split(',')
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
+
+      if (processNames.length === 0) {
+        setError('공정 이름을 입력해주세요');
+        return;
+      }
+
+      // Redux Saga 액션 dispatch (processNames 사용)
       dispatch(addFactoryProcesses.request({
         factoryId: currentFactoryId,
-        processIds: newProcessIds,
+        processNames: processNames,
       }));
+    } else {
+      // 기존 방식: 공정 ID 선택
+      if (selectedProcessIds.length === 0) {
+        setError('공정을 선택해주세요');
+        return;
+      }
+
+      // 현재 공장의 기존 공정 ID 가져오기
+      const currentFactory = factories.find((f) => f.id === currentFactoryId);
+      if (currentFactory) {
+        const currentProcesses = Array.isArray(currentFactory.processes)
+          ? currentFactory.processes
+          : Array.isArray(currentFactory.Processes)
+            ? currentFactory.Processes
+            : [];
+
+        // 기존 공정 ID 추출
+        const existingProcessIds = currentProcesses
+          .map((p) => (typeof p === 'object' ? p.id : null))
+          .filter((id) => id != null);
+
+        // 이미 추가된 공정 제외
+        const newProcessIds = selectedProcessIds.filter((id) => !existingProcessIds.includes(id));
+
+        if (newProcessIds.length === 0) {
+          setError('이미 추가된 공정입니다');
+          return;
+        }
+
+        // Redux Saga 액션 dispatch (processIds 사용)
+        dispatch(addFactoryProcesses.request({
+          factoryId: currentFactoryId,
+          processIds: newProcessIds,
+        }));
+      }
     }
 
     handleCloseModal();
   };
 
   const handleRemoveProcess = (factoryId, processId) => {
-    // 공정 제거는 백엔드 API가 필요 (DELETE /api/factories/:id/processes/:processId)
-    // 현재는 UI에서만 제거하는 것으로 처리 (추후 API 연결 필요)
+    if (!processId) {
+      console.warn('공정 ID가 없습니다.');
+      return;
+    }
+
     if (window.confirm('공정을 제거하시겠습니까?')) {
-      // TODO: removeProcess API 연결 필요
-      alert('공정 제거 기능은 곧 구현될 예정입니다.');
+      // Redux Saga 액션 dispatch
+      dispatch(removeFactoryProcess.request({
+        factoryId: factoryId,
+        processId: processId,
+      }));
     }
   };
 
@@ -153,18 +199,17 @@ const FactoryInfo = () => {
                   {(Array.isArray(factory.processes) ? factory.processes : factory.Processes || []).map((process, index) => {
                     // process가 객체인 경우 name 또는 processName 추출
                     const processId = typeof process === 'object' ? process.id : null;
-                    const processName = typeof process === 'string' 
-                      ? process 
+                    const processName = typeof process === 'string'
+                      ? process
                       : process?.name || process?.processName || process?.Name || '';
-                    
+
                     return (
                       <span
                         key={processId || index}
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                          factory.id === 1
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${factory.id === 1
                             ? 'bg-[#a3c478] text-[#fff]'
                             : 'bg-[#f9b679] text-[#fff]'
-                        }`}
+                          }`}
                       >
                         {processName}
                         <X
@@ -215,72 +260,36 @@ const FactoryInfo = () => {
             <div className='space-y-4'>
               <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  공정 선택
+                  공정 이름 (쉼표로 구분)
                 </label>
-                {processesLoading ? (
-                  <div className='text-sm text-gray-500'>공정 목록을 불러오는 중...</div>
-                ) : processes.length === 0 ? (
-                  <div className='text-sm text-gray-500'>등록된 공정이 없습니다</div>
-                ) : (
-                  <div className='max-h-60 space-y-2 overflow-y-auto rounded-xl border border-gray-200 bg-gray-50 p-3'>
-                    {processes.map((process) => {
-                      const isSelected = selectedProcessIds.includes(process.id);
-                      // 현재 공장에 이미 추가된 공정인지 확인
-                      const currentFactory = factories.find((f) => f.id === currentFactoryId);
-                      const currentProcesses = Array.isArray(currentFactory?.processes) 
-                        ? currentFactory.processes 
-                        : Array.isArray(currentFactory?.Processes) 
-                        ? currentFactory.Processes 
-                        : [];
-                      const existingProcessIds = currentProcesses
-                        .map((p) => (typeof p === 'object' ? p.id : null))
-                        .filter((id) => id != null);
-                      const isAlreadyAdded = existingProcessIds.includes(process.id);
-                      
-                      return (
-                        <label
-                          key={process.id}
-                          className={`flex cursor-pointer items-center space-x-2 rounded-lg px-3 py-2 transition-colors ${
-                            isSelected
-                              ? 'bg-[#674529] text-white'
-                              : isAlreadyAdded
-                              ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                              : 'bg-white hover:bg-gray-100 text-gray-900'
-                          }`}
-                        >
-                          <input
-                            type='checkbox'
-                            checked={isSelected}
-                            onChange={() => handleProcessToggle(process.id)}
-                            disabled={isAlreadyAdded}
-                            className='rounded border-gray-300 text-[#674529] focus:ring-[#674529]'
-                          />
-                          <span className='text-sm'>{process.name}</span>
-                          {isAlreadyAdded && (
-                            <span className='ml-auto text-xs text-gray-400'>(이미 추가됨)</span>
-                          )}
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
+                <input
+                  type='text'
+                  value={processNamesInput}
+                  onChange={(e) => {
+                    setProcessNamesInput(e.target.value);
+                    setError('');
+                  }}
+                  placeholder='예: 전처리, 혼합, 포장'
+                  className='w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529] mb-5'
+                />
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
+              {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
+            </div>
 
-              <div className='flex gap-3'>
-                <button
-                  onClick={handleCloseModal}
-                  className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleAddProcess}
-                  className='flex-1 rounded-xl bg-[#674529] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
-                >
-                  추가
-                </button>
-              </div>
+            <div className='flex gap-3'>
+              <button
+                onClick={handleCloseModal}
+                className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
+              >
+                취소
+              </button>
+              <button
+                onClick={handleAddProcess}
+                className='flex-1 rounded-xl bg-[#674529] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
+              >
+                추가
+              </button>
             </div>
           </div>
         </div>

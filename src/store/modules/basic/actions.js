@@ -19,7 +19,9 @@ export const DELETE_FACTORY = createRequestTypes('basic/DELETE_FACTORY');
 
 // 프로세스 관리
 export const FETCH_PROCESSES = createRequestTypes('basic/FETCH_PROCESSES');
+export const CREATE_PROCESS = createRequestTypes('basic/CREATE_PROCESS');
 export const ADD_FACTORY_PROCESSES = createRequestTypes('basic/ADD_FACTORY_PROCESSES');
+export const REMOVE_FACTORY_PROCESS = createRequestTypes('basic/REMOVE_FACTORY_PROCESS');
 
 // BOM 관리
 export const FETCH_BOMS = createRequestTypes('basic/FETCH_BOMS');
@@ -34,6 +36,8 @@ export const FETCH_STORAGE_CONDITION = createRequestTypes('basic/FETCH_STORAGE_C
 export const CREATE_STORAGE_CONDITION = createRequestTypes('basic/CREATE_STORAGE_CONDITION');
 export const UPDATE_STORAGE_CONDITION = createRequestTypes('basic/UPDATE_STORAGE_CONDITION');
 export const DELETE_STORAGE_CONDITION = createRequestTypes('basic/DELETE_STORAGE_CONDITION');
+export const ADD_STORAGE_CONDITION_ITEMS = createRequestTypes('basic/ADD_STORAGE_CONDITION_ITEMS');
+export const REMOVE_STORAGE_CONDITION_ITEM = createRequestTypes('basic/REMOVE_STORAGE_CONDITION_ITEM');
 
 // UI 상태 관리
 export const SET_BASIC_FILTER = 'basic/SET_BASIC_FILTER';
@@ -63,6 +67,8 @@ export const fetchStorageCondition = createAsyncActions(FETCH_STORAGE_CONDITION)
 export const createStorageCondition = createAsyncActions(CREATE_STORAGE_CONDITION);
 export const updateStorageCondition = createAsyncActions(UPDATE_STORAGE_CONDITION);
 export const deleteStorageCondition = createAsyncActions(DELETE_STORAGE_CONDITION);
+export const addStorageConditionItems = createAsyncActions(ADD_STORAGE_CONDITION_ITEMS);
+export const removeStorageConditionItem = createAsyncActions(REMOVE_STORAGE_CONDITION_ITEM);
 
 // 공장 정보 관리
 export const fetchFactories = createAsyncActions(FETCH_FACTORIES);
@@ -73,7 +79,9 @@ export const deleteFactory = createAsyncActions(DELETE_FACTORY);
 
 // 프로세스 관리
 export const fetchProcesses = createAsyncActions(FETCH_PROCESSES);
+export const createProcess = createAsyncActions(CREATE_PROCESS);
 export const addFactoryProcesses = createAsyncActions(ADD_FACTORY_PROCESSES);
+export const removeFactoryProcess = createAsyncActions(REMOVE_FACTORY_PROCESS);
 
 // UI 액션 생성자
 export const setBasicFilter = (filter) => ({

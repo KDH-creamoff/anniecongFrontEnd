@@ -17,13 +17,17 @@ import {
   CREATE_STORAGE_CONDITION,
   UPDATE_STORAGE_CONDITION,
   DELETE_STORAGE_CONDITION,
+  ADD_STORAGE_CONDITION_ITEMS,
+  REMOVE_STORAGE_CONDITION_ITEM,
   FETCH_FACTORIES,
   FETCH_FACTORY_BY_ID,
   CREATE_FACTORY,
   UPDATE_FACTORY,
   DELETE_FACTORY,
   FETCH_PROCESSES,
+  CREATE_PROCESS,
   ADD_FACTORY_PROCESSES,
+  REMOVE_FACTORY_PROCESS,
   fetchItems,
   fetchItemById,
   fetchItemByCode,
@@ -40,13 +44,17 @@ import {
   createStorageCondition,
   updateStorageCondition,
   deleteStorageCondition,
+  addStorageConditionItems,
+  removeStorageConditionItem,
   fetchFactories,
   fetchFactoryById,
   createFactory,
   updateFactory,
   deleteFactory,
   fetchProcesses,
+  createProcess,
   addFactoryProcesses,
+  removeFactoryProcess,
 } from './actions';
 
 // ==================== 목데이터 ====================
@@ -550,6 +558,44 @@ function* deleteStorageConditionSaga(action) {
   }
 }
 
+function* addStorageConditionItemsSaga(action) {
+  try {
+    const { storageConditionId, itemNames } = action.payload;
+    
+    // 백엔드 API 형식: POST /api/storage-conditions/:id/items { itemNames: [...] }
+    const response = yield call(storageConditionsAPI.addItems, storageConditionId, { itemNames });
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedStorage = response.data?.data || response.data;
+    
+    yield put(addStorageConditionItems.success(updatedStorage));
+    
+    // 보관 조건 목록 새로고침
+    yield put(fetchStorageConditions.request());
+  } catch (error) {
+    yield put(addStorageConditionItems.failure(error.response?.data?.message || '적용 품목 추가에 실패했습니다.'));
+  }
+}
+
+function* removeStorageConditionItemSaga(action) {
+  try {
+    const { storageConditionId, itemName } = action.payload;
+    
+    // 백엔드 API 형식: DELETE /api/storage-conditions/:id/items { itemName: "..." }
+    const response = yield call(storageConditionsAPI.removeItem, storageConditionId, { itemName });
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedStorage = response.data?.data || response.data;
+    
+    yield put(removeStorageConditionItem.success(updatedStorage));
+    
+    // 보관 조건 목록 새로고침
+    yield put(fetchStorageConditions.request());
+  } catch (error) {
+    yield put(removeStorageConditionItem.failure(error.response?.data?.message || '적용 품목 제거에 실패했습니다.'));
+  }
+}
+
 // ==================== 공장 정보(Factory) Saga ====================
 function* fetchFactoriesSaga(action) {
   try {
@@ -642,22 +688,63 @@ function* fetchProcessesSaga() {
   }
 }
 
+function* createProcessSaga(action) {
+  try {
+    const response = yield call(processesAPI.createProcess, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newProcess = response.data?.data || response.data;
+    
+    yield put(createProcess.success(newProcess));
+    
+    // 공정 목록 새로고침
+    yield put(fetchProcesses.request());
+  } catch (error) {
+    yield put(createProcess.failure(error.response?.data?.message || '공정 생성에 실패했습니다.'));
+  }
+}
+
 function* addFactoryProcessesSaga(action) {
   try {
-    const { factoryId, processIds } = action.payload;
+    const { factoryId, processIds, processNames } = action.payload;
     
-    // 백엔드 API 형식: POST /api/factories/:id/processes { processIds: [...] }
-    const response = yield call(factoriesAPI.addProcesses, factoryId, { processIds });
+    // processNames가 있으면 processNames 사용, 없으면 processIds 사용
+    const requestData = processNames 
+      ? { processNames }
+      : { processIds };
+    
+    // 백엔드 API 형식: POST /api/factories/:id/processes { processNames: [...] } 또는 { processIds: [...] }
+    const response = yield call(factoriesAPI.addProcesses, factoryId, requestData);
     
     // 백엔드 응답 형식: { ok: true, data: {...} }
     const updatedFactory = response.data?.data || response.data;
     
     yield put(addFactoryProcesses.success(updatedFactory));
     
+    // 공장 목록 및 공정 목록 새로고침
+    yield put(fetchFactories.request());
+    yield put(fetchProcesses.request());
+  } catch (error) {
+    yield put(addFactoryProcesses.failure(error.response?.data?.message || '공정 추가에 실패했습니다.'));
+  }
+}
+
+function* removeFactoryProcessSaga(action) {
+  try {
+    const { factoryId, processId } = action.payload;
+    
+    // 백엔드 API 형식: DELETE /api/factories/:id/processes/:processId
+    const response = yield call(factoriesAPI.removeProcess, factoryId, processId);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedFactory = response.data?.data || response.data;
+    
+    yield put(removeFactoryProcess.success(updatedFactory));
+    
     // 공장 목록 새로고침
     yield put(fetchFactories.request());
   } catch (error) {
-    yield put(addFactoryProcesses.failure(error.response?.data?.message || '공정 추가에 실패했습니다.'));
+    yield put(removeFactoryProcess.failure(error.response?.data?.message || '공정 제거에 실패했습니다.'));
   }
 }
 
@@ -677,12 +764,16 @@ export default function* basicSaga() {
   yield takeLatest(FETCH_STORAGE_CONDITION.REQUEST, fetchStorageConditionSaga);
   yield takeLatest(CREATE_STORAGE_CONDITION.REQUEST, createStorageConditionSaga);
   yield takeLatest(UPDATE_STORAGE_CONDITION.REQUEST, updateStorageConditionSaga);
-  yield takeLatest(DELETE_STORAGE_CONDITION.REQUEST, deleteStorageConditionSaga)
+  yield takeLatest(DELETE_STORAGE_CONDITION.REQUEST, deleteStorageConditionSaga);
+  yield takeLatest(ADD_STORAGE_CONDITION_ITEMS.REQUEST, addStorageConditionItemsSaga);
+  yield takeLatest(REMOVE_STORAGE_CONDITION_ITEM.REQUEST, removeStorageConditionItemSaga);
   yield takeLatest(FETCH_FACTORIES.REQUEST, fetchFactoriesSaga);
   yield takeLatest(FETCH_FACTORY_BY_ID.REQUEST, fetchFactoryByIdSaga);
   yield takeLatest(CREATE_FACTORY.REQUEST, createFactorySaga);
   yield takeLatest(UPDATE_FACTORY.REQUEST, updateFactorySaga);
   yield takeLatest(DELETE_FACTORY.REQUEST, deleteFactorySaga);
   yield takeLatest(FETCH_PROCESSES.REQUEST, fetchProcessesSaga);
+  yield takeLatest(CREATE_PROCESS.REQUEST, createProcessSaga);
   yield takeLatest(ADD_FACTORY_PROCESSES.REQUEST, addFactoryProcessesSaga);
+  yield takeLatest(REMOVE_FACTORY_PROCESS.REQUEST, removeFactoryProcessSaga);
 }
