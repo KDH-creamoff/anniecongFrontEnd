@@ -250,10 +250,11 @@ function* updateItemSaga(action) {
       name: data.name,
       category: data.category,
       unit: data.unit,
-      factoryId: data.factoryId,
+      factory_id: data.factoryId,
+      storage_condition_id: data.storageConditionId,
       shortage: data.shortage,
       expiration_date: data.shelfLife,
-      wholesalePrice: data.wholesalePrice,
+      wholesale_price: data.wholesalePrice,
     };
     
     const response = yield call(itemsAPI.updateItem, id, updateData);

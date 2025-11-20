@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Package, Edit, Trash2, Factory, Save, X } from 'lucide-react';
 import Pagination from '../common/Pagination';
-import { fetchItems, updateItem, deleteItem } from '../../store/modules/basic/actions';
+import { fetchItems, updateItem, deleteItem, fetchFactories } from '../../store/modules/basic/actions';
 import {
   selectItems,
   selectItemsLoading,
   selectItemOperation,
   selectItemOperationLoading,
+  selectFactories,
+  selectFactoriesLoading,
 } from '../../store/modules/basic/selectors';
 
 const BasicItemList = () => {
@@ -18,6 +20,8 @@ const BasicItemList = () => {
   const itemsLoading = useSelector(selectItemsLoading);
   const itemOperation = useSelector(selectItemOperation);
   const itemOperationLoading = useSelector(selectItemOperationLoading);
+  const factories = useSelector(selectFactories) || [];
+  const factoriesLoading = useSelector(selectFactoriesLoading);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -25,9 +29,10 @@ const BasicItemList = () => {
   const [editingItemId, setEditingItemId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-  // 컴포넌트 마운트 시 품목 목록 조회
+  // 컴포넌트 마운트 시 품목 목록 및 공장 목록 조회
   useEffect(() => {
     dispatch(fetchItems.request());
+    dispatch(fetchFactories.request());
   }, [dispatch]);
 
   // 품목 수정/삭제 성공 시 목록 다시 조회
@@ -82,6 +87,7 @@ const BasicItemList = () => {
 
   const handleEditSave = (item) => {
     const payload = {
+      code: item.code, // 품목코드 포함
       name: editForm.name.trim(),
       category: editForm.category,
       factoryId: Number(editForm.factoryId),
@@ -94,8 +100,29 @@ const BasicItemList = () => {
     dispatch(updateItem.request({ id: item.id, data: payload }));
   };
 
+  // 카테고리 영어 값을 한글로 변환
+  const getCategoryName = (category) => {
+    const categoryMap = {
+      'raw_material': '원재료',
+      'semi_finished': '반재료',
+      'finished_product': '완제품',
+      'consumable': '소모품',
+      '원재료': '원재료',
+      '반재료': '반재료',
+      '완제품': '완제품',
+      '소모품': '소모품',
+    };
+    return categoryMap[category] || category || '-';
+  };
+
   const getFactoryName = (item) => {
-    const factoryId = item?.factoryId || item?.Factory?.id;
+    const factoryId = item?.factoryId || item?.Factory?.id || item?.factory_id;
+    // Redux에서 공장 목록을 가져와서 매칭
+    const factory = factories.find(f => f.id === factoryId);
+    if (factory) {
+      return factory.name || factory.title || `공장 ${factoryId}`;
+    }
+    // 공장 목록이 없을 때는 ID로 표시
     if (factoryId === 1) return '1공장';
     if (factoryId === 2) return '2공장';
     return item?.Factory?.name || item?.factory?.name || '-';
@@ -201,11 +228,11 @@ const BasicItemList = () => {
                         </select>
                       ) : (
                         <span className='inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700'>
-                          {item.category}
+                          {getCategoryName(item.category)}
                         </span>
                       )}
                     </td>
-                    {/* 담당공장 -(select - 1공장, 2공장) */}
+                    {/* 담당공장 -(select) */}
                     <td className='px-4 py-4'>
                       {editing ? (
                         <select
@@ -215,9 +242,15 @@ const BasicItemList = () => {
                           disabled={itemOperationLoading}
                         >
                           <option value="" disabled hidden>선택</option>
-                          {factoryOptions.map((opt, idx) => (
-                            <option key={opt} value={idx + 1}>{opt}</option>
-                          ))}
+                          {factoriesLoading ? (
+                            <option value="" disabled>불러오는 중...</option>
+                          ) : (
+                            factories.map((factory) => (
+                              <option key={factory.id} value={factory.id}>
+                                {factory.name || factory.title || `공장 ${factory.id}`}
+                              </option>
+                            ))
+                          )}
                         </select>
                       ) : (
                         <span className='inline-flex items-center gap-1 text-sm text-gray-700'>
