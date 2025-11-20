@@ -50,17 +50,6 @@ apiClient.interceptors.response.use(
       const status = error.response.status;
       const message = error.response.data?.message || error.message;
       console.error(`❌ API 오류 [${status}]:`, message);
-      if (status === 401) {
-        console.warn('⚠️ 인증이 만료되었습니다. 로그인 페이지로 이동합니다.');
-        // localStorage 초기화
-        // 세션 기반 인증: 쿠키는 백엔드에서 제거됨
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('users'); // 임시 데이터 정리
-        // 로그인 페이지로 강제 리다이렉트
-        if (window.location.pathname !== '/login') {
-          window.location.replace('/login');
-        }
-      }
       if (status === 403) {
         console.error('❌ 접근 권한이 없습니다.');
       }

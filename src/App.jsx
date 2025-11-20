@@ -1,6 +1,5 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import Home from './components/Home';
 import Dash from './pages/Dash';
 import Basic from './pages/Basic';
@@ -17,18 +16,11 @@ import Mypage from './pages/Mypage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { isMobile } from 'react-device-detect';
 import Scanner from './pages/Scanner';
-import { getMe } from './store/modules/auth/actions';
 
 export default function App() {
-  const dispatch = useDispatch();
-
   useEffect(() => {
     console.log(isMobile);
-    
-    // 앱 시작 시 세션 유효성 확인 (새로고침 시 로그인 상태 유지)
-    // 세션 쿠키가 있으면 사용자 정보를 가져와서 로그인 상태 복원
-    dispatch(getMe.request());
-  }, [dispatch]);
+  }, []);
   console.log(isMobile);
   return (
     <Routes>
