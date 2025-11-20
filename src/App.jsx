@@ -15,7 +15,7 @@ import Signup from './pages/Signup';
 import Mypage from './pages/Mypage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { isMobile } from 'react-device-detect';
-import Scanner from './pages/Scanner';
+// import Scanner from './pages/Scanner';
 
 export default function App() {
   useEffect(() => {
