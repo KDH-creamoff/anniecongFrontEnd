@@ -1,7 +1,7 @@
 import { Thermometer, X, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchStorageConditions, updateStorageCondition } from '../../store/modules/basic/actions';
+import { fetchStorageConditions, addStorageConditionItems, removeStorageConditionItem } from '../../store/modules/basic/actions';
 import {
   selectStorageConditions,
   selectStorageConditionsLoading,
@@ -21,73 +21,100 @@ const StorageTemperature = () => {
     dispatch(fetchStorageConditions.request());
   }, [dispatch]);
 
-  // 보관 조건 업데이트 성공 시 목록 다시 조회
+  // 보관 조건 업데이트/추가/제거 성공 시 목록 다시 조회
   useEffect(() => {
-    if (storageOperation) {
+    if (storageOperation?.data) {
       dispatch(fetchStorageConditions.request());
     }
   }, [storageOperation, dispatch]);
 
+  // 적용 품목 추가 성공 시 목록 다시 조회
+  const addItemsOperation = useSelector((state) => state.basic.addStorageConditionItems);
+  useEffect(() => {
+    if (addItemsOperation?.data) {
+      dispatch(fetchStorageConditions.request());
+    }
+  }, [addItemsOperation, dispatch]);
+
+  // 적용 품목 제거 성공 시 목록 다시 조회
+  const removeItemOperation = useSelector((state) => state.basic.removeStorageConditionItem);
+  useEffect(() => {
+    if (removeItemOperation?.data) {
+      dispatch(fetchStorageConditions.request());
+    }
+  }, [removeItemOperation, dispatch]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStorageId, setCurrentStorageId] = useState(null);
-  const [newItem, setNewItem] = useState('');
+  const [itemNamesInput, setItemNamesInput] = useState('');
   const [error, setError] = useState('');
 
   const handleOpenModal = (storageId) => {
     setCurrentStorageId(storageId);
     setIsModalOpen(true);
-    setNewItem('');
+    setItemNamesInput('');
     setError('');
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentStorageId(null);
-    setNewItem('');
+    setItemNamesInput('');
     setError('');
   };
 
-  const handleAddItem = () => {
-    if (!newItem.trim()) {
-      setError('품목명을 입력해주세요');
+  const handleAddItems = () => {
+    if (!itemNamesInput.trim()) {
+      setError('품목 이름을 입력해주세요');
       return;
     }
 
-    // 현재 보관 조건 찾기
-    const currentStorage = storageConditions.find((s) => s.id === currentStorageId);
-    if (currentStorage) {
-      const currentItems = Array.isArray(currentStorage.items) ? currentStorage.items : [];
-      const updatedStorage = {
-        ...currentStorage,
-        items: [...currentItems, newItem.trim()],
-      };
+    // 쉼표로 구분된 품목 이름들을 배열로 변환
+    const itemNames = itemNamesInput
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
 
-      // 리덕스 액션 dispatch
-      dispatch(updateStorageCondition.request({
-        id: currentStorageId,
-        data: updatedStorage,
-      }));
+    if (itemNames.length === 0) {
+      setError('품목 이름을 입력해주세요');
+      return;
     }
+
+    // Redux Saga 액션 dispatch (itemNames 사용)
+    dispatch(addStorageConditionItems.request({
+      storageConditionId: currentStorageId,
+      itemNames: itemNames,
+    }));
 
     handleCloseModal();
   };
 
-  const handleRemoveItem = (storageId, itemIndex) => {
-    // 해당 보관 조건 찾기
-    const currentStorage = storageConditions.find((s) => s.id === storageId);
-    if (currentStorage) {
-      const currentItems = Array.isArray(currentStorage.items) ? currentStorage.items : [];
-      const updatedStorage = {
-        ...currentStorage,
-        items: currentItems.filter((_, index) => index !== itemIndex),
-      };
+  const handleRemoveItem = (storageId, itemName) => {
+    if (!itemName) {
+      console.warn('품목 이름이 없습니다.');
+      return;
+    }
 
-      // 리덕스 액션 dispatch
-      dispatch(updateStorageCondition.request({
-        id: storageId,
-        data: updatedStorage,
+    if (window.confirm(`"${itemName}"을(를) 제거하시겠습니까?`)) {
+      // Redux Saga 액션 dispatch
+      dispatch(removeStorageConditionItem.request({
+        storageConditionId: storageId,
+        itemName: itemName,
       }));
     }
+  };
+
+  // applicable_items 문자열을 배열로 변환하는 헬퍼 함수
+  const parseApplicableItems = (applicableItems) => {
+    if (!applicableItems) return [];
+    if (typeof applicableItems === 'string') {
+      // 쉼표와 공백으로 구분된 문자열을 배열로 변환
+      return applicableItems.split(', ').filter(item => item.trim().length > 0);
+    }
+    if (Array.isArray(applicableItems)) {
+      return applicableItems;
+    }
+    return [];
   };
 
   // 로딩 중일 때
@@ -136,25 +163,18 @@ const StorageTemperature = () => {
                   적용 품목
                 </label>
                 <div className='flex flex-wrap items-center gap-2'>
-                  {(Array.isArray(storage.items) ? storage.items : []).map((item, index) => {
-                    // item이 객체인 경우 name, code, itemName 추출
-                    const itemName = typeof item === 'string' 
-                      ? item 
-                      : item?.name || item?.code || item?.itemName || '';
-                    
-                    return (
-                      <span
-                        key={index}
-                        className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'
-                      >
-                        {itemName}
-                        <X
-                          className='h-3 w-3 cursor-pointer hover:opacity-80'
-                          onClick={() => handleRemoveItem(storage.id, index)}
-                        />
-                      </span>
-                    );
-                  })}
+                  {parseApplicableItems(storage.applicable_items || storage.items).map((itemName, index) => (
+                    <span
+                      key={index}
+                      className='inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700'
+                    >
+                      {itemName}
+                      <X
+                        className='h-3 w-3 cursor-pointer hover:opacity-80'
+                        onClick={() => handleRemoveItem(storage.id, itemName)}
+                      />
+                    </span>
+                  ))}
                   <button
                     onClick={() => handleOpenModal(storage.id)}
                     className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
@@ -196,23 +216,26 @@ const StorageTemperature = () => {
             <div className='space-y-4'>
               <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  품목명
+                  품목 이름 (쉼표로 구분)
                 </label>
                 <input
                   type='text'
-                  value={newItem}
+                  value={itemNamesInput}
                   onChange={(e) => {
-                    setNewItem(e.target.value);
+                    setItemNamesInput(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder='품목명을 입력하세요'
+                  placeholder='예: 신선 육류, 신선 채소류, 반제품'
                   className={`w-full rounded-xl border ${
-                    error ? 'border-red-300' : 'border-gray-100'
-                  } bg-gray-100 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20`}
+                    error ? 'border-red-300' : 'border-gray-300'
+                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529]`}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') handleAddItem();
+                    if (e.key === 'Enter') handleAddItems();
                   }}
                 />
+                <p className='mt-1 text-xs text-gray-500'>
+                  품목 이름을 쉼표로 구분하여 입력하세요. 중복된 품목은 자동으로 제외됩니다.
+                </p>
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
 
@@ -224,7 +247,7 @@ const StorageTemperature = () => {
                   취소
                 </button>
                 <button
-                  onClick={handleAddItem}
+                  onClick={handleAddItems}
                   className='flex-1 rounded-xl bg-[#674529] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
                 >
                   추가
