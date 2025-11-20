@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import 'html5-qrcode/html5-qrcode.min.css';
 
 // 모바일 판별
 const isMobile =
@@ -17,80 +18,7 @@ const Scanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const html5QrCodeRef = useRef(null);
   const scannerIdRef = useRef(null);
-
-  // QR 코드 스캔 성공 핸들러
-  const onScanSuccess = (decodedText, decodedResult) => {
-    if (decodedText && !scannedResult) {
-      setScannedResult(decodedText);
-      stopScanning();
-      fetchInfoFromBackend(decodedText);
-    }
-  };
-
-  // 스캔 에러 핸들러
-  const onScanFailure = (error) => {
-    // NotFoundException은 정상적인 에러 (QR 코드를 찾지 못한 경우)
-    if (error && error !== 'NotFoundException') {
-      console.warn('스캔 에러:', error);
-    }
-  };
-
-  // 카메라 스캔 시작
-  const startScanning = async () => {
-    try {
-      setCameraError('');
-      setIsScanning(true);
-      
-      const html5QrCode = new Html5Qrcode(scannerIdRef.current);
-      html5QrCodeRef.current = html5QrCode;
-
-      // 모바일에서는 후면 카메라 사용
-      const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-        videoConstraints: {
-          facingMode: isMobile ? { exact: "environment" } : "user"
-        }
-      };
-
-      await html5QrCode.start(
-        { facingMode: isMobile ? { exact: "environment" } : "user" },
-        config,
-        onScanSuccess,
-        onScanFailure
-      );
-    } catch (err) {
-      console.error('카메라 시작 실패:', err);
-      setCameraError('카메라 접근이 불가능합니다. 카메라 권한을 허용해주세요.');
-      setIsScanning(false);
-    }
-  };
-
-  // 스캔 중지
-  const stopScanning = async () => {
-    try {
-      if (html5QrCodeRef.current && isScanning) {
-        await html5QrCodeRef.current.stop();
-        await html5QrCodeRef.current.clear();
-        html5QrCodeRef.current = null;
-        setIsScanning(false);
-      }
-    } catch (err) {
-      console.error('스캔 중지 실패:', err);
-    }
-  };
-
-  // 컴포넌트 마운트 시 스캔 시작
-  useEffect(() => {
-    if (isMobile && !scannedResult && !loading) {
-      startScanning();
-    }
-    
-    return () => {
-      stopScanning();
-    };
-  }, []);
+  const scannedResultRef = useRef('');
 
   // 백엔드에서 정보 가져오기 예시 (실제 API엔드포인트로 바꿔야 함)
   const fetchInfoFromBackend = async (code) => {
@@ -125,9 +53,103 @@ const Scanner = () => {
     }
   };
 
+  // 스캔 중지
+  const stopScanning = async () => {
+    try {
+      if (html5QrCodeRef.current && isScanning) {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+        html5QrCodeRef.current = null;
+        setIsScanning(false);
+      }
+    } catch (err) {
+      console.error('스캔 중지 실패:', err);
+    }
+  };
+
+  // QR 코드 스캔 성공 핸들러
+  const onScanSuccess = (decodedText, decodedResult) => {
+    if (decodedText && !scannedResultRef.current) {
+      scannedResultRef.current = decodedText;
+      setScannedResult(decodedText);
+      stopScanning();
+      fetchInfoFromBackend(decodedText);
+    }
+  };
+
+  // 스캔 에러 핸들러
+  const onScanFailure = (error) => {
+    // NotFoundException은 정상적인 에러 (QR 코드를 찾지 못한 경우)
+    if (error && error !== 'NotFoundException') {
+      console.warn('스캔 에러:', error);
+    }
+  };
+
+  // 카메라 스캔 시작
+  const startScanning = async () => {
+    try {
+      setCameraError('');
+      
+      // 이미 스캔 중이면 중지
+      if (html5QrCodeRef.current) {
+        await stopScanning();
+      }
+      
+      const html5QrCode = new Html5Qrcode(scannerIdRef.current);
+      html5QrCodeRef.current = html5QrCode;
+
+      // 모바일에서는 후면 카메라 사용
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+      };
+
+      const cameraIdOrConfig = isMobile 
+        ? { facingMode: { exact: "environment" } }
+        : { facingMode: "user" };
+
+      await html5QrCode.start(
+        cameraIdOrConfig,
+        config,
+        onScanSuccess,
+        onScanFailure
+      );
+      
+      setIsScanning(true);
+    } catch (err) {
+      console.error('카메라 시작 실패:', err);
+      setCameraError('카메라 접근이 불가능합니다. 카메라 권한을 허용해주세요.');
+      setIsScanning(false);
+      if (html5QrCodeRef.current) {
+        html5QrCodeRef.current = null;
+      }
+    }
+  };
+
+  // 컴포넌트 마운트 시 스캔 시작
+  useEffect(() => {
+    if (isMobile && !scannedResult && !loading) {
+      // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 시작
+      const timer = setTimeout(() => {
+        startScanning();
+      }, 300);
+      
+      return () => {
+        clearTimeout(timer);
+        stopScanning();
+      };
+    }
+    
+    return () => {
+      stopScanning();
+    };
+  }, []);
+
   // 다시 스캔
   const handleRescan = async () => {
     await stopScanning();
+    scannedResultRef.current = '';
     setScannedResult('');
     setErrorMessage('');
     setApiData(null);
@@ -136,7 +158,7 @@ const Scanner = () => {
     // 스캔 재시작
     setTimeout(() => {
       startScanning();
-    }, 100);
+    }, 200);
   };
 
   // 모바일이 아닌 경우
