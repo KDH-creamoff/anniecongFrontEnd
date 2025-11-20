@@ -50,17 +50,6 @@ apiClient.interceptors.response.use(
       const status = error.response.status;
       const message = error.response.data?.message || error.message;
       console.error(`❌ API 오류 [${status}]:`, message);
-      if (status === 401) {
-        console.warn('⚠️ 인증이 만료되었습니다. 로그인 페이지로 이동합니다.');
-        // localStorage 초기화
-        // 세션 기반 인증: 쿠키는 백엔드에서 제거됨
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('users'); // 임시 데이터 정리
-        // 로그인 페이지로 강제 리다이렉트
-        if (window.location.pathname !== '/login') {
-          window.location.replace('/login');
-        }
-      }
       if (status === 403) {
         console.error('❌ 접근 권한이 없습니다.');
       }
@@ -409,7 +398,12 @@ export const factoriesAPI = {
     return response;
   },
   addProcesses: async (id, data) => {
-    const response = await apiClient.post(`/factories/${id}/processes`, data);
+    // processNames 또는 processIds 지원
+    // processNames가 있으면 processNames 사용, 없으면 processIds 사용
+    const requestData = data.processNames 
+      ? { processNames: data.processNames }
+      : { processIds: data.processIds };
+    const response = await apiClient.post(`/factories/${id}/processes`, requestData);
     return response;
   },
   removeProcess: async (id, processId) => {
@@ -458,15 +452,36 @@ export const storageConditionsAPI = {
     return response;
   },
   createStorageCondition: async (data) => {
-    const response = await apiClient.post('/storage-conditions', data);
+    // itemNames가 있으면 itemNames로 변환, 없으면 그대로 전송
+    const requestData = data.itemNames 
+      ? { ...data, itemNames: data.itemNames }
+      : data;
+    const response = await apiClient.post('/storage-conditions', requestData);
     return response;
   },
   updateStorageCondition: async (id, data) => {
-    const response = await apiClient.put(`/storage-conditions/${id}`, data);
+    // itemNames가 있으면 itemNames로 변환, 없으면 그대로 전송
+    const requestData = data.itemNames 
+      ? { ...data, itemNames: data.itemNames }
+      : data;
+    const response = await apiClient.put(`/storage-conditions/${id}`, requestData);
     return response;
   },
   deleteStorageCondition: async (id) => {
     const response = await apiClient.delete(`/storage-conditions/${id}`);
+    return response;
+  },
+  addItems: async (id, data) => {
+    // itemNames 배열을 받아서 추가
+    const response = await apiClient.post(`/storage-conditions/${id}/items`, { itemNames: data.itemNames });
+    return response;
+  },
+  removeItem: async (id, data) => {
+    // itemName 문자열을 받아서 제거
+    // DELETE 요청에서 body를 전달하려면 data 옵션 사용
+    const response = await apiClient.delete(`/storage-conditions/${id}/items`, { 
+      data: { itemName: data.itemName } 
+    });
     return response;
   },
 };
@@ -477,6 +492,10 @@ export const storageConditionsAPI = {
 export const processesAPI = {
   getProcesses: async () => {
     const response = await apiClient.get('/processes');
+    return response;
+  },
+  createProcess: async (data) => {
+    const response = await apiClient.post('/processes', data);
     return response;
   },
 };
