@@ -9,6 +9,21 @@ const BOMRegistration = ({ onSave }) => {
   // Redux에서 아이템 목록 가져오기
   const { data: items, loading: itemsLoading } = useSelector((state) => state.basic.items);
   
+  // 카테고리 영어 값을 한글로 변환
+  const getCategoryName = (category) => {
+    const categoryMap = {
+      'RawMaterial': '원재료',
+      'SemiFinished': '반제품',
+      'Finished': '완제품',
+      'Supply': '소모품',
+      '원재료': '원재료',
+      '반제품': '반제품',
+      '완제품': '완제품',
+      '소모품': '소모품',
+    };
+    return categoryMap[category] || category || '-';
+  };
+
   // 원재료/반재료만 필터링 (한글 및 영어 카테고리 모두 포함)
   const rawAndSemiMaterials = (items || []).filter(
     (item) => 
@@ -56,13 +71,26 @@ const BOMRegistration = ({ onSave }) => {
     }
   };
 
-  // 필요량 입력 시
+  // 필요량 입력 시 (소수점 2자리까지 허용)
   const handleAmountChange = (amount) => {
-    const numAmount = parseFloat(amount) || '';
-    setNewMaterial({
-      ...newMaterial,
-      amount: numAmount,
-    });
+    // 빈 값 허용
+    if (amount === '' || amount === null || amount === undefined) {
+      setNewMaterial({
+        ...newMaterial,
+        amount: '',
+      });
+      return;
+    }
+
+    // 숫자만 허용하고 소수점 2자리까지 제한
+    const regex = /^\d*\.?\d{0,2}$/;
+    if (regex.test(amount)) {
+      const numAmount = parseFloat(amount);
+      setNewMaterial({
+        ...newMaterial,
+        amount: isNaN(numAmount) ? '' : numAmount,
+      });
+    }
   };
 
   // 단위 선택 시
@@ -168,7 +196,9 @@ const BOMRegistration = ({ onSave }) => {
               <tr key={item.id} className='border-b border-gray-100'>
                 <td className='px-4 py-3 text-sm text-gray-700'>{item.code}</td>
                 <td className='px-4 py-3 text-sm text-gray-700'>{item.name}</td>
-                <td className='px-4 py-3 text-sm text-gray-700'>{item.amount}</td>
+                <td className='px-4 py-3 text-sm text-gray-700'>
+                  {typeof item.amount === 'number' ? item.amount.toFixed(2) : item.amount}
+                </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>{item.unit}</td>
                 <td className='px-4 py-3 text-center'>
                   <button
@@ -202,7 +232,7 @@ const BOMRegistration = ({ onSave }) => {
                     <option value=''>원재료/반재료 선택</option>
                     {rawAndSemiMaterials.map((material) => (
                       <option key={material.code} value={material.code}>
-                        [{material.category}] {material.name} ({material.code})
+                        [{getCategoryName(material.category)}] {material.name}
                       </option>
                     ))}
                   </select>
@@ -213,6 +243,8 @@ const BOMRegistration = ({ onSave }) => {
                 <td className='px-4 py-3 text-sm text-gray-700'>
                   <input
                     type='number'
+                    step='0.01'
+                    min='0'
                     value={newMaterial.amount}
                     onChange={(e) => handleAmountChange(e.target.value)}
                     onKeyDown={(e) => {
@@ -221,7 +253,7 @@ const BOMRegistration = ({ onSave }) => {
                       }
                     }}
                     className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
-                    placeholder='필요량'
+                    placeholder='0.00'
                   />
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>
