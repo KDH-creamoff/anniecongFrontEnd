@@ -41,8 +41,14 @@ const BasicNewItem = () => {
 
   // 컴포넌트 마운트 시 보관 조건 목록 조회
   useEffect(() => {
+    console.log('BasicNewItem 컴포넌트 마운트됨');
     dispatch(fetchStorageConditions.request());
   }, [dispatch]);
+  
+  // handleSubmit 함수가 제대로 정의되었는지 확인
+  useEffect(() => {
+    console.log('handleSubmit 함수 확인:', typeof handleSubmit);
+  }, []);
 
   useEffect(() => {
     if (itemOperationError) {
@@ -53,7 +59,7 @@ const BasicNewItem = () => {
   const handleInputChange = (field, value) => {
     // 보관 조건 선택 시 id와 name을 모두 저장
     if (field === 'storageConditionId') {
-      const selectedStorage = storageConditions.find((sc) => sc.id === Number(value));
+      const selectedStorage = storageConditions.find((sc) => sc.id === value);
       setFormData((prev) => ({ 
         ...prev, 
         storageConditionId: value,
@@ -94,8 +100,28 @@ const BasicNewItem = () => {
   };
 
   const handleSubmit = () => {
-    if (itemOperationLoading) return;
-    if (!validateForm()) return;
+    console.log('handleSubmit 호출됨');
+    console.log('itemOperationLoading:', itemOperationLoading);
+    console.log('formData:', formData);
+    
+    if (itemOperationLoading) {
+      console.log('로딩 중이므로 리턴');
+      return;
+    }
+    
+    if (!validateForm()) {
+      console.log('유효성 검사 실패');
+      return;
+    }
+
+    // storage_condition_id와 storage_temp를 console.log로 출력
+    const storageConditionId = Number(formData.storageConditionId);
+    const storageTemp = formData.storageTemp;
+    
+    console.log('=== 등록 버튼 클릭 ===');
+    console.log('storage_condition_id:', storageConditionId);
+    console.log('storage_temp:', storageTemp);
+    console.log('===================');
 
     // Redux Saga를 통해 품목 등록 요청
     dispatch(
@@ -104,8 +130,8 @@ const BasicNewItem = () => {
         name: formData.name.trim(),
         category: formData.category,
         factoryId: Number(formData.factoryId),
-        storage_condition_id: Number(formData.storageConditionId), // 보관 조건 id
-        storage_temp: formData.storageTemp, // 보관 조건 name
+        storageConditionId: storageConditionId, // 보관 조건 id (Number로 변환)
+        storageTemp: storageTemp, // 보관 조건 name
         shelfLife: Number(formData.shelfLife),
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
@@ -350,7 +376,11 @@ const BasicNewItem = () => {
             <button
               type="button"
               disabled={itemOperationLoading}
-              onClick={handleSubmit}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+              }}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#674529] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95 disabled:opacity-60"
             >
               <span>{itemOperationLoading ? '등록중…' : '등록'}</span>

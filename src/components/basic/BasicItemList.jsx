@@ -115,15 +115,15 @@ const BasicItemList = () => {
   const factoryOptions = ['1공장', '2공장'];
   const storageOptions = ['냉동', '냉장', '실온'];
   const columnWidths = [
-    { width: '9%', key: 'code' },
     { width: '20%', key: 'name' },
+    { width: '9%', key: 'code' },
     { width: '9%', key: 'category' },
     { width: '9%', key: 'factory' },
     { width: '9%', key: 'storage' },
     { width: '9%', key: 'shelfLife' },
-    { width: '9%', key: 'price' },
-    { width: '9%', key: 'quantity' },
+    { width: '9%', key: 'shortage' },
     { width: '9%', key: 'unit' },
+    { width: '9%', key: 'price' },
     { width: '8%', key: 'actions' },
   ];
 
@@ -143,15 +143,15 @@ const BasicItemList = () => {
           </colgroup>
           <thead className='border-b border-gray-200'>
             <tr>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>품목코드</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>품목명</th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>품목코드</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>카테고리</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>담당공장</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>보관조건</th>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>유통기한(일)</th>
-              <th className='px-4 py-3 text-right text-sm font-medium text-gray-900'>도매가(원)</th>
-              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>수량</th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>유통기한</th>
+              <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>최소 보유 갯수</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>단위</th>
+              <th className='px-4 py-3 text-right text-sm font-medium text-gray-900'>도매가</th>
               <th className='px-4 py-3 text-left text-sm font-medium text-gray-900'>작업</th>
             </tr>
           </thead>
@@ -167,10 +167,6 @@ const BasicItemList = () => {
                 const editing = editingItemId === item.id;
                 return (
                   <tr key={item.id} className='transition-colors hover:bg-gray-50/50'>
-                    {/* 품목코드 - 읽기전용 (10자 미만) */}
-                    <td className='px-4 py-4 text-sm font-medium text-gray-900'>
-                      {item.code}
-                    </td>
                     {/* 품목명 -(50자 이하) */}
                     <td className='px-4 py-4 text-sm text-gray-900'>
                       {editing ? (
@@ -185,6 +181,10 @@ const BasicItemList = () => {
                       ) : (
                         <div className="truncate" title={item.name}>{item.name}</div>
                       )}
+                    </td>
+                    {/* 품목코드 - 읽기전용 (10자 미만) */}
+                    <td className='px-4 py-4 text-sm font-medium text-gray-900'>
+                      {item.code}
                     </td>
                     {/* 카테고리 -(select) */}
                     <td className='px-4 py-4'>
@@ -260,24 +260,9 @@ const BasicItemList = () => {
                         item.expiration_date || item.shelfLife || item.shelf_life || '-'
                       )}
                     </td>
-                    {/* 도매가 */}
-                    <td className='px-4 py-4 text-right text-sm text-gray-700'>
-                      {editing ? (
-                        <input
-                          type="number"
-                          min={0}
-                          value={editForm.wholesalePrice}
-                          onChange={e => handleEditChange("wholesalePrice", e.target.value)}
-                          className="w-full rounded border border-gray-200 px-2 py-1 text-xs text-right"
-                          disabled={itemOperationLoading}
-                        />
-                      ) : (
-                        price == null ? '-' : Number(price).toLocaleString()
-                      )}
-                    </td>
-                    {/* 수량 - 읽기전용 */}
+                    {/* 최소 보유 갯수 */}
                     <td className='px-4 py-4 text-sm text-gray-700'>
-                      {qty == null ? '-' : Number(qty).toLocaleString()}
+                      {item.shortage ?? item.shortage_amount ?? '-'}
                     </td>
                     {/* 단위 -(select - kg, g, ea, box, pallet) */}
                     <td className='px-4 py-4 text-sm text-gray-700'>
@@ -294,6 +279,21 @@ const BasicItemList = () => {
                         </select>
                       ) : (
                         item.unit
+                      )}
+                    </td>
+                    {/* 도매가 */}
+                    <td className='px-4 py-4 text-right text-sm text-gray-700'>
+                      {editing ? (
+                        <input
+                          type="number"
+                          min={0}
+                          value={editForm.wholesalePrice}
+                          onChange={e => handleEditChange("wholesalePrice", e.target.value)}
+                          className="w-full rounded border border-gray-200 px-2 py-1 text-xs text-right"
+                          disabled={itemOperationLoading}
+                        />
+                      ) : (
+                        price == null ? '-' : Number(price).toLocaleString()
                       )}
                     </td>
                     {/* 작업 */}

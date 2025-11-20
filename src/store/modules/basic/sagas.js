@@ -219,6 +219,8 @@ function* createItemSaga(action) {
       category: payload.category,
       unit: payload.unit,
       factory_id: payload.factoryId,
+      storage_temp: payload.storageTemp, // 보관 조건 name
+      storage_condition_id: payload.storageConditionId, // 보관 조건 ID
       shortage: payload.shortage,
       expiration_date: payload.shelfLife,
       wholesale_price: payload.wholesalePrice,
