@@ -9,9 +9,13 @@ const BOMRegistration = ({ onSave }) => {
   // Redux에서 아이템 목록 가져오기
   const { data: items, loading: itemsLoading } = useSelector((state) => state.basic.items);
   
-  // 원재료/반재료만 필터링
+  // 원재료/반재료만 필터링 (한글 및 영어 카테고리 모두 포함)
   const rawAndSemiMaterials = (items || []).filter(
-    (item) => item.category === '원재료' || item.category === '반재료'
+    (item) => 
+      item.category === '원재료' || 
+      item.category === '반제품' ||
+      item.category === 'RawMaterial' || 
+      item.category === 'SemiFinished'
   );
 
   // 컴포넌트 마운트 시 아이템 목록 조회

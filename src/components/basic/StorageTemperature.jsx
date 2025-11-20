@@ -80,6 +80,22 @@ const StorageTemperature = () => {
       return;
     }
 
+    // 현재 보관 조건의 기존 품목 목록 가져오기
+    const currentStorage = storageConditions.find(sc => sc.id === currentStorageId);
+    const existingItems = currentStorage 
+      ? parseApplicableItems(currentStorage.applicable_items || currentStorage.items)
+      : [];
+
+    // 중복 체크
+    const duplicates = itemNames.filter(itemName => 
+      existingItems.some(existing => existing.trim() === itemName.trim())
+    );
+
+    if (duplicates.length > 0) {
+      setError(`이미 등록된 품목입니다: ${duplicates.join(', ')}`);
+      return;
+    }
+
     // Redux Saga 액션 dispatch (itemNames 사용)
     dispatch(addStorageConditionItems.request({
       storageConditionId: currentStorageId,

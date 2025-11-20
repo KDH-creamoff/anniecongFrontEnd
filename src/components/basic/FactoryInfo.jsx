@@ -139,13 +139,17 @@ const FactoryInfo = () => {
     handleCloseModal();
   };
 
-  const handleRemoveProcess = (factoryId, processId) => {
+  const handleRemoveProcess = (factoryId, processId, processName) => {
     if (!processId) {
       console.warn('공정 ID가 없습니다.');
       return;
     }
 
-    if (window.confirm('공정을 제거하시겠습니까?')) {
+    const confirmMessage = processName 
+      ? `"${processName}" 공정을 제거하시겠습니까?`
+      : '공정을 제거하시겠습니까?';
+
+    if (window.confirm(confirmMessage)) {
       // Redux Saga 액션 dispatch
       dispatch(removeFactoryProcess.request({
         factoryId: factoryId,
@@ -219,7 +223,7 @@ const FactoryInfo = () => {
                         {processName}
                         <X
                           className='h-3 w-3 cursor-pointer hover:opacity-80'
-                          onClick={() => handleRemoveProcess(factory.id, processId || index)}
+                          onClick={() => handleRemoveProcess(factory.id, processId || index, processName)}
                         />
                       </span>
                     );
