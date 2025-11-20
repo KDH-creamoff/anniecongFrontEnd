@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import 'html5-qrcode/html5-qrcode.min.css';
 
 // 모바일 판별
 const isMobile =
