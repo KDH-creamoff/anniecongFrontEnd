@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Package, Edit, Trash2, Factory, Save, X } from 'lucide-react';
 import Pagination from '../common/Pagination';
-import { fetchItems, updateItem, deleteItem, fetchFactories } from '../../store/modules/basic/actions';
+import { fetchItems, updateItem, deleteItem, fetchFactories, fetchStorageConditions } from '../../store/modules/basic/actions';
 import {
   selectItems,
   selectItemsLoading,
@@ -10,6 +10,8 @@ import {
   selectItemOperationLoading,
   selectFactories,
   selectFactoriesLoading,
+  selectStorageConditions,
+  selectStorageConditionsLoading,
 } from '../../store/modules/basic/selectors';
 
 const BasicItemList = () => {
@@ -22,6 +24,8 @@ const BasicItemList = () => {
   const itemOperationLoading = useSelector(selectItemOperationLoading);
   const factories = useSelector(selectFactories) || [];
   const factoriesLoading = useSelector(selectFactoriesLoading);
+  const storageConditions = useSelector(selectStorageConditions) || [];
+  const storageConditionsLoading = useSelector(selectStorageConditionsLoading);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -29,10 +33,11 @@ const BasicItemList = () => {
   const [editingItemId, setEditingItemId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-  // 컴포넌트 마운트 시 품목 목록 및 공장 목록 조회
+  // 컴포넌트 마운트 시 품목 목록, 공장 목록, 보관 조건 목록 조회
   useEffect(() => {
     dispatch(fetchItems.request());
     dispatch(fetchFactories.request());
+    dispatch(fetchStorageConditions.request());
   }, [dispatch]);
 
   // 품목 수정/삭제 성공 시 목록 다시 조회
@@ -62,12 +67,17 @@ const BasicItemList = () => {
 
   const handleEditStart = (item) => {
     setEditingItemId(item.id);
+    // storageConditionId는 ID로 저장되어야 함
+    const storageConditionId = item.storage_condition_id || item.storageConditionId || item.StorageCondition?.id || '';
+    // 카테고리는 영어 값으로 저장되어야 함
+    const category = item.category || '';
     setEditForm({
       name: item.name,
-      category: item.category,
-      factoryId: item.factoryId || item.Factory?.id || '',
-      storageConditionId: item.storageConditionId || item.StorageCondition?.name || '',
+      category: category, // 영어 값 그대로 저장
+      factoryId: item.factory_id || item.factoryId || item.Factory?.id || '',
+      storageConditionId: storageConditionId,
       shelfLife: item.expiration_date || item.shelfLife || item.shelf_life || '',
+      shortage: item.shortage ?? item.shortage_amount ?? '',
       wholesalePrice: item.wholesalePrice ?? item.wholesale_price ?? '',
       unit: item.unit,
     });
@@ -91,8 +101,9 @@ const BasicItemList = () => {
       name: editForm.name.trim(),
       category: editForm.category,
       factoryId: Number(editForm.factoryId),
-      storageConditionId: editForm.storageConditionId,
+      storageConditionId: Number(editForm.storageConditionId), // ID로 변환
       shelfLife: Number(editForm.shelfLife),
+      shortage: Number(editForm.shortage) || 0, // 최소 보유 갯수 포함
       wholesalePrice: Number(editForm.wholesalePrice) || 0,
       unit: editForm.unit,
     };
@@ -103,16 +114,31 @@ const BasicItemList = () => {
   // 카테고리 영어 값을 한글로 변환
   const getCategoryName = (category) => {
     const categoryMap = {
+      'RawMaterial': '원재료',
+      'SemiFinished': '반제품',
+      'Finished': '완제품',
+      'Supply': '소모품',
       'raw_material': '원재료',
       'semi_finished': '반재료',
       'finished_product': '완제품',
       'consumable': '소모품',
       '원재료': '원재료',
-      '반재료': '반재료',
+      '반제품': '반제품',
       '완제품': '완제품',
       '소모품': '소모품',
     };
     return categoryMap[category] || category || '-';
+  };
+  
+  // 한글 카테고리를 영어로 변환 (저장용)
+  const getCategoryValue = (category) => {
+    const reverseMap = {
+      '원재료': 'RawMaterial',
+      '반제품': 'SemiFinished',
+      '완제품': 'Finished',
+      '소모품': 'Supply',
+    };
+    return reverseMap[category] || category;
   };
 
   const getFactoryName = (item) => {
@@ -128,8 +154,16 @@ const BasicItemList = () => {
     return item?.Factory?.name || item?.factory?.name || '-';
   };
 
-  const getStorageName = (item) =>
-    item?.StorageCondition?.name || item?.storageCondition?.name || item?.storageConditionId || '-';
+  const getStorageName = (item) => {
+    const storageConditionId = item?.storage_condition_id || item?.storageConditionId || item?.StorageCondition?.id;
+    if (storageConditionId) {
+      const condition = storageConditions.find(sc => sc.id === storageConditionId);
+      if (condition) {
+        return condition.name || condition.title || '-';
+      }
+    }
+    return item?.StorageCondition?.name || item?.storageCondition?.name || '-';
+  };
 
   const getWholesalePrice = (item) =>
     item.wholesalePrice ?? item.wholesale_price ?? item.default_wholesale_price ?? null;
@@ -217,11 +251,17 @@ const BasicItemList = () => {
                     <td className='px-4 py-4'>
                       {editing ? (
                         <select
-                          value={editForm.category}
-                          onChange={e => handleEditChange("category", e.target.value)}
+                          value={getCategoryName(editForm.category) || editForm.category || ''}
+                          onChange={e => {
+                            // 한글 값을 영어로 변환하여 저장
+                            const selectedKorean = e.target.value;
+                            const englishValue = getCategoryValue(selectedKorean);
+                            handleEditChange("category", englishValue);
+                          }}
                           className="w-full rounded border border-gray-200 px-2 py-1 text-xs"
                           disabled={itemOperationLoading}
                         >
+                          <option value="" disabled hidden>선택</option>
                           {categoryOptions.map(opt => (
                             <option key={opt} value={opt}>{opt}</option>
                           ))}
@@ -259,7 +299,7 @@ const BasicItemList = () => {
                         </span>
                       )}
                     </td>
-                    {/* 보관조건 -(4글자) */}
+                    {/* 보관조건 */}
                     <td className='px-4 py-4 text-sm text-gray-700'>
                       {editing ? (
                         <select
@@ -269,9 +309,15 @@ const BasicItemList = () => {
                           disabled={itemOperationLoading}
                         >
                           <option value="" disabled hidden>선택</option>
-                          {storageOptions.map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
+                          {storageConditionsLoading ? (
+                            <option value="" disabled>불러오는 중...</option>
+                          ) : (
+                            storageConditions.map((condition) => (
+                              <option key={condition.id} value={condition.id}>
+                                {condition.name || condition.title || '-'}
+                              </option>
+                            ))
+                          )}
                         </select>
                       ) : (
                         getStorageName(item)
@@ -295,7 +341,18 @@ const BasicItemList = () => {
                     </td>
                     {/* 최소 보유 갯수 */}
                     <td className='px-4 py-4 text-sm text-gray-700'>
-                      {item.shortage ?? item.shortage_amount ?? '-'}
+                      {editing ? (
+                        <input
+                          type="number"
+                          min={0}
+                          value={editForm.shortage}
+                          onChange={e => handleEditChange("shortage", e.target.value)}
+                          className="w-full rounded border border-gray-200 px-2 py-1 text-xs text-right"
+                          disabled={itemOperationLoading}
+                        />
+                      ) : (
+                        item.shortage ?? item.shortage_amount ?? '-'
+                      )}
                     </td>
                     {/* 단위 -(select - kg, g, ea, box, pallet) */}
                     <td className='px-4 py-4 text-sm text-gray-700'>
