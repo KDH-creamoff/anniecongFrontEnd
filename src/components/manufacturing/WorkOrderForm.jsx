@@ -12,7 +12,7 @@ const WorkOrderForm = () => {
   // 작업 내용 폼 상태
   const [workForm, setWorkForm] = useState({
     title: '',
-    workType: '세척',
+    workType: '',
     material: '',
     materialCode: '',
     quantity: '',
@@ -31,6 +31,8 @@ const WorkOrderForm = () => {
 
   // BOM 선택 옵션
   const bomOptions = ['콩부장 쿠키', '맛있는 닭기슴살', '강아지 간식', '단호박과자'];
+
+  const workOptions = ['세척', '전처리', '포장'];
 
   // 담당자 선택 옵션
   const managerOptions = ['대표', '이사', '팀장', '직원', '알바'];
@@ -69,7 +71,7 @@ const WorkOrderForm = () => {
     // 폼 초기화
     setWorkForm({
       title: '',
-      workType: '세척',
+      workType: '',
       material: '',
       materialCode: '',
       quantity: '',
@@ -78,7 +80,7 @@ const WorkOrderForm = () => {
     });
     setSelectedFactory('');
     setSelectedManager('');
-    alert('작업 지시서가 등록되었습니다.');
+    alert('작업지시서가 등록되었습니다.');
   };
   
   // BOM 등록
@@ -113,12 +115,12 @@ const WorkOrderForm = () => {
     });
     setSelectedFactoryBom('');
     setSelectedManagerBom('');
-    alert('작업 지시서가 등록되었습니다.');
+    alert('작업지시서가 등록되었습니다.');
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-xl text-[#674529] mb-6">작업 지시서 등록</h3>
+      <h3 className="text-xl text-[#674529] font-bold mb-6">작업지시서 등록</h3>
 
       <div className="grid grid-cols-2 gap-6">
         {/* 좌측 - 작업 내용 */}
@@ -156,9 +158,12 @@ const WorkOrderForm = () => {
                 onChange={(e) => setWorkForm({...workForm, workType: e.target.value})}
                 className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
               >
-                <option>세척</option>
-                <option>전처리</option>
-                <option>포장</option>
+                <option value="" disabled hidden>작업 내용 선택</option>
+                {workOptions.map((work) => (
+                  <option key={work} value={work}>
+                    {work}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -236,7 +241,7 @@ const WorkOrderForm = () => {
                 onClick={handleWorkSubmit}
                 className="px-8 py-2 bg-[#674529] text-white text-sm rounded hover:bg-[#553821] transition-colors"
               >
-                작업 지시서 등록
+                작업지시서 등록
               </button>
             </div>
           </div>
@@ -346,7 +351,7 @@ const WorkOrderForm = () => {
                 onClick={handleBomSubmit}
                 className="px-8 py-2 bg-[#674529] text-white text-sm rounded hover:bg-[#553821] transition-colors"
               >
-                작업 지시서 등록
+                작업지시서 등록
               </button>
             </div>
           </div>

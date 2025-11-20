@@ -81,6 +81,10 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료 확인 (목록에 추가)
   const handleConfirmMaterial = () => {
+    if (newMaterial.name === '') {
+      alert('원재료를 선택해주세요.');
+      return;
+    } 
     if (newMaterial.code && newMaterial.name && newMaterial.amount && newMaterial.unit) {
       setCurrentMaterials([...currentMaterials, newMaterial]);
       setNewMaterial(null);

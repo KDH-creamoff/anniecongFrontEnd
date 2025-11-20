@@ -19,11 +19,12 @@ const ShippingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
         <table className='w-full table-fixed'>
           <colgroup>
             <col className='w-[12%]' />
-            <col className='w-[20%]' />
+            <col className='w-[28%]' />
             <col className='w-[12%]' />
             <col className='w-[12%]' />
             <col className='w-[12%]' />
-            <col className='w-[32%]' />
+            <col className='w-[10%]' />
+            <col className='w-[14%]' />
           </colgroup>
           <thead>
             <tr>
@@ -41,6 +42,9 @@ const ShippingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
               </th>
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 묶음 수
+              </th>
+              <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
+                출고완료일
               </th>
             </tr>
           </thead>

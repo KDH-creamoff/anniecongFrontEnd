@@ -2,13 +2,13 @@ import { createRequestTypes, createAsyncActions } from '../../../utils/sagaUtils
 
 // ==================== 액션 타입 ====================
 
-// 작업 지시서 관리
-export const FETCH_WORK_ORDERS = createRequestTypes('manufacturing/FETCH_WORK_ORDERS'); // 작업 지시서 목록 조회
-export const FETCH_WORK_ORDER_BY_ID = createRequestTypes('manufacturing/FETCH_WORK_ORDER_BY_ID'); // 작업 지시서 상세 조회
-export const CREATE_WORK_ORDER = createRequestTypes('manufacturing/CREATE_WORK_ORDER'); // 작업 지시서 등록
-export const UPDATE_WORK_ORDER = createRequestTypes('manufacturing/UPDATE_WORK_ORDER'); // 작업 지시서 수정
-export const DELETE_WORK_ORDER = createRequestTypes('manufacturing/DELETE_WORK_ORDER'); // 작업 지시서 삭제
-export const UPDATE_WORK_ORDER_STATUS = createRequestTypes('manufacturing/UPDATE_WORK_ORDER_STATUS'); // 작업 지시서 상태 변경
+// 작업지시서 관리
+export const FETCH_WORK_ORDERS = createRequestTypes('manufacturing/FETCH_WORK_ORDERS'); // 작업지시서 목록 조회
+export const FETCH_WORK_ORDER_BY_ID = createRequestTypes('manufacturing/FETCH_WORK_ORDER_BY_ID'); // 작업지시서 상세 조회
+export const CREATE_WORK_ORDER = createRequestTypes('manufacturing/CREATE_WORK_ORDER'); // 작업지시서 등록
+export const UPDATE_WORK_ORDER = createRequestTypes('manufacturing/UPDATE_WORK_ORDER'); // 작업지시서 수정
+export const DELETE_WORK_ORDER = createRequestTypes('manufacturing/DELETE_WORK_ORDER'); // 작업지시서 삭제
+export const UPDATE_WORK_ORDER_STATUS = createRequestTypes('manufacturing/UPDATE_WORK_ORDER_STATUS'); // 작업지시서 상태 변경
 
 // 제조 이력 관리
 export const FETCH_MANUFACTURING_HISTORY = createRequestTypes('manufacturing/FETCH_MANUFACTURING_HISTORY'); // 제조 이력 조회
@@ -41,7 +41,7 @@ export const RESET_MANUFACTURING_STATE = 'manufacturing/RESET_MANUFACTURING_STAT
 
 // ==================== 액션 생성자 ====================
 
-// 작업 지시서 관리
+// 작업지시서 관리
 export const fetchWorkOrders = createAsyncActions(FETCH_WORK_ORDERS);
 export const fetchWorkOrderById = createAsyncActions(FETCH_WORK_ORDER_BY_ID);
 export const createWorkOrder = createAsyncActions(CREATE_WORK_ORDER);

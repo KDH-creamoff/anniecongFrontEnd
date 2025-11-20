@@ -66,7 +66,7 @@ const MainModule = ({ onNavigate }) => {
     },
     {
       id: 'label',
-      title: '라벨 프린트',
+      title: '라벨관리',
       description: '',
       icon: <Tags className='h-6 w-6' />,
       nav: '라벨관리',

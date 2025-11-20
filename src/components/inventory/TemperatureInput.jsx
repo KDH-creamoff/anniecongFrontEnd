@@ -10,7 +10,7 @@ const TemperatureInput = ({ onFilterChange }) => {
     date: new Date().toISOString().split('T')[0],
     hour: '00',
     minute: '00',
-    storageType: '냉장고',
+    storageType: '',
     temperature: '',
     inspector: '',
   });
@@ -138,6 +138,7 @@ const TemperatureInput = ({ onFilterChange }) => {
               onChange={(e) => handleFilterChange('storageType', e.target.value)}
               className='w-full cursor-pointer appearance-none rounded-xl border-0 bg-[#f3f3f5] px-4 py-2.5 text-[#000] outline-none transition-all'
             >
+              <option value="" disabled hidden>보관 유형 선택</option>
               {storageTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}

@@ -21,11 +21,11 @@ const WorkOrderList = () => {
   });
   const [expandedOrderId, setExpandedOrderId] = useState(null);
 
-  // Redux에서 작업 지시서 목록 가져오기
+  // Redux에서 작업지시서 목록 가져오기
   const workOrdersFromRedux = useSelector(selectWorkOrders);
   const loading = useSelector(selectWorkOrdersLoading);
 
-  // 컴포넌트 마운트 시 작업 지시서 목록 조회
+  // 컴포넌트 마운트 시 작업지시서 목록 조회
   useEffect(() => {
     dispatch(fetchWorkOrders.request());
   }, [dispatch]);
@@ -141,7 +141,7 @@ const WorkOrderList = () => {
           workerCount={3}
         />
 
-        <h3 className="text-lg font-semibold text-[#674529] mb-4">작업 지시서 목록</h3>
+        <h3 className="text-lg font-semibold text-[#674529] mb-4">작업지시서 목록</h3>
 
         <div className="mb-6 flex items-center gap-4">
           {/* 작업 구분 필터 */}
@@ -176,7 +176,7 @@ const WorkOrderList = () => {
         <div className="space-y-6">
           {workOrders.length === 0 && !loading ? (
             <div className="text-center py-8 text-gray-500">
-              작업 지시서가 없습니다.
+              작업지시서가 없습니다.
             </div>
           ) : (
             workOrders.map((order) => (

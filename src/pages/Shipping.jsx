@@ -33,7 +33,7 @@ const Shipping = () => {
     <div>
       <div className='flex items-center space-x-2 mb-6'>
         <Box className='text-[#674529]' />
-        <div className='text-xl text-[#674529] font-semibold'>배송 관리</div>
+        <div className='text-xl text-[#674529] font-semibold'>배송관리</div>
       </div>
       {/* Tab Navigation - matching first image style */}
       <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-xl grid grid-cols-2">
