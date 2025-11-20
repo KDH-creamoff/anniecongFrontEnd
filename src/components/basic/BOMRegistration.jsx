@@ -35,7 +35,7 @@ const BOMRegistration = ({ onSave }) => {
       code: '',
       name: '',
       amount: '',
-      unit: 'g',
+      unit: '',
     });
   };
 
@@ -47,7 +47,7 @@ const BOMRegistration = ({ onSave }) => {
         ...newMaterial,
         code: material.code,
         name: material.name,
-        unit: material.unit || 'g', // 아이템의 단위 사용, 없으면 기본값
+        unit: material.unit || 'g', 
       });
     }
   };
@@ -221,17 +221,12 @@ const BOMRegistration = ({ onSave }) => {
                   />
                 </td>
                 <td className='px-4 py-3 text-sm text-gray-700'>
-                  <select
+                  <input
+                    type='text'
                     value={newMaterial.unit}
-                    onChange={(e) => handleUnitChange(e.target.value)}
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
-                  >
-                    <option value='g'>g</option>
-                    <option value='kg'>kg</option>
-                    <option value='ea'>ea</option>
-                    <option value='box'>box</option>
-                    <option value='pallet'>pallet</option>
-                  </select>
+                    readOnly
+                    className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none'
+                  />
                 </td>
                 <td className='px-4 py-3 text-center'>
                   <div className='flex items-center justify-center gap-2'>

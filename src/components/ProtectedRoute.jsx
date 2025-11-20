@@ -80,7 +80,8 @@ const ProtectedRoute = ({ permission, children }) => {
   //     </div>
   //   );
   // }
-  // 권한이 있는 경우
+
+  // // 권한이 있는 경우
   return children;
 };
 

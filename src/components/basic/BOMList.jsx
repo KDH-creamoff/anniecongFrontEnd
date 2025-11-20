@@ -292,24 +292,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                             className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-[#674529] focus:outline-none"
                                           />
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
-                                          <select
-                                            value={m.unit}
-                                            onChange={(e) => {
-                                              const newMaterials = editingBOM.materials.map((mat) =>
-                                                mat.id === m.id ? { ...mat, unit: e.target.value } : mat
-                                              );
-                                              setEditingBOM({ ...editingBOM, materials: newMaterials });
-                                            }}
-                                            className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-[#674529] focus:outline-none"
-                                          >
-                                            <option value="g">g</option>
-                                            <option value="kg">kg</option>
-                                            <option value="ea">ea</option>
-                                            <option value="box">box</option>
-                                            <option value="pallet">pallet</option>
-                                          </select>
-                                        </td>
+                                        <td className="px-4 py-2 text-xs text-gray-700">{m.unit}</td>
                                       </tr>
                                     ))}
                                   </tbody>

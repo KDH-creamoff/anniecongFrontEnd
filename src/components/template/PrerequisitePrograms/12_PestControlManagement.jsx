@@ -52,6 +52,36 @@ const PestControlManagement = ({ pdfRef }) => {
 
   return (
     <div className="mx-auto max-w-4xl bg-white p-8">
+      <div className="flex justify-end mb-6">
+        <table className="border-2 border-black border-collapse">
+          <tbody>
+            <tr>
+              <td className="h-8 border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+            </tr>
+            <tr>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div ref={contentRef} className="border border-black" style={{fontSize: '11px', lineHeight: '1'}}>
         {/* 상단 헤더 */}
         <table className="w-full border-collapse" style={{tableLayout: 'fixed', borderCollapse: 'collapse'}}>

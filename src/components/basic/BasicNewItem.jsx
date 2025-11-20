@@ -8,6 +8,8 @@ import {
   selectItemOperationError,
   selectStorageConditions,
   selectStorageConditionsLoading,
+  selectFactories,
+  selectFactoriesLoading,
 } from '../../store/modules/basic/selectors';
 
 const BasicNewItem = () => {
@@ -19,6 +21,8 @@ const BasicNewItem = () => {
   const itemOperationError = useSelector(selectItemOperationError);
   const storageConditions = useSelector(selectStorageConditions) || [];
   const storageConditionsLoading = useSelector(selectStorageConditionsLoading);
+  const factories = useSelector(selectFactories) || [];
+  const factoriesLoading = useSelector(selectFactoriesLoading);
 
   const [formData, setFormData] = useState({
     code: '',
@@ -34,12 +38,6 @@ const BasicNewItem = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const factoryOptions = [
-    { id: 1, name: '1공장' },
-    { id: 2, name: '2공장' },
-    { id: 3, name: '3창고' },
-    { id: 4, name: '4창고' },
-  ];
 
   // 컴포넌트 마운트 시 보관 조건 목록 조회
   useEffect(() => {
@@ -137,14 +135,18 @@ const BasicNewItem = () => {
     return (
       <>
         <option value="" disabled hidden>공장 선택</option>
-        {factoryOptions.map((f) => (
-          <option key={f.id} value={f.id}>
-            {f.name}
-          </option>
-        ))}
+        {factoriesLoading ? ( 
+          <option value="" disabled>불러오는 중...</option>
+        ) : (
+          factories.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name || f.title || '-'}
+            </option>
+          ))
+        )}       
       </>
     );
-  }, [factoryOptions]);
+  }, [factories, factoriesLoading]);
 
   const storageSelect = useMemo(() => {
     return (

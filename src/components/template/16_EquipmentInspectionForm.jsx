@@ -57,13 +57,13 @@ const EquipmentInspectionForm = ({ pdfRef }) => {
 
       <div ref={contentRef} className="w-full max-w-[1400px] mx-auto p-5 bg-white">
         {/* 제목 */}
-        <div className="border-2 border-black mb-2">
+        <div className="border-2 border-black mb-4">
           <h1 className="text-2xl font-bold text-center py-4">설비정기점검표</h1>
         </div>
 
         {/* 상단 정보 */}
       <div className="mb-1">
-        <div className="flex mb-1">
+        <div className="flex mb-4">
           <div className="flex items-center gap-2">
             <span className="font-medium">설비점검주기 :</span>
             <input type="text" className="outline-none px-1 w-64" />
@@ -72,51 +72,6 @@ const EquipmentInspectionForm = ({ pdfRef }) => {
             <span className="font-medium">점검일시 :</span>
             <input type="text" className="outline-none px-1 w-64" />
           </div>
-        </div>
-
-        {/* 점검자 테이블 */}
-        <div className="flex justify-end mb-4">
-          <table className="border-collapse border border-black">
-            <tbody>
-              <tr>
-                <td className="border border-black px-2 py-1 text-center font-medium whitespace-nowrap w-12" rowSpan="2">
-                  결<br />재
-                </td>
-                <td className="border border-black px-4 py-1 text-center font-medium w-24">
-                  담당자
-                </td>
-                <td className="border border-black px-4 py-1 text-center font-medium w-24">
-                  책임자
-                </td>
-              </tr>
-              <tr>
-                <td
-                  className="border border-black h-16 cursor-pointer hover:bg-gray-50"
-                  onClick={handleManagerClick}
-                >
-                  {managerImage ? (
-                    <img
-                      src={managerImage}
-                      alt="담당자 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-                <td
-                  className="border border-black h-16 cursor-pointer hover:bg-gray-50"
-                  onClick={handleSupervisorClick}
-                >
-                  {supervisorImage ? (
-                    <img
-                      src={supervisorImage}
-                      alt="책임자 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
@@ -151,8 +106,39 @@ const EquipmentInspectionForm = ({ pdfRef }) => {
       </table>
 
       {/* 하단 안내문구 */}
-      <div className="mt-2 text-sm">
+      <div className="mt-2 text-sm mb-8">
         <p>※ 특정설비에 대하여는 위 양식번호를 사용하며 양식의 관리내용을 변경할 수 있음</p>
+      </div>
+
+            <div className="flex justify-end mb-6">
+        <table className="border-2 border-black border-collapse">
+          <tbody>
+            <tr>
+              <td className="h-8 border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+            </tr>
+            <tr>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     </>
