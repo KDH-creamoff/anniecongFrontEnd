@@ -300,13 +300,18 @@ const FactoryInfo = () => {
                     }
                   }}
                   placeholder='예: 전처리'
-                  className='w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529] mb-5'
+                  className={`w-full rounded-xl border ${
+                    error ? 'border-red-300' : 'border-gray-300'
+                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529]`}
                 />
+                <p className='mt-1 text-xs text-gray-500'>
+                  공정 이름을 쉼표로 구분하여 입력하세요. 중복된 공정은 자동으로 제외됩니다.
+                </p>
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
             </div>
 
-            <div className='flex gap-3'>
+            <div className='flex gap-3 mt-2'>
               <button
                 onClick={handleCloseModal}
                 className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
