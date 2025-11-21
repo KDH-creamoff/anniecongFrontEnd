@@ -39,6 +39,7 @@ const BasicNewItem = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [hasSubmittedCreate, setHasSubmittedCreate] = useState(false); // 등록 요청 여부 추적
 
   // 컴포넌트 마운트 시 보관 조건 목록 조회
   useEffect(() => {
@@ -54,18 +55,21 @@ const BasicNewItem = () => {
   useEffect(() => {
     if (itemOperationError) {
       alert(itemOperationError || '등록 중 오류가 발생했습니다.');
+      setHasSubmittedCreate(false); // 에러 시 초기화
     }
   }, [itemOperationError]);
 
   // 품목 등록 성공 시 리스트 업데이트 + 폼 초기화 + 알림
   useEffect(() => {
-    if (itemOperation && !itemOperationLoading && !itemOperationError) {
+    // 등록 요청을 보낸 경우에만 성공 메시지 표시
+    if (hasSubmittedCreate && itemOperation && !itemOperationLoading && !itemOperationError) {
       dispatch(fetchItems.request());
       setFormData(initialFormData);
       setErrors({});
       alert('품목이 성공적으로 등록되었습니다!');
+      setHasSubmittedCreate(false); // 메시지 표시 후 초기화
     }
-  }, [itemOperation, itemOperationLoading, itemOperationError, dispatch]);
+  }, [hasSubmittedCreate, itemOperation, itemOperationLoading, itemOperationError, dispatch]);
 
   const handleInputChange = (field, value) => {
     if (field === 'storageConditionId') {
@@ -149,6 +153,7 @@ const BasicNewItem = () => {
     console.log('storage_temp:', storageTemp);
     console.log('===================');
 
+    setHasSubmittedCreate(true); // 등록 요청 플래그 설정
     dispatch(
       createItem.request({
         code: formData.code.trim(),
