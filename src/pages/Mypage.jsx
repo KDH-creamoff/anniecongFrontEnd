@@ -332,11 +332,11 @@ const Mypage = () => {
                   disabled 
                   className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" 
                 />
-                {!isEditingStamp && (
+                {/* {!isEditingStamp && (
                   <button onClick={() => setIsEditingStamp(true)} className="rounded bg-[#674529] px-3 py-2 text-sm text-white transition-colors hover:bg-[#543620]">
                     {user.signatureImage ? "변경" : "등록"}
                   </button>
-                )}
+                )} */}
               </div>
             </div>
           </div>
