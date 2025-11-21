@@ -24,7 +24,7 @@ const BasicNewItem = () => {
   const factories = useSelector(selectFactories) || [];
   const factoriesLoading = useSelector(selectFactoriesLoading);
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     code: '',
     name: '',
     category: '',
@@ -35,8 +35,9 @@ const BasicNewItem = () => {
     shortage: '',
     unit: '',
     wholesalePrice: '',
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
 
   // 컴포넌트 마운트 시 보관 조건 목록 조회
@@ -56,25 +57,44 @@ const BasicNewItem = () => {
     }
   }, [itemOperationError]);
 
-  // 품목 등록 성공 시 리스트 업데이트
+  // 품목 등록 성공 시 리스트 업데이트 + 폼 초기화 + 알림
   useEffect(() => {
     if (itemOperation && !itemOperationLoading && !itemOperationError) {
       dispatch(fetchItems.request());
+      setFormData(initialFormData);
+      setErrors({});
+      alert('품목이 성공적으로 등록되었습니다!');
     }
   }, [itemOperation, itemOperationLoading, itemOperationError, dispatch]);
 
   const handleInputChange = (field, value) => {
-    // 보관 조건 선택 시 id와 name을 모두 저장
     if (field === 'storageConditionId') {
-      const selectedStorage = storageConditions.find((sc) => sc.id === value);
+      const selectedStorage = storageConditions.find(
+        (sc) => String(sc.id) === String(value)
+      );
+
+      // 🔥 여기가 핵심 수정 부분
+      // 예: "냉장(0~5도)" → "냉장" 만 잘라서 storageTemp에 저장
+      let storageTemp = selectedStorage?.name || '';
+
+      if (typeof storageTemp === 'string') {
+        // 괄호 앞까지만 사용
+        storageTemp = storageTemp.split('(')[0].trim();
+        // 혹시 너무 길면 안전하게 한 번 더 자르기 (DB 컬럼 길이 대비)
+        if (storageTemp.length > 20) {
+          storageTemp = storageTemp.slice(0, 20);
+        }
+      }
+
       setFormData((prev) => ({ 
         ...prev, 
         storageConditionId: value,
-        storageTemp: selectedStorage?.name || '',
+        storageTemp,
       }));
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
+
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
@@ -121,7 +141,6 @@ const BasicNewItem = () => {
       return;
     }
 
-    // storage_condition_id와 storage_temp를 console.log로 출력
     const storageConditionId = Number(formData.storageConditionId);
     const storageTemp = formData.storageTemp;
     
@@ -130,38 +149,20 @@ const BasicNewItem = () => {
     console.log('storage_temp:', storageTemp);
     console.log('===================');
 
-    // Redux Saga를 통해 품목 등록 요청
     dispatch(
       createItem.request({
         code: formData.code.trim(),
         name: formData.name.trim(),
         category: formData.category,
         factoryId: Number(formData.factoryId),
-        storageConditionId: storageConditionId, // 보관 조건 id (Number로 변환)
-        storageTemp: storageTemp, // 보관 조건 name
+        storageConditionId: storageConditionId,
+        storageTemp: storageTemp,
         shelfLife: Number(formData.shelfLife),
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
         wholesalePrice: Number(formData.wholesalePrice),
       })
     );
-
-    if (itemOperation && !itemOperationLoading) {
-      alert('품목이 성공적으로 등록되었습니다!');
-      // 폼 초기화
-      setFormData({
-        code: '',
-        name: '',
-        category: '',
-        factoryId: '',
-        storageConditionId: '',
-        storageTemp: '',
-        shelfLife: '',
-        shortage: '',
-        unit: '',
-        wholesalePrice: '',
-      });
-    }
   };
 
   const factorySelect = useMemo(() => {

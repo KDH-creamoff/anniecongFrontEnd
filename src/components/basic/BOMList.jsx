@@ -136,8 +136,13 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
     return filteredBomList.slice(start, start + itemsPerPage);
   }, [filteredBomList, currentPage]);
 
+  // --- 변경: 삭제 시 BOM명명시 ---
   const handleDeleteBOM = async (id) => {
-    const confirmed = window.confirm('이 BOM을 삭제하시겠습니까?');
+    const bomToDelete = (filteredBomList.find(b => b.id === id) || bomList.find(b => b.id === id));
+    const bomName = bomToDelete?.bomName || '';
+    const confirmed = window.confirm(
+      `"${bomName}"을(를) 삭제하시겠습니까?`
+    );
     if (!confirmed) return;
     await onDelete?.(id);
     if (selectedBOM?.id === id) {
@@ -246,16 +251,52 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
     setEditingBOM({ ...editingBOM, bomName: newName });
   };
 
-  // 수정 저장
+  // 수정 저장 (필수필드 미작성시 알림 추가)
   const handleSaveEdit = () => {
     if (!editingBOM) return;
 
     if (!editingBOM.bomName.trim()) {
-      alert('BOM 명을 입력해주세요.');
+      alert('BOM 명 작성이 안되었습니다.');
       return;
     }
     if (editingBOM.materials.length === 0) {
       alert('원재료를 최소 1개 이상 추가해주세요.');
+      return;
+    }
+
+    // 추가된 유효성 검사: 원재료명을 선택했을 때 필요량이 비어 있으면 알림
+    let fieldError = null;
+    for (let i = 0; i < editingBOM.materials.length; i++) {
+      const m = editingBOM.materials[i];
+      if (!m.code || m.code.trim().length === 0) {
+        fieldError = '원재료명';
+        break;
+      }
+      // 원재료명 선택은 했는데 필요량이 입력 안 되었을 때도 반드시 알림
+      if (
+        (m.code && m.code.trim().length > 0) && // 원재료명 선택했고
+        (m.amount === undefined || m.amount === null || m.amount === '' || Number.isNaN(Number(m.amount)))
+      ) {
+        fieldError = '필요량';
+        break;
+      }
+      // <--- 여기에서 "필요량" 추가 검증
+      // 필요량이 0 또는 0.01 미만이면 알림
+      if (
+        (m.code && m.code.trim().length > 0) &&
+        ((typeof m.amount === 'number' && m.amount < 0.01) || Number(m.amount) < 0.01)
+      ) {
+        fieldError = '필요량이';
+        break;
+      }
+    }
+
+    if (fieldError) {
+      if (fieldError === '필요량(0 또는 0.01 미만)') {
+        alert('필요량을 입력해주세요.');
+      } else {
+        alert(`${fieldError} 작성이 안되었습니다.`);
+      }
       return;
     }
 
@@ -357,7 +398,9 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                         <div className="flex items-center justify-center gap-2">
                           {editingBOM?.id === bom.id ? (
                             <>
+                              {/* 테이블 우측 상단 저장으로 이동, 기존 버튼은 숨김 */}
                               <button
+                                style={{ display: 'none' }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleSaveEdit();
@@ -409,11 +452,22 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                     {(selectedBOM?.id === bom.id || editingBOM?.id === bom.id) && (
                       <tr className="bg-gray-50">
                         <td colSpan={3} className="px-4 py-4">
-                          <div className="rounded-lg bg-white p-4">
-                            <h3 className="mb-3 text-sm font-medium text-gray-900">
-                              {editingBOM?.id === bom.id ? '원재료 수정' : '등록된 원재료 목록'}
-                            </h3>
-
+                          <div className="rounded-lg bg-white p-4 border-2 border-[#bfa181]">
+                            <div className="flex justify-between items-center mb-3">
+                              <h3 className="text-xl font-medium text-gray-900">
+                                {editingBOM?.id === bom.id ? '원재료 수정' : '등록된 원재료 목록'}
+                              </h3>
+                              {editingBOM?.id === bom.id && (
+                                <button
+                                  onClick={handleSaveEdit}
+                                  className="flex items-center gap-1 rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-green-700 hover:shadow-md active:scale-95"
+                                  title="저장"
+                                >
+                                  <Save className="h-4 w-4" />
+                                  저장
+                                </button>
+                              )}
+                            </div>
                             {selectedBOM?._loading || bomDetailLoading ? (
                               <div className="p-3 text-xs text-gray-500">상세 불러오는 중…</div>
                             ) : editingBOM?.id === bom.id ? (
@@ -421,19 +475,19 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                 <table className="w-full">
                                   <thead className="border-b border-gray-200">
                                     <tr>
-                                      <th className="w-[12%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[12%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         원재료 코드
                                       </th>
-                                      <th className="w-[40%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[40%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         원재료명
                                       </th>
-                                      <th className="w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[19%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         필요량
                                       </th>
-                                      <th className="w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[19%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         단위
                                       </th>
-                                      <th className="w-[10%] px-4 py-2 text-center text-xs font-medium text-gray-700">
+                                      <th className="w-[10%] px-4 py-2 text-center text-base font-medium text-gray-700">
                                         작업
                                       </th>
                                     </tr>
@@ -446,7 +500,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                             type="text"
                                             value={m.code}
                                             readOnly
-                                            className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-500 focus:outline-none"
+                                            className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none"
                                           />
                                         </td>
                                         <td className="px-4 py-2 text-xs text-gray-700">
@@ -475,7 +529,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                                 materials: newMaterials,
                                               });
                                             }}
-                                            className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-[#674529] focus:outline-none"
+                                            className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-[#674529] focus:outline-none"
                                           >
                                             <option value="">원재료/반재료 선택</option>
                                             {rawAndSemiMaterials.map((material) => (
@@ -486,7 +540,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                             ))}
                                           </select>
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           <input
                                             type="number"
                                             step="0.01"
@@ -497,11 +551,20 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                               )?.amount ?? 0
                                             }
                                             onChange={(e) => {
+                                              // 만약 원재료명이 선택되지 않았다면 입력 불가
+                                              if (!m.code || m.code === '') {
+                                                return;
+                                              }
                                               const numAmount = Number.isNaN(
                                                 Number(e.target.value),
                                               )
                                                 ? 0
                                                 : Number(e.target.value);
+                                              // 입력 시 필요량 0이거나 0.01미만이면 알림과 입력 거부
+                                              if (numAmount < 0.01) {
+                                                alert('필요량은 0.01 미만이 될 수 없습니다.');
+                                                return;
+                                              }
                                               const newMaterials = editingBOM.materials.map(
                                                 (mat) =>
                                                   mat.id === m.id
@@ -513,16 +576,19 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                                 materials: newMaterials,
                                               });
                                             }}
-                                            className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-[#674529] focus:outline-none"
+                                            className={`w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-[#674529] focus:outline-none ${
+                                              !m.code ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
+                                            }`}
                                             placeholder="0.00"
+                                            disabled={!m.code}
                                           />
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           <input
                                             type="text"
                                             value={m.unit}
                                             readOnly
-                                            className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-500 focus:outline-none"
+                                            className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none"
                                           />
                                         </td>
                                         <td className="px-4 py-2 text-center">
@@ -538,10 +604,10 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                     ))}
                                   </tbody>
                                 </table>
-                                <div className="mt-3 flex justify-end">
+                                <div className="mt-3 flex justify-end gap-2">
                                   <button
                                     onClick={handleAddMaterial}
-                                    className="flex items-center gap-2 rounded-xl bg-[#56331F] px-4 py-2 text-xs font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95"
+                                    className="flex items-center gap-2 rounded-xl bg-[#56331F] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95"
                                   >
                                     <Plus className="h-4 w-4" />
                                     원재료 추가
@@ -549,7 +615,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                 </div>
                               </div>
                             ) : (selectedBOM?.materials ?? []).length === 0 ? (
-                              <div className="p-3 text-xs text-gray-500">
+                              <div className="p-3 text-xl text-gray-500">
                                 등록된 자재가 없습니다.
                               </div>
                             ) : (
@@ -557,16 +623,16 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                 <table className="w-full">
                                   <thead className="border-b border-gray-200">
                                     <tr>
-                                      <th className="w-[12%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[12%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         원재료 코드
                                       </th>
-                                      <th className="w-[50%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[50%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         원재료명
                                       </th>
-                                      <th className="w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[19%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         필요량
                                       </th>
-                                      <th className="w-[19%] px-4 py-2 text-left text-xs font-medium text-gray-700">
+                                      <th className="w-[19%] px-4 py-2 text-left text-base font-medium text-gray-700">
                                         단위
                                       </th>
                                     </tr>
@@ -574,18 +640,18 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                   <tbody>
                                     {selectedBOM?.materials.map((m) => (
                                       <tr key={m.id} className="border-b border-gray-100">
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           {m.code}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           {m.name}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           {typeof m.amount === 'number'
                                             ? m.amount.toFixed(2)
                                             : m.amount}
                                         </td>
-                                        <td className="px-4 py-2 text-xs text-gray-700">
+                                        <td className="px-4 py-2 text-sm text-gray-700">
                                           {m.unit}
                                         </td>
                                       </tr>

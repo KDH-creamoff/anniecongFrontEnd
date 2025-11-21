@@ -69,11 +69,21 @@ const StorageTemperature = () => {
       return;
     }
 
-    // 쉼표로 구분된 품목 이름들을 배열로 변환
-    const itemNames = itemNamesInput
+    // 쉼표로 구분된 품목 이름들을 배열로 변환하고 중복 제거 (띄어쓰기 무시)
+    const trimmedNames = itemNamesInput
       .split(',')
       .map(name => name.trim())
       .filter(name => name.length > 0);
+    
+    const seen = new Set();
+    const itemNames = [];
+    for (const name of trimmedNames) {
+      const key = name.replace(/\s+/g, ''); // 공백 제거한 버전
+      if (!seen.has(key)) {
+        seen.add(key);
+        itemNames.push(name); // 원본 형태 유지
+      }
+    }
 
     if (itemNames.length === 0) {
       setError('품목 이름을 입력해주세요');

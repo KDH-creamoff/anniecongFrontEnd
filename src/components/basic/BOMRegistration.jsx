@@ -5,10 +5,10 @@ import { fetchItems } from '../../store/modules/basic/actions';
 
 const BOMRegistration = ({ onSave }) => {
   const dispatch = useDispatch();
-  
+
   // Redux에서 아이템 목록 가져오기
   const { data: items, loading: itemsLoading } = useSelector((state) => state.basic.items);
-  
+
   // 카테고리 영어 값을 한글로 변환
   const getCategoryName = (category) => {
     const categoryMap = {
@@ -26,10 +26,10 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료/반재료만 필터링 (한글 및 영어 카테고리 모두 포함)
   const rawAndSemiMaterials = (items || []).filter(
-    (item) => 
-      item.category === '원재료' || 
+    (item) =>
+      item.category === '원재료' ||
       item.category === '반제품' ||
-      item.category === 'RawMaterial' || 
+      item.category === 'RawMaterial' ||
       item.category === 'SemiFinished'
   );
 
@@ -66,13 +66,22 @@ const BOMRegistration = ({ onSave }) => {
         ...newMaterial,
         code: material.code,
         name: material.name,
-        unit: material.unit || 'g', 
+        unit: material.unit || 'g',
+      });
+    } else if (newMaterial) {
+      setNewMaterial({
+        ...newMaterial,
+        code: '',
+        name: '',
+        unit: '',
       });
     }
   };
 
-  // 필요량 입력 시 (소수점 2자리까지 허용)
+  // 필요량 입력 시 (소수점 2자리까지 허용) - 원재료명 선택 전에는 입력 불가!
   const handleAmountChange = (amount) => {
+    if (!newMaterial?.code) return; // 원재료명 미선택 시 필요량 입력 불가
+
     // 빈 값 허용
     if (amount === '' || amount === null || amount === undefined) {
       setNewMaterial({
@@ -113,7 +122,36 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료 확인 (목록에 추가)
   const handleConfirmMaterial = () => {
-    if (newMaterial?.code && newMaterial?.name && newMaterial?.amount && newMaterial?.unit) {
+    // 원재료명(코드) 선택 안 했을 때
+    if (!newMaterial?.code) {
+      alert('원재료명을 선택해주세요.');
+      return;
+    }
+    // 필요량을 입력 안 했을 때
+    if (
+      newMaterial.amount === '' ||
+      newMaterial.amount === null ||
+      newMaterial.amount === undefined
+    ) {
+      alert('필요량을 입력해주세요.');
+      return;
+    }
+    // 필요량이 0.01 미만 또는 음수일 때
+    const amountValid =
+      !Number.isNaN(Number(newMaterial.amount)) &&
+      Number(newMaterial.amount) >= 0.01;
+    if (!amountValid) {
+      alert('필요량은 0.01 이상이어야 합니다.');
+      return;
+    }
+    // 모든 입력이 정상일 때만 추가
+    if (
+      newMaterial.code &&
+      newMaterial.name &&
+      newMaterial.amount !== '' &&
+      newMaterial.unit &&
+      amountValid
+    ) {
       setCurrentMaterials([...currentMaterials, newMaterial]);
       setNewMaterial(null);
     }
@@ -136,7 +174,7 @@ const BOMRegistration = ({ onSave }) => {
         m.code &&
         m.code.trim().length > 0 &&
         !Number.isNaN(Number(m.amount)) &&
-        Number(m.amount) > 0,
+        Number(m.amount) >= 0.01
     );
 
     if (validMaterials.length === 0) {
@@ -156,7 +194,7 @@ const BOMRegistration = ({ onSave }) => {
 
     // ✅ 백엔드로 바로 넘겨도 되는 형태로 변환
     const newBOM = {
-      code: currentMaterials.code,           // 🔥 백엔드에서 요구하는 code
+      code: currentMaterials.code, // 🔥 백엔드에서 요구하는 code
       name: currentBOMName,
       bomName: currentBOMName,
       updatedDate: now.toISOString().split('T')[0],
@@ -166,7 +204,7 @@ const BOMRegistration = ({ onSave }) => {
 
       // 백엔드에서 components[*].code, quantity, unit 등을 바로 쓸 수 있게 구성
       components: validMaterials.map((mItem, index) => ({
-        code: mItem.code,                // 🔥 여기가 없으면 "code가 필요합니다." 뜰 수 있음
+        code: mItem.code, // 🔥 여기가 없으면 "code가 필요합니다." 뜰 수 있음
         itemCode: mItem.code,
         quantity: Number(mItem.amount),
         unit: mItem.unit || 'g',
@@ -187,63 +225,65 @@ const BOMRegistration = ({ onSave }) => {
   };
 
   return (
-    <div className='rounded-xl bg-white p-6 shadow-sm'>
-      <div className='mb-6 flex items-center gap-2'>
-        <Package className='h-5 w-5 text-[#674529]' />
-        <h2 className='text-base text-[#674529]'>BOM 등록</h2>
+    <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center gap-2">
+        <Package className="h-5 w-5 text-[#674529]" />
+        <h2 className="text-base text-[#674529]">BOM 등록</h2>
       </div>
 
       {/* BOM 명 입력 */}
-      <div className='mb-6'>
-        <label className='mb-2 block text-sm font-medium text-gray-700'>
+      <div className="mb-6">
+        <label className="mb-2 block text-sm font-medium text-gray-700">
           BOM 명
         </label>
         <input
-          type='text'
+          type="text"
           value={currentBOMName}
           onChange={(e) => setCurrentBOMName(e.target.value)}
-          placeholder='BOM 명을 입력하세요'
-          className='w-full rounded-xl border border-gray-100 bg-gray-100 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20'
+          placeholder="BOM 명을 입력하세요"
+          className="w-full rounded-xl border border-gray-100 bg-gray-100 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20"
         />
       </div>
 
       {/* 원재료 테이블 */}
-      <div className='overflow-x-auto'>
-        <table className='w-full'>
-          <thead className='border-b border-gray-200'>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="border-b border-gray-200">
             <tr>
-              <th className='w-[12%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className="w-[12%] px-4 py-3 text-left text-sm font-medium text-gray-900">
                 원재료 코드
               </th>
-              <th className='w-[40%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className="w-[40%] px-4 py-3 text-left text-sm font-medium text-gray-900">
                 원재료명
               </th>
-              <th className='w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className="w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900">
                 필요량
               </th>
-              <th className='w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900'>
+              <th className="w-[15%] px-4 py-3 text-left text-sm font-medium text-gray-900">
                 단위
               </th>
-              <th className='w-[18%] px-4 py-3 text-center text-sm font-medium text-gray-900'>
+              <th className="w-[18%] px-4 py-3 text-center text-sm font-medium text-gray-900">
                 작업
               </th>
             </tr>
           </thead>
           <tbody>
             {currentMaterials.map((item) => (
-              <tr key={item.id} className='border-b border-gray-100'>
-                <td className='px-4 py-3 text-sm text-gray-700'>{item.code}</td>
-                <td className='px-4 py-3 text-sm text-gray-700'>{item.name}</td>
-                <td className='px-4 py-3 text-sm text-gray-700'>
-                  {typeof item.amount === 'number' ? item.amount.toFixed(2) : item.amount}
+              <tr key={item.id} className="border-b border-gray-100">
+                <td className="px-4 py-3 text-sm text-gray-700">{item.code}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{item.name}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {typeof item.amount === 'number'
+                    ? item.amount.toFixed(2)
+                    : item.amount}
                 </td>
-                <td className='px-4 py-3 text-sm text-gray-700'>{item.unit}</td>
-                <td className='px-4 py-3 text-center'>
+                <td className="px-4 py-3 text-sm text-gray-700">{item.unit}</td>
+                <td className="px-4 py-3 text-center">
                   <button
                     onClick={() => handleDeleteMaterial(item.id)}
-                    className='inline-flex items-center justify-center text-red-500 hover:text-red-700'
+                    className="inline-flex items-center justify-center text-red-500 hover:text-red-700"
                   >
-                    <Trash2 className='h-5 w-5' />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </td>
               </tr>
@@ -251,23 +291,23 @@ const BOMRegistration = ({ onSave }) => {
 
             {/* 신규 원재료 추가 행 */}
             {newMaterial && (
-              <tr className='border-b border-gray-100 bg-white'>
-                <td className='px-4 py-3 text-sm text-gray-700'>
+              <tr className="border-b border-gray-100 bg-white">
+                <td className="px-4 py-3 text-sm text-gray-700">
                   <input
-                    type='text'
+                    type="text"
                     value={newMaterial.code}
                     readOnly
-                    className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none'
+                    className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none"
                   />
                 </td>
-                <td className='px-4 py-3 text-sm text-gray-700'>
+                <td className="px-4 py-3 text-sm text-gray-700">
                   <select
                     value={newMaterial.code}
                     onChange={(e) => handleMaterialChange(e.target.value)}
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
+                    className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
                     disabled={itemsLoading}
                   >
-                    <option value=''>원재료/반재료 선택</option>
+                    <option value="">원재료/반재료 선택</option>
                     {rawAndSemiMaterials.map((material) => (
                       <option key={material.code} value={material.code}>
                         [{getCategoryName(material.category)}] {material.name}
@@ -275,48 +315,49 @@ const BOMRegistration = ({ onSave }) => {
                     ))}
                   </select>
                   {itemsLoading && (
-                    <span className='text-xs text-gray-500'>로딩 중...</span>
+                    <span className="text-xs text-gray-500">로딩 중...</span>
                   )}
                 </td>
-                <td className='px-4 py-3 text-sm text-gray-700'>
+                <td className="px-4 py-3 text-sm text-gray-700">
                   <input
-                    type='number'
-                    step='0.01'
-                    min='0'
+                    type="number"
+                    step="0.01"
+                    min="0.01"
                     value={newMaterial.amount}
+                    disabled={!newMaterial.code} // 원재료명 미선택 시 필요량 입력 불가 
                     onChange={(e) => handleAmountChange(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleConfirmMaterial();
                       }
                     }}
-                    className='w-full rounded border border-gray-300 px-2 py-1 text-sm'
-                    placeholder='0.00'
+                    className={`w-full rounded border border-gray-300 px-2 py-1 text-sm ${!newMaterial.code ? 'bg-gray-50 text-gray-400' : ''}`}
+                    placeholder="0.00"
                   />
                 </td>
-                <td className='px-4 py-3 text-sm text-gray-700'>
+                <td className="px-4 py-3 text-sm text-gray-700">
                   <input
-                    type='text'
+                    type="text"
                     value={newMaterial.unit}
                     readOnly
-                    className='w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none'
+                    className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-500 focus:outline-none"
                   />
                 </td>
-                <td className='px-4 py-3 text-center'>
-                  <div className='flex items-center justify-center gap-2'>
+                <td className="px-4 py-3 text-center">
+                  <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={handleConfirmMaterial}
-                      className='inline-flex items-center justify-center text-green-500 hover:text-green-700'
-                      title='확인'
+                      className="inline-flex items-center justify-center text-green-500 hover:text-green-700"
+                      title="확인"
                     >
-                      <Check className='h-5 w-5' />
+                      <Check className="h-5 w-5" />
                     </button>
                     <button
                       onClick={handleCancelMaterial}
-                      className='inline-flex items-center justify-center text-red-500 hover:text-red-700'
-                      title='취소'
+                      className="inline-flex items-center justify-center text-red-500 hover:text-red-700"
+                      title="취소"
                     >
-                      <X className='h-5 w-5' />
+                      <X className="h-5 w-5" />
                     </button>
                   </div>
                 </td>
@@ -327,21 +368,21 @@ const BOMRegistration = ({ onSave }) => {
       </div>
 
       {/* 재료 추가 버튼 */}
-      <div className='mt-4 flex justify-end'>
+      <div className="mt-4 flex justify-end">
         <button
           onClick={handleAddMaterial}
           disabled={newMaterial !== null}
-          className='flex w-28 items-center gap-2 rounded-xl bg-[#56331F] px-7 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
+          className="flex w-28 items-center gap-2 rounded-xl bg-[#56331F] px-7 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#432618] hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           재료 추가
         </button>
       </div>
 
       {currentMaterials.length > 0 && (
-        <div className='mt-3 flex justify-end'>
+        <div className="mt-3 flex justify-end">
           <button
             onClick={handleSaveBOM}
-            className='flex w-28 items-center gap-2 rounded-xl bg-[#10B981] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#059669] hover:shadow-md active:scale-95'
+            className="flex w-28 items-center gap-2 rounded-xl bg-[#10B981] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#059669] hover:shadow-md active:scale-95"
           >
             BOM 저장
           </button>

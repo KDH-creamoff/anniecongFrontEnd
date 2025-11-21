@@ -83,11 +83,21 @@ const FactoryInfo = () => {
         return;
       }
 
-      // 쉼표로 구분된 공정 이름들을 배열로 변환
-      const processNames = processNamesInput
+      // 쉼표로 구분된 공정 이름들을 배열로 변환하고 중복 제거 (띄어쓰기 무시)
+      const trimmedNames = processNamesInput
         .split(',')
         .map(name => name.trim())
         .filter(name => name.length > 0);
+      
+      const seen = new Set();
+      const processNames = [];
+      for (const name of trimmedNames) {
+        const key = name.replace(/\s+/g, ''); // 공백 제거한 버전
+        if (!seen.has(key)) {
+          seen.add(key);
+          processNames.push(name); // 원본 형태 유지
+        }
+      }
 
       if (processNames.length === 0) {
         setError('공정 이름을 입력해주세요');
@@ -283,12 +293,11 @@ const FactoryInfo = () => {
                     setProcessNamesInput(e.target.value);
                     setError('');
                   }}
-                  placeholder='예: 전처리, 혼합, 포장'
+                  placeholder='예: 전처리'
                   className='w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529] mb-5'
                 />
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
-              {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
             </div>
 
             <div className='flex gap-3'>
