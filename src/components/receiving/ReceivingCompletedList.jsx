@@ -18,12 +18,13 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint, isLoadi
       <div className='overflow-x-auto'>
         <table className='w-full table-fixed'>
           <colgroup>
-            <col className='w-[12%]' />
-            <col className='w-[20%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[32%]' />
+            <col className='w-[10%]' />
+            <col className='w-[25%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[19%]' />
           </colgroup>
           <thead>
             <tr>
@@ -41,6 +42,9 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint, isLoadi
               </th>
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 묶음 수
+              </th>
+              <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
+                입고완료일
               </th>
             </tr>
           </thead>
@@ -77,8 +81,11 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint, isLoadi
                 <td className='px-4 py-4 text-sm text-gray-700'>
                   {item.unitCount}
                 </td>
+                <td className='px-4 py-4 text-sm text-gray-700'>
+                  {item.completedDate}
+                </td>
                 <td className='px-4 py-4'>
-                  <div className='flex items-center justify-end space-x-2'>
+                  <div className='flex items-center justify-start space-x-2'>
                     <button
                       onClick={() => onCancel(item.id)}
                       className='flex items-center space-x-1 rounded-xl bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100'

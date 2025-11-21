@@ -168,6 +168,24 @@ const BasicNewItem = () => {
         wholesalePrice: Number(formData.wholesalePrice),
       })
     );
+
+    if (itemOperation && !itemOperationLoading) {
+      e.preventDefault();
+      alert('품목이 성공적으로 등록되었습니다!');
+      // 폼 초기화
+      setFormData({
+        code: '',
+        name: '',
+        category: '',
+        factoryId: '',
+        storageConditionId: '',
+        storageTemp: '',
+        shelfLife: '',
+        shortage: '',
+        unit: '',
+        wholesalePrice: '',
+      });
+    }
   };
 
   const factorySelect = useMemo(() => {

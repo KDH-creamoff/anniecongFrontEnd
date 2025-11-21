@@ -9,13 +9,13 @@ const InventoryStatusFilter = ({ onFilterChange }) => {
     searchTerm: '',
   });
 
-  const categories = ['전체', '원재료', '완제품', '반재료', '소모품'];
+  const categories = ['전체', '원재료', '반재료', '완제품', '소모품'];
   const warehouses = [
     '전체',
-    '의성자재창고',
-    '상주자재창고',
-    '상주생산창고',
-    '의성생산창고',
+    '1공장',
+    '2공장',
+    '1창고',
+    '2창고',
   ];
   const statuses = ['전체', '정상', '재고부족', '유통기한 임박', '유통기한 만료'];
 

@@ -132,11 +132,11 @@ const PermissionManagement = () => {
       { key: 'can_plant1_preprocess', title: '공장1 전처리' },
       { key: 'can_plant_transfer', title: '공장 이송' },
       { key: 'can_plant2_manufacture', title: '공장2 제조' },
-      { key: 'can_shipping', title: '배송 관리' },
-      { key: 'can_label', title: '라벨 관리' },
-      { key: 'can_inventory', title: '재고 관리' },
-      { key: 'can_quality', title: '품질 관리' },
-      { key: 'can_user_management', title: '사용자 관리' },
+      { key: 'can_shipping', title: '배송관리' },
+      { key: 'can_label', title: '라벨관리' },
+      { key: 'can_inventory', title: '재고관리' },
+      { key: 'can_quality', title: '품질관리' },
+      { key: 'can_user_management', title: '사용자관리' },
     ];
 
     return (

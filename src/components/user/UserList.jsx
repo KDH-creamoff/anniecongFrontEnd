@@ -8,7 +8,7 @@ const UserList = () => {
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // 컴포넌트 마운트 시 사용자 목록 조회
   useEffect(() => {

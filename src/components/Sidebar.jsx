@@ -13,16 +13,8 @@ import {
   FileText,
 } from 'lucide-react';
 
-const Sidebar = ({ activeNav, setActiveNav }) => {
+const Sidebar = ({ activeNav, setActiveNav, openSections, setOpenSections }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openSections, setOpenSections] = useState({
-    기초정보: false,
-    입출고관리: false,
-    제조관리: false,
-    배송관리: false,
-    전자결재: false,
-    사용자관리: false,
-  });
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({

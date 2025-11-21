@@ -7,8 +7,15 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeNav, setActiveNav] = useState('대시보드');
+  const [openSections, setOpenSections] = useState({
+    입출고관리: false,
+    제조관리: false,
+    배송관리: false,
+    전자결재: false,
+    사용자관리: false,
+  });
 
-  // URL에 따라 activeNav 업데이트
+  // URL에 따라 activeNav 업데이트 및 해당 섹션 자동 펼치기
   useEffect(() => {
     const path = location.pathname;
     const pathMap = {
@@ -30,7 +37,19 @@ const Home = () => {
       '/user/nav2': '사용자관리-nav2',
     };
 
-    setActiveNav(pathMap[path] || '대시보드');
+    const newActiveNav = pathMap[path] || '대시보드';
+    setActiveNav(newActiveNav);
+
+    // 자식 메뉴가 있는 섹션일 경우 자동으로 펼치기
+    const newOpenSections = {
+      기초정보: false,
+      입출고관리: newActiveNav.startsWith('입출고관리'),
+      제조관리: newActiveNav.startsWith('제조관리'),
+      배송관리: false,
+      전자결재: newActiveNav.startsWith('전자결재'),
+      사용자관리: newActiveNav.startsWith('사용자관리'),
+    };
+    setOpenSections(newOpenSections);
   }, [location.pathname]);
 
   // activeNav 변경 시 URL 업데이트
@@ -62,7 +81,12 @@ const Home = () => {
   return (
     <div className='flex h-screen' style={{ backgroundColor: '#f9f6f2' }}>
       {/* 왼쪽 사이드바 */}
-      <Sidebar activeNav={activeNav} setActiveNav={handleNavChange} />
+      <Sidebar 
+        activeNav={activeNav} 
+        setActiveNav={handleNavChange}
+        openSections={openSections}
+        setOpenSections={setOpenSections}
+      />
 
       {/* 메인 콘텐츠 영역 */}
       <div className='flex-1 overflow-auto'>
