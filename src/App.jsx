@@ -1,4 +1,5 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import Home from './components/Home';
 import Dash from './pages/Dash';
 import Basic from './pages/Basic';
@@ -14,8 +15,7 @@ import Signup from './pages/Signup';
 import Mypage from './pages/Mypage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { isMobile } from 'react-device-detect';
-import Scanner from './pages/Scanner';
-import { useEffect } from 'react';
+// import Scanner from './pages/Scanner';
 
 export default function App() {
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function App() {
     <Routes>
       {
         isMobile ? (
-          <Route path='*' element={<Scanner />} />
+          <Route path='*' element={<>모바일 페이지입니다.</>} />
         ) : (
           <>
             <Route path='/login' element={<Login />} />

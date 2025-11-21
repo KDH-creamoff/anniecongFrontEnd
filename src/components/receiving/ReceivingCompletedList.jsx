@@ -1,6 +1,6 @@
 import { CheckCircle2, Printer, X } from 'lucide-react';
 
-const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
+const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint, isLoading = false }) => {
 
   return (
     <div className='rounded-xl border border-gray-200 bg-white shadow-sm'>
@@ -18,12 +18,13 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
       <div className='overflow-x-auto'>
         <table className='w-full table-fixed'>
           <colgroup>
-            <col className='w-[12%]' />
-            <col className='w-[20%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[32%]' />
+            <col className='w-[10%]' />
+            <col className='w-[25%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[19%]' />
           </colgroup>
           <thead>
             <tr>
@@ -42,10 +43,26 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 묶음 수
               </th>
+              <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
+                입고완료일
+              </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
-            {completedData.map((item) => (
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  로딩 중...
+                </td>
+              </tr>
+            ) : completedData.length === 0 ? (
+              <tr>
+                <td colSpan={6} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  입고 완료 목록이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              completedData.map((item) => (
               <tr key={item.id}>
                 <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                   {item.itemCode}
@@ -54,16 +71,21 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
                   {item.itemName}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.expectedQuantity}
+                  {item.expectedQuantity || item.quantity} {item.unit || ''}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.receivedQuantity}
+                  {typeof item.receivedQuantity === 'string' 
+                    ? item.receivedQuantity 
+                    : `${item.receivedQuantity || item.actualQuantity || item.quantity || 0} ${item.unit || ''}`}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
                   {item.unitCount}
                 </td>
+                <td className='px-4 py-4 text-sm text-gray-700'>
+                  {item.completedDate}
+                </td>
                 <td className='px-4 py-4'>
-                  <div className='flex items-center justify-end space-x-2'>
+                  <div className='flex items-center justify-start space-x-2'>
                     <button
                       onClick={() => onCancel(item.id)}
                       className='flex items-center space-x-1 rounded-xl bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100'
@@ -81,7 +103,8 @@ const ReceivingCompletedList = ({ completedData, onCancel, onLabelPrint }) => {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

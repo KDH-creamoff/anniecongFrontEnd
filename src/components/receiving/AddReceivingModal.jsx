@@ -64,7 +64,7 @@ const AddReceivingModal = ({ isOpen, onClose, onSubmit }) => {
         selectedItemId: itemId,
         itemName: selectedItem.name || selectedItem.itemName || '',
         itemCode: selectedItem.code || selectedItem.itemCode || '',
-        unit: selectedItem.unit || 'Kg',
+        unit: selectedItem.unit || '',
       }));
     } else {
       setFormData((prev) => ({
@@ -91,12 +91,16 @@ const AddReceivingModal = ({ isOpen, onClose, onSubmit }) => {
     try {
       // 백엔드 API를 통해 입고 대기 항목 저장
       const receivingData = {
+        selectedItemId: formData.selectedItemId,
+        itemId: parseInt(formData.selectedItemId),
         itemCode: formData.itemCode,
         itemName: formData.itemName,
         expectedQuantity: parseFloat(formData.expectedQuantity),
+        quantity: parseFloat(formData.expectedQuantity),
         unit: formData.unit,
         expectedDate: formData.expectedDate,
-        status: 'pending', // 대기 상태
+        scheduledDate: formData.expectedDate,
+        status: 'PENDING', // 대기 상태
       };
 
       await onSubmit(receivingData);
@@ -164,25 +168,11 @@ const AddReceivingModal = ({ isOpen, onClose, onSubmit }) => {
                         key={item.id || item.code || item.itemCode || item.name} 
                         value={itemValue}
                       >
-                        {itemName} {itemCode ? `(${itemCode})` : ''}
+                        품목명:{itemName} {itemCode ? `/ 품목코드: ${itemCode}` : ''}
                       </option>
                     );
                   })}
                 </select>
-              </div>
-
-              {/* 품목코드 (자동 표시) */}
-              <div>
-                <label className='mb-1 block text-sm font-medium text-gray-700'>
-                  품목코드
-                </label>
-                <input
-                  type='text'
-                  value={formData.itemCode}
-                  readOnly
-                  className='w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600'
-                  placeholder=''
-                />
               </div>
 
               {/* 주문량 */}

@@ -52,20 +52,30 @@ const Mypage = () => {
 
   // 사용자 정보 로드 시 position 설정
   useEffect(() => {
-    if (user?.position) {
-      setNewPosition(user.position);
+    const userPosition = user?.position || user?.UserProfile?.position;
+    if (userPosition) {
+      setNewPosition(userPosition);
     }
   }, [user]);
 
-  // 에러 처리
+  // 에러 처리 - 401 에러 시 로그인 페이지로 리다이렉트
   useEffect(() => {
     if (error) {
-      if (error.includes("401") || error.includes("인증")) {
+      const errorString = String(error);
+      // 401 에러 또는 인증 관련 에러인 경우
+      if (errorString.includes("401") || errorString.includes("인증") || errorString.includes("Unauthorized") || errorString.includes("인증이")) {
+        console.log('⚠️ Mypage: 401 에러 감지, 로그인 페이지로 리다이렉트', error);
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        navigate("/login");
+        // localStorage 초기화
+        // 세션 기반 인증: 쿠키는 백엔드에서 제거됨
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('users'); // 임시 데이터 정리
+        // 로그인 페이지로 강제 리다이렉트
+        window.location.replace('/login');
+        return;
       }
     }
-  }, [error, navigate]);
+  }, [error]);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
@@ -152,7 +162,8 @@ const Mypage = () => {
 
   const handlePositionSubmit = () => {
     if (newPosition === "대표") return alert("대표 직급으로 변경할 수 없습니다.");
-    if (user?.position === newPosition) {
+    const currentPosition = user?.position || user?.UserProfile?.position;
+    if (currentPosition === newPosition) {
       setIsEditingPosition(false);
       return;
     }
@@ -169,7 +180,8 @@ const Mypage = () => {
   };
 
   const handlePositionCancel = () => {
-    setNewPosition(user?.position || "");
+    const currentPosition = user?.position || user?.UserProfile?.position || "";
+    setNewPosition(currentPosition);
     setIsEditingPosition(false);
   };
 
@@ -257,42 +269,42 @@ const Mypage = () => {
                 <User className="h-4 w-4" />
                 <span>아이디</span>
               </label>
-              <input type="text" value={user?.id || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.id || user?.username || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <User className="h-4 w-4" />
                 <span>이름</span>
               </label>
-              <input type="text" value={user?.name || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.name || user?.UserProfile?.full_name || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Briefcase className="h-4 w-4" />
                 <span>부서</span>
               </label>
-              <input type="text" value={user?.department || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.department || user?.UserProfile?.department || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Phone className="h-4 w-4" />
                 <span>연락처</span>
               </label>
-              <input type="text" value={user?.phone || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.phone || user?.UserProfile?.phone_number || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Mail className="h-4 w-4" />
                 <span>이메일</span>
               </label>
-              <input type="email" value={user?.email || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="email" value={user?.email || user?.UserProfile?.email || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
                 <Calendar className="h-4 w-4" />
                 <span>입사일</span>
               </label>
-              <input type="text" value={user?.joinDate || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+              <input type="text" value={user?.joinDate || user?.UserProfile?.hire_date || ""} disabled className="w-full rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
             </div>
             <div>
               <label className="mb-2 flex items-center space-x-2 text-sm font-medium text-gray-700">
@@ -300,7 +312,7 @@ const Mypage = () => {
                 <span>직급</span>
               </label>
               <div className="flex items-center space-x-2">
-                <input type="text" value={user?.position || ""} disabled className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
+                <input type="text" value={user?.position || user?.UserProfile?.position || ""} disabled className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" />
                 {!isEditingPosition && (
                   <button onClick={() => setIsEditingPosition(true)} className="rounded bg-[#674529] px-3 py-2 text-sm text-white transition-colors hover:bg-[#543620]">
                     변경
@@ -320,11 +332,11 @@ const Mypage = () => {
                   disabled 
                   className="flex-1 rounded bg-gray-100 px-3 py-2 text-sm text-gray-900" 
                 />
-                {!isEditingStamp && (
+                {/* {!isEditingStamp && (
                   <button onClick={() => setIsEditingStamp(true)} className="rounded bg-[#674529] px-3 py-2 text-sm text-white transition-colors hover:bg-[#543620]">
                     {user.signatureImage ? "변경" : "등록"}
                   </button>
-                )}
+                )} */}
               </div>
             </div>
           </div>

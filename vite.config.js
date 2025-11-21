@@ -5,7 +5,8 @@ module.exports = defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true
+    open: true,
+    allowedHosts: ["www.anniecong.o-r.kr", "anniecong.o-r.kr"]
   },
   build: {
     outDir: 'build'

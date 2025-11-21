@@ -1,5 +1,5 @@
-import { put, takeLatest, delay } from 'redux-saga/effects';
-import { itemsAPI, bomsAPI, factoriesAPI, storageConditionsAPI } from '../../../api';
+import { call, put, takeLatest } from 'redux-saga/effects';
+import { itemsAPI, bomsAPI, factoriesAPI, storageConditionsAPI, processesAPI } from '../../../api';
 import {
   FETCH_ITEMS,
   FETCH_ITEM_BY_ID,
@@ -17,11 +17,17 @@ import {
   CREATE_STORAGE_CONDITION,
   UPDATE_STORAGE_CONDITION,
   DELETE_STORAGE_CONDITION,
+  ADD_STORAGE_CONDITION_ITEMS,
+  REMOVE_STORAGE_CONDITION_ITEM,
   FETCH_FACTORIES,
   FETCH_FACTORY_BY_ID,
   CREATE_FACTORY,
   UPDATE_FACTORY,
   DELETE_FACTORY,
+  FETCH_PROCESSES,
+  CREATE_PROCESS,
+  ADD_FACTORY_PROCESSES,
+  REMOVE_FACTORY_PROCESS,
   fetchItems,
   fetchItemById,
   fetchItemByCode,
@@ -38,11 +44,17 @@ import {
   createStorageCondition,
   updateStorageCondition,
   deleteStorageCondition,
+  addStorageConditionItems,
+  removeStorageConditionItem,
   fetchFactories,
   fetchFactoryById,
   createFactory,
   updateFactory,
   deleteFactory,
+  fetchProcesses,
+  createProcess,
+  addFactoryProcesses,
+  removeFactoryProcess,
 } from './actions';
 
 // ==================== 목데이터 ====================
@@ -151,11 +163,13 @@ let mockItems = [
 
 function* fetchItemsSaga(action) {
   try {
-    // const response = yield call(itemsAPI.getItems, action.payload);
-    // yield put(fetchItems.success(response.data));
-
-    yield delay(500);
-    yield put(fetchItems.success(mockItems));
+    const response = yield call(itemsAPI.getItems, action.payload);
+    console.log('fetchItemsSaga response:', response.data);
+    // 백엔드 응답 형식: { ok: true, data: [...] }
+    const items = response.data?.data || response.data || [];
+    const itemsArray = Array.isArray(items) ? items : [];
+    
+    yield put(fetchItems.success(itemsArray));
   } catch (error) {
     yield put(fetchItems.failure(error.response?.data?.message || '품목 목록을 불러오는데 실패했습니다.'));
   }
@@ -163,11 +177,11 @@ function* fetchItemsSaga(action) {
 
 function* fetchItemByIdSaga(action) {
   try {
-    // const response = yield call(itemsAPI.getItem, action.payload);
-    // yield put(fetchItemById.success(response.data));
-
-    yield delay(500);
-    const item = mockItems.find((item) => item.id === action.payload);
+    const response = yield call(itemsAPI.getItemById, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const item = response.data?.data || response.data;
+    
     if (item) {
       yield put(fetchItemById.success(item));
     } else {
@@ -180,12 +194,11 @@ function* fetchItemByIdSaga(action) {
 
 function* fetchItemByCodeSaga(action) {
   try {
-    // TODO: 백엔드에 getItemByCode API 없음 - 임시 목데이터 사용
-    // const response = yield call(itemsAPI.getItemByCode, action.payload);
-    // yield put(fetchItemByCode.success(response.data));
-
-    yield delay(500);
-    const item = mockItems.find((item) => item.code === action.payload);
+    const response = yield call(itemsAPI.getItemByCode, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const item = response.data?.data || response.data;
+    
     if (item) {
       yield put(fetchItemByCode.success(item));
     } else {
@@ -198,16 +211,30 @@ function* fetchItemByCodeSaga(action) {
 
 function* createItemSaga(action) {
   try {
-    // const response = yield call(itemsAPI.createItem, action.payload);
-    // yield put(createItem.success(response.data));
-
-    yield delay(500);
-    const newItem = {
-      id: mockItems.length + 1,
-      ...action.payload,
+    // 백엔드 API 형식에 맞게 데이터 변환
+    const payload = action.payload;
+    const itemData = {
+      code: payload.code,
+      name: payload.name,
+      category: payload.category,
+      unit: payload.unit,
+      factory_id: payload.factoryId,
+      storage_temp: payload.storageTemp, // 보관 조건 name
+      storage_condition_id: payload.storageConditionId, // 보관 조건 ID
+      shortage: payload.shortage,
+      expiration_date: payload.shelfLife,
+      wholesale_price: payload.wholesalePrice,
     };
-    mockItems = [...mockItems, newItem];
+    
+    const response = yield call(itemsAPI.createItem, itemData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newItem = response.data?.data || response.data;
+    
     yield put(createItem.success(newItem));
+    
+    // 목록 새로고침
+    yield put(fetchItems.request());
   } catch (error) {
     yield put(createItem.failure(error.response?.data?.message || '품목 등록에 실패했습니다.'));
   }
@@ -215,19 +242,30 @@ function* createItemSaga(action) {
 
 function* updateItemSaga(action) {
   try {
-    // const { id, data } = action.payload;
-    // const response = yield call(itemsAPI.updateItem, id, data);
-    // yield put(updateItem.success(response.data));
-
-    yield delay(500);
     const { id, data } = action.payload;
-    const index = mockItems.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      mockItems[index] = { ...mockItems[index], ...data };
-      yield put(updateItem.success(mockItems[index]));
-    } else {
-      yield put(updateItem.failure('품목을 찾을 수 없습니다.'));
-    }
+    
+    // 백엔드 API 형식에 맞게 데이터 변환
+    const updateData = {
+      code: data.code,
+      name: data.name,
+      category: data.category,
+      unit: data.unit,
+      factory_id: data.factoryId,
+      storage_condition_id: data.storageConditionId,
+      shortage: data.shortage,
+      expiration_date: data.shelfLife,
+      wholesale_price: data.wholesalePrice,
+    };
+    
+    const response = yield call(itemsAPI.updateItem, id, updateData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedItem = response.data?.data || response.data;
+    
+    yield put(updateItem.success(updatedItem));
+    
+    // 목록 새로고침
+    yield put(fetchItems.request());
   } catch (error) {
     yield put(updateItem.failure(error.response?.data?.message || '품목 수정에 실패했습니다.'));
   }
@@ -235,12 +273,11 @@ function* updateItemSaga(action) {
 
 function* deleteItemSaga(action) {
   try {
-    // const response = yield call(itemsAPI.deleteItem, action.payload);
-    // yield put(deleteItem.success(response.data));
-
-    yield delay(500);
-    mockItems = mockItems.filter((item) => item.id !== action.payload);
+    yield call(itemsAPI.deleteItem, action.payload);
     yield put(deleteItem.success({ id: action.payload }));
+    
+    // 목록 새로고침
+    yield put(fetchItems.request());
   } catch (error) {
     yield put(deleteItem.failure(error.response?.data?.message || '품목 삭제에 실패했습니다.'));
   }
@@ -356,23 +393,31 @@ let mockFactories = [
 
 function* fetchBomsSaga(action) {
   try {
-    // const response = yield call(bomsAPI.getBoms, action.payload);
-    // yield put(fetchBoms.success(response.data));
-
-    yield delay(500);
-    yield put(fetchBoms.success(mockBoms));
+    const response = yield call(bomsAPI.getBoms, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: { rows: [...], count: number } }
+    const boms = response.data?.data?.rows || response.data?.rows || response.data?.data || response.data || [];
+    const bomsArray = Array.isArray(boms) ? boms : [];
+    
+    yield put(fetchBoms.success(bomsArray));
   } catch (error) {
     yield put(fetchBoms.failure(error.response?.data?.message || 'BOM 목록을 불러오는데 실패했습니다.'));
   }
 }
 
 function* fetchBomByIdSaga(action) {
+  // null이면 초기화만 하고 API 호출 안 함
+  if (action.payload === null) {
+    yield put(fetchBomById.success(null));
+    return;
+  }
+  
   try {
-    // const response = yield call(bomsAPI.getBom, action.payload);
-    // yield put(fetchBomById.success(response.data));
-
-    yield delay(500);
-    const bom = mockBoms.find((b) => b.id === action.payload);
+    const response = yield call(bomsAPI.getBom, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const bom = response.data?.data || response.data;
+    
     if (bom) {
       yield put(fetchBomById.success(bom));
     } else {
@@ -385,19 +430,24 @@ function* fetchBomByIdSaga(action) {
 
 function* createBomSaga(action) {
   try {
-    // const response = yield call(bomsAPI.createBom, action.payload);
-    // yield put(createBom.success(response.data));
-
-    yield delay(500);
-    const currentDate = new Date().toISOString().split('T')[0];
-    const newBom = {
-      id: mockBoms.length + 1,
-      ...action.payload,
-      updatedAt: currentDate,
-      updated_at: currentDate,
+    // 백엔드 API 형식에 맞게 데이터 변환
+    const payload = action.payload;
+    const bomData = {
+      name: payload.name,
+      code: payload.code,
+      description: payload.description,
+      lines: payload.lines || payload.components || [],
     };
-    mockBoms = [...mockBoms, newBom];
+    
+    const response = yield call(bomsAPI.createBom, bomData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newBom = response.data?.data || response.data;
+    
     yield put(createBom.success(newBom));
+    
+    // 목록 새로고침
+    yield put(fetchBoms.request());
   } catch (error) {
     yield put(createBom.failure(error.response?.data?.message || 'BOM 등록에 실패했습니다.'));
   }
@@ -405,26 +455,24 @@ function* createBomSaga(action) {
 
 function* updateBomSaga(action) {
   try {
-    // const { id, data } = action.payload;
-    // const response = yield call(bomsAPI.updateBom, id, data);
-    // yield put(updateBom.success(response.data));
-
-    yield delay(500);
     const { id, data } = action.payload;
-    const index = mockBoms.findIndex((b) => b.id === id);
-    if (index !== -1) {
-      // 업데이트 날짜 자동 갱신
-      const currentDate = new Date().toISOString().split('T')[0];
-      mockBoms[index] = {
-        ...mockBoms[index],
-        ...data,
-        updatedAt: currentDate,
-        updated_at: currentDate,
-      };
-      yield put(updateBom.success(mockBoms[index]));
-    } else {
-      yield put(updateBom.failure('BOM을 찾을 수 없습니다.'));
-    }
+    
+    // 백엔드 API 형식에 맞게 데이터 변환
+    const updateData = {
+      name: data.name,
+      description: data.description,
+      lines: data.lines || data.components || [],
+    };
+    
+    const response = yield call(bomsAPI.updateBom, id, updateData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedBom = response.data?.data || response.data;
+    
+    yield put(updateBom.success(updatedBom));
+    
+    // 목록 새로고침
+    yield put(fetchBoms.request());
   } catch (error) {
     yield put(updateBom.failure(error.response?.data?.message || 'BOM 수정에 실패했습니다.'));
   }
@@ -432,12 +480,11 @@ function* updateBomSaga(action) {
 
 function* deleteBomSaga(action) {
   try {
-    // const response = yield call(bomsAPI.deleteBom, action.payload);
-    // yield put(deleteBom.success(response.data));
-
-    yield delay(500);
-    mockBoms = mockBoms.filter((b) => b.id !== action.payload);
+    yield call(bomsAPI.deleteBom, action.payload);
     yield put(deleteBom.success({ id: action.payload }));
+    
+    // 목록 새로고침
+    yield put(fetchBoms.request());
   } catch (error) {
     yield put(deleteBom.failure(error.response?.data?.message || 'BOM 삭제에 실패했습니다.'));
   }
@@ -446,12 +493,13 @@ function* deleteBomSaga(action) {
 // ==================== 보관 조건(Storage) Saga ====================
 function* fetchStorageConditionsSaga(action) {
   try {
-    // const response = yield call(storageConditionsAPI.getStorageConditions);
-    // yield put(fetchStorageConditions.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    yield put(fetchStorageConditions.success(mockStorageConditions));
+    const response = yield call(storageConditionsAPI.getStorageConditions);
+    
+    // 백엔드 응답 형식: { ok: true, data: [...] }
+    const conditions = response.data?.data || response.data || [];
+    const conditionsArray = Array.isArray(conditions) ? conditions : [];
+    
+    yield put(fetchStorageConditions.success(conditionsArray));
   } catch (error) {
     yield put(fetchStorageConditions.failure(error.response?.data?.message || '보관 조건 목록을 불러오는데 실패했습니다.'));
   }
@@ -459,12 +507,11 @@ function* fetchStorageConditionsSaga(action) {
 
 function* fetchStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageConditionsAPI.getStorageCondition, action.payload);
-    // yield put(fetchStorageCondition.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const storage = mockStorageConditions.find((s) => s.id === action.payload);
+    const response = yield call(storageConditionsAPI.getStorageCondition, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const storage = response.data?.data || response.data;
+    
     if (storage) {
       yield put(fetchStorageCondition.success(storage));
     } else {
@@ -477,17 +524,15 @@ function* fetchStorageConditionSaga(action) {
 
 function* createStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageConditionsAPI.createStorageCondition, action.payload);
-    // yield put(createStorageCondition.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const newStorage = {
-      id: mockStorageConditions.length + 1,
-      ...action.payload,
-    };
-    mockStorageConditions = [...mockStorageConditions, newStorage];
+    const response = yield call(storageConditionsAPI.createStorageCondition, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newStorage = response.data?.data || response.data;
+    
     yield put(createStorageCondition.success(newStorage));
+    
+    // 목록 새로고침
+    yield put(fetchStorageConditions.request());
   } catch (error) {
     yield put(createStorageCondition.failure(error.response?.data?.message || '보관 조건 등록에 실패했습니다.'));
   }
@@ -495,20 +540,16 @@ function* createStorageConditionSaga(action) {
 
 function* updateStorageConditionSaga(action) {
   try {
-    // const { id, data } = action.payload;
-    // const response = yield call(storageConditionsAPI.updateStorageCondition, id, data);
-    // yield put(updateStorageCondition.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
     const { id, data } = action.payload;
-    const index = mockStorageConditions.findIndex((s) => s.id === id);
-    if (index !== -1) {
-      mockStorageConditions[index] = { ...mockStorageConditions[index], ...data };
-      yield put(updateStorageCondition.success(mockStorageConditions[index]));
-    } else {
-      yield put(updateStorageCondition.failure('보관 조건을 찾을 수 없습니다.'));
-    }
+    const response = yield call(storageConditionsAPI.updateStorageCondition, id, data);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedStorage = response.data?.data || response.data;
+    
+    yield put(updateStorageCondition.success(updatedStorage));
+    
+    // 목록 새로고침
+    yield put(fetchStorageConditions.request());
   } catch (error) {
     yield put(updateStorageCondition.failure(error.response?.data?.message || '보관 조건 수정에 실패했습니다.'));
   }
@@ -516,39 +557,76 @@ function* updateStorageConditionSaga(action) {
 
 function* deleteStorageConditionSaga(action) {
   try {
-    // const response = yield call(storageConditionsAPI.deleteStorageCondition, action.payload);
-    // yield put(deleteStorageCondition.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    mockStorageConditions = mockStorageConditions.filter((s) => s.id !== action.payload);
+    yield call(storageConditionsAPI.deleteStorageCondition, action.payload);
     yield put(deleteStorageCondition.success({ id: action.payload }));
+    
+    // 목록 새로고침
+    yield put(fetchStorageConditions.request());
   } catch (error) {
     yield put(deleteStorageCondition.failure(error.response?.data?.message || '보관 조건 삭제에 실패했습니다.'));
+  }
+}
+
+function* addStorageConditionItemsSaga(action) {
+  try {
+    const { storageConditionId, itemNames } = action.payload;
+    
+    // 백엔드 API 형식: POST /api/storage-conditions/:id/items { itemNames: [...] }
+    const response = yield call(storageConditionsAPI.addItems, storageConditionId, { itemNames });
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedStorage = response.data?.data || response.data;
+    
+    yield put(addStorageConditionItems.success(updatedStorage));
+    
+    // 보관 조건 목록 새로고침
+    yield put(fetchStorageConditions.request());
+  } catch (error) {
+    yield put(addStorageConditionItems.failure(error.response?.data?.message || '적용 품목 추가에 실패했습니다.'));
+  }
+}
+
+function* removeStorageConditionItemSaga(action) {
+  try {
+    const { storageConditionId, itemName } = action.payload;
+    
+    // 백엔드 API 형식: DELETE /api/storage-conditions/:id/items { itemName: "..." }
+    const response = yield call(storageConditionsAPI.removeItem, storageConditionId, { itemName });
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedStorage = response.data?.data || response.data;
+    
+    yield put(removeStorageConditionItem.success(updatedStorage));
+    
+    // 보관 조건 목록 새로고침
+    yield put(fetchStorageConditions.request());
+  } catch (error) {
+    yield put(removeStorageConditionItem.failure(error.response?.data?.message || '적용 품목 제거에 실패했습니다.'));
   }
 }
 
 // ==================== 공장 정보(Factory) Saga ====================
 function* fetchFactoriesSaga(action) {
   try {
-    // const response = yield call(factoriesAPI.getFactories);
-    // yield put(fetchFactories.success(response.data));
-
-    yield delay(500);
-    yield put(fetchFactories.success(mockFactories));
+    const response = yield call(factoriesAPI.getFactories);
+    
+    // 백엔드 응답 형식: { ok: true, data: [...] }
+    const factories = response.data?.data || response.data || [];
+    const factoriesArray = Array.isArray(factories) ? factories : [];
+    
+    yield put(fetchFactories.success(factoriesArray));
   } catch (error) {
-    yield put(fetchFactories.failure(error.response?.data?.message || '공장 조건을 불러오는데 실패했습니다.'));
+    yield put(fetchFactories.failure(error.response?.data?.message || '공장 정보를 불러오는데 실패했습니다.'));
   }
 }
 
 function* fetchFactoryByIdSaga(action) {
   try {
-    // const response = yield call(factoriesAPI.getFactory, action.payload);
-    // yield put(fetchFactoryById.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const factory = mockFactories.find((f) => f.id === action.payload);
+    const response = yield call(factoriesAPI.getFactory, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const factory = response.data?.data || response.data;
+    
     if (factory) {
       yield put(fetchFactoryById.success(factory));
     } else {
@@ -561,17 +639,15 @@ function* fetchFactoryByIdSaga(action) {
 
 function* createFactorySaga(action) {
   try {
-    // const response = yield call(factoriesAPI.createFactory, action.payload);
-    // yield put(createFactory.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    const newFactory = {
-      id: mockFactories.length + 1,
-      ...action.payload,
-    };
-    mockFactories = [...mockFactories, newFactory];
+    const response = yield call(factoriesAPI.createFactory, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newFactory = response.data?.data || response.data;
+    
     yield put(createFactory.success(newFactory));
+    
+    // 목록 새로고침
+    yield put(fetchFactories.request());
   } catch (error) {
     yield put(createFactory.failure(error.response?.data?.message || '공장 등록에 실패했습니다.'));
   }
@@ -579,20 +655,16 @@ function* createFactorySaga(action) {
 
 function* updateFactorySaga(action) {
   try {
-    // const { id, data } = action.payload;
-    // const response = yield call(factoriesAPI.updateFactory, id, data);
-    // yield put(updateFactory.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
     const { id, data } = action.payload;
-    const index = mockFactories.findIndex((f) => f.id === id);
-    if (index !== -1) {
-      mockFactories[index] = { ...mockFactories[index], ...data };
-      yield put(updateFactory.success(mockFactories[index]));
-    } else {
-      yield put(updateFactory.failure('공장을 찾을 수 없습니다.'));
-    }
+    const response = yield call(factoriesAPI.updateFactory, id, data);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedFactory = response.data?.data || response.data;
+    
+    yield put(updateFactory.success(updatedFactory));
+    
+    // 목록 새로고침
+    yield put(fetchFactories.request());
   } catch (error) {
     yield put(updateFactory.failure(error.response?.data?.message || '공장 수정에 실패했습니다.'));
   }
@@ -600,15 +672,88 @@ function* updateFactorySaga(action) {
 
 function* deleteFactorySaga(action) {
   try {
-    // const response = yield call(factoriesAPI.deleteFactory, action.payload);
-    // yield put(deleteFactory.success(response.data));
-
-    // 임시 목데이터 사용
-    yield delay(500);
-    mockFactories = mockFactories.filter((f) => f.id !== action.payload);
+    yield call(factoriesAPI.deleteFactory, action.payload);
     yield put(deleteFactory.success({ id: action.payload }));
+    
+    // 목록 새로고침
+    yield put(fetchFactories.request());
   } catch (error) {
     yield put(deleteFactory.failure(error.response?.data?.message || '공장 삭제에 실패했습니다.'));
+  }
+}
+
+// ==================== 프로세스 관리 Saga ====================
+function* fetchProcessesSaga() {
+  try {
+    const response = yield call(processesAPI.getProcesses);
+    
+    // 백엔드 응답 형식: { ok: true, data: [...] }
+    const processes = response.data?.data || response.data || [];
+    const processesArray = Array.isArray(processes) ? processes : [];
+    
+    yield put(fetchProcesses.success(processesArray));
+  } catch (error) {
+    yield put(fetchProcesses.failure(error.response?.data?.message || '프로세스 목록을 불러오는데 실패했습니다.'));
+  }
+}
+
+function* createProcessSaga(action) {
+  try {
+    const response = yield call(processesAPI.createProcess, action.payload);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const newProcess = response.data?.data || response.data;
+    
+    yield put(createProcess.success(newProcess));
+    
+    // 공정 목록 새로고침
+    yield put(fetchProcesses.request());
+  } catch (error) {
+    yield put(createProcess.failure(error.response?.data?.message || '공정 생성에 실패했습니다.'));
+  }
+}
+
+function* addFactoryProcessesSaga(action) {
+  try {
+    const { factoryId, processIds, processNames } = action.payload;
+    
+    // processNames가 있으면 processNames 사용, 없으면 processIds 사용
+    const requestData = processNames 
+      ? { processNames }
+      : { processIds };
+    
+    // 백엔드 API 형식: POST /api/factories/:id/processes { processNames: [...] } 또는 { processIds: [...] }
+    const response = yield call(factoriesAPI.addProcesses, factoryId, requestData);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedFactory = response.data?.data || response.data;
+    
+    yield put(addFactoryProcesses.success(updatedFactory));
+    
+    // 공장 목록 및 공정 목록 새로고침
+    yield put(fetchFactories.request());
+    yield put(fetchProcesses.request());
+  } catch (error) {
+    yield put(addFactoryProcesses.failure(error.response?.data?.message || '공정 추가에 실패했습니다.'));
+  }
+}
+
+function* removeFactoryProcessSaga(action) {
+  try {
+    const { factoryId, processId } = action.payload;
+    
+    // 백엔드 API 형식: DELETE /api/factories/:id/processes/:processId
+    const response = yield call(factoriesAPI.removeProcess, factoryId, processId);
+    
+    // 백엔드 응답 형식: { ok: true, data: {...} }
+    const updatedFactory = response.data?.data || response.data;
+    
+    yield put(removeFactoryProcess.success(updatedFactory));
+    
+    // 공장 목록 새로고침
+    yield put(fetchFactories.request());
+  } catch (error) {
+    yield put(removeFactoryProcess.failure(error.response?.data?.message || '공정 제거에 실패했습니다.'));
   }
 }
 
@@ -628,10 +773,16 @@ export default function* basicSaga() {
   yield takeLatest(FETCH_STORAGE_CONDITION.REQUEST, fetchStorageConditionSaga);
   yield takeLatest(CREATE_STORAGE_CONDITION.REQUEST, createStorageConditionSaga);
   yield takeLatest(UPDATE_STORAGE_CONDITION.REQUEST, updateStorageConditionSaga);
-  yield takeLatest(DELETE_STORAGE_CONDITION.REQUEST, deleteStorageConditionSaga)
+  yield takeLatest(DELETE_STORAGE_CONDITION.REQUEST, deleteStorageConditionSaga);
+  yield takeLatest(ADD_STORAGE_CONDITION_ITEMS.REQUEST, addStorageConditionItemsSaga);
+  yield takeLatest(REMOVE_STORAGE_CONDITION_ITEM.REQUEST, removeStorageConditionItemSaga);
   yield takeLatest(FETCH_FACTORIES.REQUEST, fetchFactoriesSaga);
   yield takeLatest(FETCH_FACTORY_BY_ID.REQUEST, fetchFactoryByIdSaga);
   yield takeLatest(CREATE_FACTORY.REQUEST, createFactorySaga);
   yield takeLatest(UPDATE_FACTORY.REQUEST, updateFactorySaga);
   yield takeLatest(DELETE_FACTORY.REQUEST, deleteFactorySaga);
+  yield takeLatest(FETCH_PROCESSES.REQUEST, fetchProcessesSaga);
+  yield takeLatest(CREATE_PROCESS.REQUEST, createProcessSaga);
+  yield takeLatest(ADD_FACTORY_PROCESSES.REQUEST, addFactoryProcessesSaga);
+  yield takeLatest(REMOVE_FACTORY_PROCESS.REQUEST, removeFactoryProcessSaga);
 }

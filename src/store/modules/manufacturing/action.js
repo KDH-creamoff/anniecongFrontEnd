@@ -2,13 +2,13 @@ import { createRequestTypes, createAsyncActions } from '../../../utils/sagaUtils
 
 // ==================== 액션 타입 ====================
 
-// 작업 지시서 관리
-export const FETCH_WORK_ORDERS = createRequestTypes('manufacturing/FETCH_WORK_ORDERS'); // 작업 지시서 목록 조회
-export const FETCH_WORK_ORDER_BY_ID = createRequestTypes('manufacturing/FETCH_WORK_ORDER_BY_ID'); // 작업 지시서 상세 조회
-export const CREATE_WORK_ORDER = createRequestTypes('manufacturing/CREATE_WORK_ORDER'); // 작업 지시서 등록
-export const UPDATE_WORK_ORDER = createRequestTypes('manufacturing/UPDATE_WORK_ORDER'); // 작업 지시서 수정
-export const DELETE_WORK_ORDER = createRequestTypes('manufacturing/DELETE_WORK_ORDER'); // 작업 지시서 삭제
-export const UPDATE_WORK_ORDER_STATUS = createRequestTypes('manufacturing/UPDATE_WORK_ORDER_STATUS'); // 작업 지시서 상태 변경
+// 작업지시서 관리
+export const FETCH_WORK_ORDERS = createRequestTypes('manufacturing/FETCH_WORK_ORDERS'); // 작업지시서 목록 조회
+export const FETCH_WORK_ORDER_BY_ID = createRequestTypes('manufacturing/FETCH_WORK_ORDER_BY_ID'); // 작업지시서 상세 조회
+export const CREATE_WORK_ORDER = createRequestTypes('manufacturing/CREATE_WORK_ORDER'); // 작업지시서 등록
+export const UPDATE_WORK_ORDER = createRequestTypes('manufacturing/UPDATE_WORK_ORDER'); // 작업지시서 수정
+export const DELETE_WORK_ORDER = createRequestTypes('manufacturing/DELETE_WORK_ORDER'); // 작업지시서 삭제
+export const UPDATE_WORK_ORDER_STATUS = createRequestTypes('manufacturing/UPDATE_WORK_ORDER_STATUS'); // 작업지시서 상태 변경
 
 // 제조 이력 관리
 export const FETCH_MANUFACTURING_HISTORY = createRequestTypes('manufacturing/FETCH_MANUFACTURING_HISTORY'); // 제조 이력 조회
@@ -21,6 +21,7 @@ export const FETCH_TRANSFER_BY_ID = createRequestTypes('manufacturing/FETCH_TRAN
 export const CREATE_TRANSFER = createRequestTypes('manufacturing/CREATE_TRANSFER'); // 이송 등록
 export const UPDATE_TRANSFER_STATUS = createRequestTypes('manufacturing/UPDATE_TRANSFER_STATUS'); // 이송 상태 변경
 export const CANCEL_TRANSFER = createRequestTypes('manufacturing/CANCEL_TRANSFER'); // 이송 취소
+export const FETCH_AVAILABLE_PRODUCTS = createRequestTypes('manufacturing/FETCH_AVAILABLE_PRODUCTS'); // 출고가능품목 조회
 
 // 2공장 제조 관리
 export const FETCH_FACTORY2_WORKS = createRequestTypes('manufacturing/FETCH_FACTORY2_WORKS'); // 2공장 작업 목록 조회
@@ -40,7 +41,7 @@ export const RESET_MANUFACTURING_STATE = 'manufacturing/RESET_MANUFACTURING_STAT
 
 // ==================== 액션 생성자 ====================
 
-// 작업 지시서 관리
+// 작업지시서 관리
 export const fetchWorkOrders = createAsyncActions(FETCH_WORK_ORDERS);
 export const fetchWorkOrderById = createAsyncActions(FETCH_WORK_ORDER_BY_ID);
 export const createWorkOrder = createAsyncActions(CREATE_WORK_ORDER);
@@ -59,6 +60,7 @@ export const fetchTransferById = createAsyncActions(FETCH_TRANSFER_BY_ID);
 export const createTransfer = createAsyncActions(CREATE_TRANSFER);
 export const updateTransferStatus = createAsyncActions(UPDATE_TRANSFER_STATUS);
 export const cancelTransfer = createAsyncActions(CANCEL_TRANSFER);
+export const fetchAvailableProducts = createAsyncActions(FETCH_AVAILABLE_PRODUCTS);
 
 // 2공장 제조 관리
 export const fetchFactory2Works = createAsyncActions(FETCH_FACTORY2_WORKS);

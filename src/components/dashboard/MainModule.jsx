@@ -40,7 +40,7 @@ const MainModule = ({ onNavigate }) => {
     {
       id: 'manufacturing',
       title: '제조관리',
-      description: '제조이력 캘린더, 1공장 전처리, 공장간 이동, 2공장 제조, 작업지시서 관리',
+      description: '제조이력 캘린더, 1공장, 공장간 이동, 2공장, 작업지시서 관리',
       icon: <Factory className='h-6 w-6' />,
       nav: '제조관리-nav1',
       color: 'bg-[#724323]',
@@ -66,7 +66,7 @@ const MainModule = ({ onNavigate }) => {
     },
     {
       id: 'label',
-      title: '라벨 프린트',
+      title: '라벨관리',
       description: '',
       icon: <Tags className='h-6 w-6' />,
       nav: '라벨관리',

@@ -14,6 +14,7 @@ import {
   CREATE_TRANSFER,
   UPDATE_TRANSFER_STATUS,
   CANCEL_TRANSFER,
+  FETCH_AVAILABLE_PRODUCTS,
   FETCH_FACTORY2_WORKS,
   FETCH_FACTORY2_ORDERS,
   UPDATE_FACTORY2_WORK_STATUS,
@@ -40,6 +41,7 @@ const initialState = {
   transfers: createAsyncState([]), // 이송 목록
   transferDetail: createAsyncState(null), // 이송 상세 정보
   transferOperation: createAsyncState(null), // 이송 등록/상태변경/취소 결과
+  availableProducts: createAsyncState([]), // 출고가능품목 목록
 
   // 2공장 제조 관련 상태
   factory2Works: createAsyncState([]), // 2공장 작업 목록
@@ -133,7 +135,7 @@ const manufacturingReducer = (state = initialState, action) => {
         workOrders: {
           ...state.workOrders,
           data: state.workOrders.data.map((order) =>
-            order.id === action.payload.id ? { ...order, status: action.payload.status } : order
+            order.id === action.payload.id ? action.payload : order
           ),
         },
         workOrderOperation: { data: action.payload, loading: false, error: null },
@@ -223,6 +225,14 @@ const manufacturingReducer = (state = initialState, action) => {
     case CANCEL_TRANSFER.FAILURE:
       return { ...state, transferOperation: { ...state.transferOperation, loading: false, error: action.error } };
 
+    // ==================== 출고가능품목 조회 ====================
+    case FETCH_AVAILABLE_PRODUCTS.REQUEST:
+      return { ...state, availableProducts: { ...state.availableProducts, loading: true, error: null } };
+    case FETCH_AVAILABLE_PRODUCTS.SUCCESS:
+      return { ...state, availableProducts: { data: action.payload, loading: false, error: null } };
+    case FETCH_AVAILABLE_PRODUCTS.FAILURE:
+      return { ...state, availableProducts: { ...state.availableProducts, loading: false, error: action.error } };
+
     // ==================== 2공장 작업 목록 조회 ====================
     case FETCH_FACTORY2_WORKS.REQUEST:
       return { ...state, factory2Works: { ...state.factory2Works, loading: true, error: null } };
@@ -248,7 +258,13 @@ const manufacturingReducer = (state = initialState, action) => {
         factory2Works: {
           ...state.factory2Works,
           data: state.factory2Works.data.map((work) =>
-            work.id === action.payload.id ? { ...work, status: action.payload.status } : work
+            work.id === action.payload.id ? action.payload : work
+          ),
+        },
+        factory2Orders: {
+          ...state.factory2Orders,
+          data: state.factory2Orders.data.map((order) =>
+            order.id === action.payload.id ? action.payload : order
           ),
         },
         factory2Operation: { data: action.payload, loading: false, error: null },

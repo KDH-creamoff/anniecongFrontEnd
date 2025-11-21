@@ -20,10 +20,16 @@ import {
   CREATE_FACTORY,
   UPDATE_FACTORY,
   DELETE_FACTORY,
+  FETCH_PROCESSES,
+  CREATE_PROCESS,
+  ADD_FACTORY_PROCESSES,
+  REMOVE_FACTORY_PROCESS,
   SET_BASIC_FILTER,
   CLEAR_BASIC_ERROR,
   RESET_BASIC_STATE,
   DELETE_STORAGE_CONDITION,
+  ADD_STORAGE_CONDITION_ITEMS,
+  REMOVE_STORAGE_CONDITION_ITEM,
 } from './actions';
 
 const initialState = {
@@ -36,9 +42,14 @@ const initialState = {
   storageConditions: createAsyncState([]),
   storageConditionDetail: createAsyncState(null),
   storageOperation: createAsyncState(null),
+  addStorageConditionItems: createAsyncState(null),
+  removeStorageConditionItem: createAsyncState(null),
   factories: createAsyncState([]),
   factoryDetail: createAsyncState(null),
   factoryOperation: createAsyncState(null),
+  processes: createAsyncState([]),
+  factoryProcessOperation: createAsyncState(null),
+  removeFactoryProcess: createAsyncState(null),
   filter: {
     category: '',
     factoryId: '',
@@ -114,6 +125,10 @@ const basicReducer = (state = initialState, action) => {
 
     // BOM 상세 조회
     case FETCH_BOM_BY_ID.REQUEST:
+      // null이면 bomDetail 초기화
+      if (action.payload === null) {
+        return { ...state, bomDetail: { data: null, loading: false, error: null } };
+      }
       return { ...state, bomDetail: { ...state.bomDetail, loading: true, error: null } };
     case FETCH_BOM_BY_ID.SUCCESS:
       return { ...state, bomDetail: { data: action.payload, loading: false, error: null } };
@@ -192,6 +207,40 @@ const basicReducer = (state = initialState, action) => {
     case UPDATE_STORAGE_CONDITION.FAILURE:
       return { ...state, storageOperation: { ...state.storageOperation, loading: false, error: action.error } };
 
+    // 보관 조건에 적용 품목 추가
+    case ADD_STORAGE_CONDITION_ITEMS.REQUEST:
+      return { ...state, addStorageConditionItems: { ...state.addStorageConditionItems, loading: true, error: null } };
+    case ADD_STORAGE_CONDITION_ITEMS.SUCCESS:
+      return {
+        ...state,
+        storageConditions: {
+          ...state.storageConditions,
+          data: state.storageConditions.data.map((storage) =>
+            storage.id === action.payload.id ? action.payload : storage
+          ),
+        },
+        addStorageConditionItems: { data: action.payload, loading: false, error: null }
+      };
+    case ADD_STORAGE_CONDITION_ITEMS.FAILURE:
+      return { ...state, addStorageConditionItems: { ...state.addStorageConditionItems, loading: false, error: action.error } };
+
+    // 보관 조건에서 적용 품목 제거
+    case REMOVE_STORAGE_CONDITION_ITEM.REQUEST:
+      return { ...state, removeStorageConditionItem: { ...state.removeStorageConditionItem, loading: true, error: null } };
+    case REMOVE_STORAGE_CONDITION_ITEM.SUCCESS:
+      return {
+        ...state,
+        storageConditions: {
+          ...state.storageConditions,
+          data: state.storageConditions.data.map((storage) =>
+            storage.id === action.payload.id ? action.payload : storage
+          ),
+        },
+        removeStorageConditionItem: { data: action.payload, loading: false, error: null }
+      };
+    case REMOVE_STORAGE_CONDITION_ITEM.FAILURE:
+      return { ...state, removeStorageConditionItem: { ...state.removeStorageConditionItem, loading: false, error: action.error } };
+
     // 공장 목록 조회
     case FETCH_FACTORIES.REQUEST:
       return { ...state, factories: { ...state.factories, loading: true, error: null } };
@@ -241,6 +290,64 @@ const basicReducer = (state = initialState, action) => {
     case DELETE_FACTORY.FAILURE:
       return { ...state, factoryOperation: { ...state.factoryOperation, loading: false, error: action.error } };
 
+    // 프로세스 목록 조회
+    case FETCH_PROCESSES.REQUEST:
+      return { ...state, processes: { ...state.processes, loading: true, error: null } };
+    case FETCH_PROCESSES.SUCCESS:
+      return { ...state, processes: { data: action.payload, loading: false, error: null } };
+    case FETCH_PROCESSES.FAILURE:
+      return { ...state, processes: { ...state.processes, loading: false, error: action.error } };
+
+    // 공정 생성
+    case CREATE_PROCESS.REQUEST:
+      return { ...state, processes: { ...state.processes, loading: true, error: null } };
+    case CREATE_PROCESS.SUCCESS:
+      return {
+        ...state,
+        processes: {
+          ...state.processes,
+          data: [...state.processes.data, action.payload],
+          loading: false,
+          error: null
+        }
+      };
+    case CREATE_PROCESS.FAILURE:
+      return { ...state, processes: { ...state.processes, loading: false, error: action.error } };
+
+    // 공장에 공정 추가
+    case ADD_FACTORY_PROCESSES.REQUEST:
+      return { ...state, factoryProcessOperation: { ...state.factoryProcessOperation, loading: true, error: null } };
+    case ADD_FACTORY_PROCESSES.SUCCESS:
+      return {
+        ...state,
+        factories: {
+          ...state.factories,
+          data: state.factories.data.map((factory) =>
+            factory.id === action.payload.id ? action.payload : factory
+          ),
+        },
+        factoryProcessOperation: { data: action.payload, loading: false, error: null }
+      };
+    case ADD_FACTORY_PROCESSES.FAILURE:
+      return { ...state, factoryProcessOperation: { ...state.factoryProcessOperation, loading: false, error: action.error } };
+
+    // 공장에서 공정 제거
+    case REMOVE_FACTORY_PROCESS.REQUEST:
+      return { ...state, removeFactoryProcess: { ...state.removeFactoryProcess, loading: true, error: null } };
+    case REMOVE_FACTORY_PROCESS.SUCCESS:
+      return {
+        ...state,
+        factories: {
+          ...state.factories,
+          data: state.factories.data.map((factory) =>
+            factory.id === action.payload.id ? action.payload : factory
+          ),
+        },
+        removeFactoryProcess: { data: action.payload, loading: false, error: null }
+      };
+    case REMOVE_FACTORY_PROCESS.FAILURE:
+      return { ...state, removeFactoryProcess: { ...state.removeFactoryProcess, loading: false, error: action.error } };
+
     // UI 상태 관리
     case SET_BASIC_FILTER:
       return { ...state, filter: { ...state.filter, ...action.payload } };
@@ -257,9 +364,14 @@ const basicReducer = (state = initialState, action) => {
         storageConditions: { ...state.storageConditions, error: null },
         storageConditionDetail: { ...state.storageConditionDetail, error: null },
         storageOperation: { ...state.storageOperation, error: null },
+        addStorageConditionItems: { ...state.addStorageConditionItems, error: null },
+        removeStorageConditionItem: { ...state.removeStorageConditionItem, error: null },
         factories: { ...state.factories, error: null },
         factoryDetail: { ...state.factoryDetail, error: null },
         factoryOperation: { ...state.factoryOperation, error: null },
+        processes: { ...state.processes, error: null },
+        factoryProcessOperation: { ...state.factoryProcessOperation, error: null },
+        removeFactoryProcess: { ...state.removeFactoryProcess, error: null },
       };
 
     case RESET_BASIC_STATE:

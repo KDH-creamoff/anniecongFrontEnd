@@ -1,11 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Plus } from 'lucide-react';
-import { createItem } from '../../store/modules/basic/actions';
+import { createItem, fetchStorageConditions, fetchItems } from '../../store/modules/basic/actions';
 import {
   selectItemOperation,
   selectItemOperationLoading,
   selectItemOperationError,
+  selectStorageConditions,
+  selectStorageConditionsLoading,
+  selectFactories,
+  selectFactoriesLoading,
 } from '../../store/modules/basic/selectors';
 
 const BasicNewItem = () => {
@@ -15,34 +19,86 @@ const BasicNewItem = () => {
   const itemOperation = useSelector(selectItemOperation);
   const itemOperationLoading = useSelector(selectItemOperationLoading);
   const itemOperationError = useSelector(selectItemOperationError);
+  const storageConditions = useSelector(selectStorageConditions) || [];
+  const storageConditionsLoading = useSelector(selectStorageConditionsLoading);
+  const factories = useSelector(selectFactories) || [];
+  const factoriesLoading = useSelector(selectFactoriesLoading);
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     code: '',
     name: '',
     category: '',
     factoryId: '',
     storageConditionId: '',
+    storageTemp: '', // 보관 조건 name 저장
     shelfLife: '',
     shortage: '',
     unit: '',
     wholesalePrice: '',
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
-  const factoryOptions = [
-    { id: 1, name: '1공장' },
-    { id: 2, name: '2공장' },
-  ];
-  const storageOptions = ['냉동', '냉장', '실온'];
+  const [hasSubmittedCreate, setHasSubmittedCreate] = useState(false); // 등록 요청 여부 추적
+
+  // 컴포넌트 마운트 시 보관 조건 목록 조회
+  useEffect(() => {
+    console.log('BasicNewItem 컴포넌트 마운트됨');
+    dispatch(fetchStorageConditions.request());
+  }, [dispatch]);
+  
+  // handleSubmit 함수가 제대로 정의되었는지 확인
+  useEffect(() => {
+    console.log('handleSubmit 함수 확인:', typeof handleSubmit);
+  }, []);
 
   useEffect(() => {
     if (itemOperationError) {
       alert(itemOperationError || '등록 중 오류가 발생했습니다.');
+      setHasSubmittedCreate(false); // 에러 시 초기화
     }
   }, [itemOperationError]);
 
+  // 품목 등록 성공 시 리스트 업데이트 + 폼 초기화 + 알림
+  useEffect(() => {
+    // 등록 요청을 보낸 경우에만 성공 메시지 표시
+    if (hasSubmittedCreate && itemOperation && !itemOperationLoading && !itemOperationError) {
+      dispatch(fetchItems.request());
+      setFormData(initialFormData);
+      setErrors({});
+      alert('품목이 성공적으로 등록되었습니다!');
+      setHasSubmittedCreate(false); // 메시지 표시 후 초기화
+    }
+  }, [hasSubmittedCreate, itemOperation, itemOperationLoading, itemOperationError, dispatch]);
+
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === 'storageConditionId') {
+      const selectedStorage = storageConditions.find(
+        (sc) => String(sc.id) === String(value)
+      );
+
+      // 🔥 여기가 핵심 수정 부분
+      // 예: "냉장(0~5도)" → "냉장" 만 잘라서 storageTemp에 저장
+      let storageTemp = selectedStorage?.name || '';
+
+      if (typeof storageTemp === 'string') {
+        // 괄호 앞까지만 사용
+        storageTemp = storageTemp.split('(')[0].trim();
+        // 혹시 너무 길면 안전하게 한 번 더 자르기 (DB 컬럼 길이 대비)
+        if (storageTemp.length > 20) {
+          storageTemp = storageTemp.slice(0, 20);
+        }
+      }
+
+      setFormData((prev) => ({ 
+        ...prev, 
+        storageConditionId: value,
+        storageTemp,
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }
+
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
@@ -75,17 +131,37 @@ const BasicNewItem = () => {
   };
 
   const handleSubmit = () => {
-    if (itemOperationLoading) return;
-    if (!validateForm()) return;
+    console.log('handleSubmit 호출됨');
+    console.log('itemOperationLoading:', itemOperationLoading);
+    console.log('formData:', formData);
+    
+    if (itemOperationLoading) {
+      console.log('로딩 중이므로 리턴');
+      return;
+    }
+    
+    if (!validateForm()) {
+      console.log('유효성 검사 실패');
+      return;
+    }
 
-    // Redux Saga를 통해 품목 등록 요청
+    const storageConditionId = Number(formData.storageConditionId);
+    const storageTemp = formData.storageTemp;
+    
+    console.log('=== 등록 버튼 클릭 ===');
+    console.log('storage_condition_id:', storageConditionId);
+    console.log('storage_temp:', storageTemp);
+    console.log('===================');
+
+    setHasSubmittedCreate(true); // 등록 요청 플래그 설정
     dispatch(
       createItem.request({
         code: formData.code.trim(),
         name: formData.name.trim(),
         category: formData.category,
         factoryId: Number(formData.factoryId),
-        storageConditionId: formData.storageConditionId,
+        storageConditionId: storageConditionId,
+        storageTemp: storageTemp,
         shelfLife: Number(formData.shelfLife),
         shortage: Number(formData.shortage),
         unit: normUnit(formData.unit),
@@ -94,6 +170,7 @@ const BasicNewItem = () => {
     );
 
     if (itemOperation && !itemOperationLoading) {
+      e.preventDefault();
       alert('품목이 성공적으로 등록되었습니다!');
       // 폼 초기화
       setFormData({
@@ -102,6 +179,7 @@ const BasicNewItem = () => {
         category: '',
         factoryId: '',
         storageConditionId: '',
+        storageTemp: '',
         shelfLife: '',
         shortage: '',
         unit: '',
@@ -114,27 +192,35 @@ const BasicNewItem = () => {
     return (
       <>
         <option value="" disabled hidden>공장 선택</option>
-        {factoryOptions.map((f) => (
-          <option key={f.id} value={f.id}>
-            {f.name}
-          </option>
-        ))}
+        {factoriesLoading ? ( 
+          <option value="" disabled>불러오는 중...</option>
+        ) : (
+          factories.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name || f.title || '-'}
+            </option>
+          ))
+        )}       
       </>
     );
-  }, [factoryOptions]);
+  }, [factories, factoriesLoading]);
 
   const storageSelect = useMemo(() => {
     return (
       <>
         <option value="" disabled hidden>보관조건 선택</option>
-        {storageOptions.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {storageConditionsLoading ? (
+          <option value="" disabled>불러오는 중...</option>
+        ) : (
+          storageConditions.map((condition) => (
+            <option key={condition.id} value={condition.id}>
+              {condition.name || condition.title || '-'}
+            </option>
+          ))
+        )}
       </>
     );
-  }, [storageOptions]);
+  }, [storageConditions, storageConditionsLoading]);
 
   return (
     <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
@@ -321,7 +407,11 @@ const BasicNewItem = () => {
             <button
               type="button"
               disabled={itemOperationLoading}
-              onClick={handleSubmit}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+              }}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#674529] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95 disabled:opacity-60"
             >
               <span>{itemOperationLoading ? '등록중…' : '등록'}</span>

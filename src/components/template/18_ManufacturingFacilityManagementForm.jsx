@@ -55,6 +55,37 @@ const ManufacturingFacilityManagementForm = ({ pdfRef }) => {
         className="hidden"
       />
 
+      <div className="flex justify-end mb-6">
+        <table className="border-2 border-black border-collapse">
+          <tbody>
+            <tr>
+              <td className="h-8 border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+              <td className="border-2 border-black px-4 py-2 text-center text-sm"></td>
+            </tr>
+            <tr>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+              <td
+                className="border-2 border-black w-20 h-16 cursor-pointer hover:bg-gray-50"
+              >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div ref={contentRef} className="w-full max-w-[1400px] mx-auto p-5 bg-white">
         {/* 제목 및 날짜 */}
         <div className="relative border-2 border-black mb-4">
@@ -79,51 +110,6 @@ const ManufacturingFacilityManagementForm = ({ pdfRef }) => {
               <span>요일</span>
             </div>
           </div>
-        </div>
-
-        {/* 결재란 */}
-        <div className="flex mb-4 justify-end">
-          <table className="border-collapse border border-black">
-            <tbody>
-              <tr>
-                <td className="border border-black px-2 py-1 text-center font-medium whitespace-nowrap w-12" rowSpan="2">
-                  결<br />재
-                </td>
-                <td className="border border-black px-4 py-1 text-center font-medium w-24">
-                  담당자
-                </td>
-                <td className="border border-black px-4 py-1 text-center font-medium w-24">
-                  책임자
-                </td>
-              </tr>
-              <tr>
-                <td
-                  className="border border-black h-14 cursor-pointer hover:bg-gray-50"
-                  onClick={handleManagerClick}
-                >
-                  {managerImage ? (
-                    <img
-                      src={managerImage}
-                      alt="담당자 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-                <td
-                  className="border border-black h-14 cursor-pointer hover:bg-gray-50"
-                  onClick={handleSupervisorClick}
-                >
-                  {supervisorImage ? (
-                    <img
-                      src={supervisorImage}
-                      alt="책임자 서명"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : null}
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
 
         {/* 1. 제조시설관리 및 청소점검 */}

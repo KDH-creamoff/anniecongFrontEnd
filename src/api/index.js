@@ -50,10 +50,6 @@ apiClient.interceptors.response.use(
       const status = error.response.status;
       const message = error.response.data?.message || error.message;
       console.error(`❌ API 오류 [${status}]:`, message);
-      if (status === 401) {
-        console.warn('⚠️ 인증이 만료되었습니다. 로그인 페이지로 이동합니다.');
-        window.location.href = '/login';
-      }
       if (status === 403) {
         console.error('❌ 접근 권한이 없습니다.');
       }
@@ -76,12 +72,20 @@ apiClient.interceptors.response.use(
 // 1. Label API (라벨)
 // ============================================
 export const labelAPI = {
+  getAllLabels: async () => {
+    const response = await apiClient.get('/label/templates');
+    return response;
+  },
   getPrinters: async () => {
-    const response = await apiClient.get('/label/printers');
+    const response = await axios.get('http://localhost:4310/printers');
+    return response;
+  },
+  printSavedLabelPdf: async (data) => {
+    const response = await apiClient.post('/label/pdf', data);
     return response;
   },
   printLabel: async (data) => {
-    const response = await apiClient.post('/label/print', data);
+    const response = await axios.post('http://localhost:4310/print', data);
     return response;
   },
   saveTemplate: async (data) => {
@@ -148,8 +152,8 @@ export const authAPI = {
     const response = await apiClient.get('/auth/me');
     return response;
   },
-  getUsers: async (params = {}) => {
-    const response = await apiClient.get('/auth/', { params });
+  getUsers: async () => {
+    const response = await apiClient.get('/auth/');
     return response;
   },
   getUser: async (id) => {
@@ -168,11 +172,51 @@ export const authAPI = {
     return authAPI.join(data);
   },
   changePassword: async (data) => {
-    const response = await apiClient.post('/auth/password', data);
+    // 비밀번호 변경은 사용자 정보 수정 API를 통해 처리
+    // 현재 사용자 ID를 알아야 하므로, data에 userId가 포함되어야 함
+    const { userId, newPassword } = data;
+    const response = await apiClient.put(`/auth/${userId}`, { password: newPassword });
     return response;
   },
-  changePosition: async (data) => {
-    const response = await apiClient.post('/auth/position', data);
+};
+
+// ============================================
+// 3-1. Role API (역할/권한 관리)
+// ============================================
+export const roleAPI = {
+  // 모든 역할 목록 조회
+  getAllRoles: async () => {
+    const response = await apiClient.get('/roles');
+    return response;
+  },
+  // 역할 상세 조회
+  getRoleById: async (id) => {
+    const response = await apiClient.get(`/roles/${id}`);
+    return response;
+  },
+  // 역할 생성
+  createRole: async (data) => {
+    const response = await apiClient.post('/roles', data);
+    return response;
+  },
+  // 역할 수정
+  updateRole: async (id, data) => {
+    const response = await apiClient.put(`/roles/${id}`, data);
+    return response;
+  },
+  // 역할 삭제
+  deleteRole: async (id) => {
+    const response = await apiClient.delete(`/roles/${id}`);
+    return response;
+  },
+  // 권한 단일 업데이트
+  updatePermission: async (roleId, permissionName, value) => {
+    const response = await apiClient.put(`/roles/${roleId}/permissions/${permissionName}`, { value });
+    return response;
+  },
+  // 권한 일괄 업데이트
+  updatePermissions: async (roleId, permissions) => {
+    const response = await apiClient.put(`/roles/${roleId}/permissions`, permissions);
     return response;
   },
 };
@@ -182,7 +226,7 @@ export const authAPI = {
 // ============================================
 export const userAPI = {
   getUsers: async (params = {}) => {
-    return authAPI.getUsers(params);
+    return authAPI.getUsers();
   },
   getUserById: async (id) => {
     return authAPI.getUser(id);
@@ -195,12 +239,6 @@ export const userAPI = {
   },
   deleteUser: async (id) => {
     return authAPI.deleteUser(id);
-  },
-  changePassword: async (data) => {
-    return authAPI.changePassword(data);
-  },
-  changePosition: async (data) => {
-    return authAPI.changePosition(data);
   },
   getAccessLogs: async (params = {}) => {
     console.warn('getAccessLogs API는 문서에 정의되지 않았습니다.');
@@ -289,7 +327,8 @@ export const inventoryTransactionsAPI = {
 // ============================================
 export const plannedTransactionsAPI = {
   getPlannedTransactions: async (params = {}) => {
-    const response = await apiClient.get('/planned-transactions', { params });
+    const response = await apiClient.get('/planned-transactions', {params});
+    console.log('planned-transactions response : ', response);
     return response;
   },
   getPlannedTransaction: async (id) => {
@@ -297,7 +336,7 @@ export const plannedTransactionsAPI = {
     return response;
   },
   getStats: async (params = {}) => {
-    const response = await apiClient.get('/planned-transactions/stats', { params });
+    const response = await apiClient.get('/planned-transactions/stats');
     return response;
   },
   createPlannedTransaction: async (data) => {
@@ -359,7 +398,12 @@ export const factoriesAPI = {
     return response;
   },
   addProcesses: async (id, data) => {
-    const response = await apiClient.post(`/factories/${id}/processes`, data);
+    // processNames 또는 processIds 지원
+    // processNames가 있으면 processNames 사용, 없으면 processIds 사용
+    const requestData = data.processNames 
+      ? { processNames: data.processNames }
+      : { processIds: data.processIds };
+    const response = await apiClient.post(`/factories/${id}/processes`, requestData);
     return response;
   },
   removeProcess: async (id, processId) => {
@@ -408,15 +452,50 @@ export const storageConditionsAPI = {
     return response;
   },
   createStorageCondition: async (data) => {
-    const response = await apiClient.post('/storage-conditions', data);
+    // itemNames가 있으면 itemNames로 변환, 없으면 그대로 전송
+    const requestData = data.itemNames 
+      ? { ...data, itemNames: data.itemNames }
+      : data;
+    const response = await apiClient.post('/storage-conditions', requestData);
     return response;
   },
   updateStorageCondition: async (id, data) => {
-    const response = await apiClient.put(`/storage-conditions/${id}`, data);
+    // itemNames가 있으면 itemNames로 변환, 없으면 그대로 전송
+    const requestData = data.itemNames 
+      ? { ...data, itemNames: data.itemNames }
+      : data;
+    const response = await apiClient.put(`/storage-conditions/${id}`, requestData);
     return response;
   },
   deleteStorageCondition: async (id) => {
     const response = await apiClient.delete(`/storage-conditions/${id}`);
+    return response;
+  },
+  addItems: async (id, data) => {
+    // itemNames 배열을 받아서 추가
+    const response = await apiClient.post(`/storage-conditions/${id}/items`, { itemNames: data.itemNames });
+    return response;
+  },
+  removeItem: async (id, data) => {
+    // itemName 문자열을 받아서 제거
+    // DELETE 요청에서 body를 전달하려면 data 옵션 사용
+    const response = await apiClient.delete(`/storage-conditions/${id}/items`, { 
+      data: { itemName: data.itemName } 
+    });
+    return response;
+  },
+};
+
+// ============================================
+// 16. Processes API (프로세스)
+// ============================================
+export const processesAPI = {
+  getProcesses: async () => {
+    const response = await apiClient.get('/processes');
+    return response;
+  },
+  createProcess: async (data) => {
+    const response = await apiClient.post('/processes', data);
     return response;
   },
 };
@@ -440,7 +519,7 @@ export const warehouseTransfersAPI = {
 };
 
 // ============================================
-// 12. Work Orders API (작업 지시서)
+// 12. Work Orders API (작업지시서)
 // ============================================
 export const workOrdersAPI = {
   createWorkOrder: async (data) => {
@@ -493,10 +572,6 @@ export const approvalAPI = {
     const response = await apiClient.get(`/approval/approvals/${id}`);
     return response;
   },
-  createDocument: async (data) => {
-    const response = await apiClient.post('/approval/approvals', data);
-    return response;
-  },
   approve: async (id, data = {}) => {
     const response = await apiClient.post(`/approval/approvals/${id}/approve`, data);
     return response;
@@ -508,7 +583,37 @@ export const approvalAPI = {
 };
 
 // ============================================
-// 14. Dashboard API (대시보드)
+// 14. Notifications API (알림)
+// ============================================
+export const notificationsAPI = {
+  getLowStock: async (params = {}) => {
+    const response = await apiClient.get('/notifications/low-stock', { params });
+    return response;
+  },
+  getExpiring: async (params = {}) => {
+    const response = await apiClient.get('/notifications/expiring', { params });
+    return response;
+  },
+  getExpired: async (params = {}) => {
+    const response = await apiClient.get('/notifications/expired', { params });
+    return response;
+  },
+  getSummary: async (params = {}) => {
+    const response = await apiClient.get('/notifications/summary', { params });
+    return response;
+  },
+  getFactoryAlerts: async () => {
+    const response = await apiClient.get('/notifications/factory-alerts');
+    return response;
+  },
+  getDailyReport: async () => {
+    const response = await apiClient.get('/notifications/daily-report');
+    return response;
+  },
+};
+
+// ============================================
+// 15. Dashboard API (대시보드)
 // ============================================
 export const dashboardAPI = {
   getDashboard: async (params = {}) => {
@@ -629,6 +734,27 @@ export const shippingAPI = {
     const response = await apiClient.get(`/shipping/download/${filename}`);
     return response;
   },
+  // 기존 출고 관련 API (호환성 유지)
+  getWaitingList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/waiting', { params });
+    return response;
+  },
+  getCompletedList: async (params = {}) => {
+    const response = await apiClient.get('/shipping/completed', { params });
+    return response;
+  },
+  createShipping: async (data) => {
+    const response = await apiClient.post('/shipping', data);
+    return response;
+  },
+  confirmShipping: async (id, data = {}) => {
+    const response = await apiClient.put(`/shipping/${id}/confirm`, data);
+    return response;
+  },
+  cancelShipping: async (id) => {
+    const response = await apiClient.put(`/shipping/${id}/cancel`);
+    return response;
+  },
 };
 
 // ============================================
@@ -648,6 +774,7 @@ export default {
   warehouseTransfersAPI,
   workOrdersAPI,
   approvalAPI,
+  notificationsAPI,
   dashboardAPI,
   shippingAPI,
   apiClient,

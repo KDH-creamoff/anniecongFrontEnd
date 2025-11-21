@@ -1,7 +1,7 @@
 import { Factory, X, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchFactories, updateFactory } from '../../store/modules/basic/actions';
+import { fetchFactories, fetchProcesses, addFactoryProcesses, removeFactoryProcess } from '../../store/modules/basic/actions';
 import {
   selectFactories,
   selectFactoriesLoading,
@@ -15,75 +15,155 @@ const FactoryInfo = () => {
   const factories = useSelector(selectFactories);
   const loading = useSelector(selectFactoriesLoading);
   const factoryOperation = useSelector(selectFactoryOperation);
+  const processes = useSelector((state) => state.basic.processes.data || []);
+  const processesLoading = useSelector((state) => state.basic.processes.loading);
+  const factoryProcessOperation = useSelector((state) => state.basic.factoryProcessOperation);
 
-  // 컴포넌트 마운트 시 공장 목록 조회
+  // 컴포넌트 마운트 시 공장 목록 및 프로세스 목록 조회
   useEffect(() => {
     dispatch(fetchFactories.request());
+    dispatch(fetchProcesses.request());
   }, [dispatch]);
 
-  // 공장 정보 업데이트 성공 시 목록 다시 조회
+  // 공정 추가/제거 성공 시 목록 다시 조회
   useEffect(() => {
-    if (factoryOperation) {
+    if (factoryProcessOperation?.data) {
       dispatch(fetchFactories.request());
     }
-  }, [factoryOperation, dispatch]);
+  }, [factoryProcessOperation, dispatch]);
+
+  // 공정 제거 성공 시 목록 다시 조회
+  const removeProcessOperation = useSelector((state) => state.basic.removeFactoryProcess);
+  useEffect(() => {
+    if (removeProcessOperation?.data) {
+      dispatch(fetchFactories.request());
+    }
+  }, [removeProcessOperation, dispatch]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentFactoryId, setCurrentFactoryId] = useState(null);
-  const [newProcess, setNewProcess] = useState('');
+  const [selectedProcessIds, setSelectedProcessIds] = useState([]);
+  const [processNamesInput, setProcessNamesInput] = useState('');
+  const [useProcessNames, setUseProcessNames] = useState(true); // 공정 이름 입력 방식 기본값
   const [error, setError] = useState('');
 
   const handleOpenModal = (factoryId) => {
     setCurrentFactoryId(factoryId);
     setIsModalOpen(true);
-    setNewProcess('');
+    setSelectedProcessIds([]);
+    setProcessNamesInput('');
+    setUseProcessNames(true);
     setError('');
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentFactoryId(null);
-    setNewProcess('');
+    setSelectedProcessIds([]);
+    setProcessNamesInput('');
+    setUseProcessNames(true);
     setError('');
   };
 
+  const handleProcessToggle = (processId) => {
+    setSelectedProcessIds((prev) => {
+      if (prev.includes(processId)) {
+        return prev.filter((id) => id !== processId);
+      } else {
+        return [...prev, processId];
+      }
+    });
+  };
+
   const handleAddProcess = () => {
-    if (!newProcess.trim()) {
-      setError('공정명을 입력해주세요');
-      return;
-    }
+    if (useProcessNames) {
+      // 공정 이름 입력 방식
+      if (!processNamesInput.trim()) {
+        setError('공정 이름을 입력해주세요');
+        return;
+      }
 
-    // 현재 공장 찾기
-    const currentFactory = factories.find((f) => f.id === currentFactoryId);
-    if (currentFactory) {
-      const updatedFactory = {
-        ...currentFactory,
-        processes: [...currentFactory.processes, newProcess.trim()],
-      };
+      // 쉼표로 구분된 공정 이름들을 배열로 변환하고 중복 제거 (띄어쓰기 무시)
+      const trimmedNames = processNamesInput
+        .split(',')
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
+      
+      const seen = new Set();
+      const processNames = [];
+      for (const name of trimmedNames) {
+        const key = name.replace(/\s+/g, ''); // 공백 제거한 버전
+        if (!seen.has(key)) {
+          seen.add(key);
+          processNames.push(name); // 원본 형태 유지
+        }
+      }
 
-      // 리덕스 액션 dispatch
-      dispatch(updateFactory.request({
-        id: currentFactoryId,
-        data: updatedFactory,
+      if (processNames.length === 0) {
+        setError('공정 이름을 입력해주세요');
+        return;
+      }
+
+      // Redux Saga 액션 dispatch (processNames 사용)
+      dispatch(addFactoryProcesses.request({
+        factoryId: currentFactoryId,
+        processNames: processNames,
       }));
+    } else {
+      // 기존 방식: 공정 ID 선택
+      if (selectedProcessIds.length === 0) {
+        setError('공정을 선택해주세요');
+        return;
+      }
+
+      // 현재 공장의 기존 공정 ID 가져오기
+      const currentFactory = factories.find((f) => f.id === currentFactoryId);
+      if (currentFactory) {
+        const currentProcesses = Array.isArray(currentFactory.processes)
+          ? currentFactory.processes
+          : Array.isArray(currentFactory.Processes)
+            ? currentFactory.Processes
+            : [];
+
+        // 기존 공정 ID 추출
+        const existingProcessIds = currentProcesses
+          .map((p) => (typeof p === 'object' ? p.id : null))
+          .filter((id) => id != null);
+
+        // 이미 추가된 공정 제외
+        const newProcessIds = selectedProcessIds.filter((id) => !existingProcessIds.includes(id));
+
+        if (newProcessIds.length === 0) {
+          setError('이미 추가된 공정입니다');
+          return;
+        }
+
+        // Redux Saga 액션 dispatch (processIds 사용)
+        dispatch(addFactoryProcesses.request({
+          factoryId: currentFactoryId,
+          processIds: newProcessIds,
+        }));
+      }
     }
 
     handleCloseModal();
   };
 
-  const handleRemoveProcess = (factoryId, processIndex) => {
-    // 해당 공장 찾기
-    const currentFactory = factories.find((f) => f.id === factoryId);
-    if (currentFactory) {
-      const updatedFactory = {
-        ...currentFactory,
-        processes: currentFactory.processes.filter((_, index) => index !== processIndex),
-      };
+  const handleRemoveProcess = (factoryId, processId, processName) => {
+    if (!processId) {
+      console.warn('공정 ID가 없습니다.');
+      return;
+    }
 
-      // 리덕스 액션 dispatch
-      dispatch(updateFactory.request({
-        id: factoryId,
-        data: updatedFactory,
+    const confirmMessage = processName 
+      ? `"${processName}" 공정을 제거하시겠습니까?`
+      : '공정을 제거하시겠습니까?';
+
+    if (window.confirm(confirmMessage)) {
+      // Redux Saga 액션 dispatch
+      dispatch(removeFactoryProcess.request({
+        factoryId: factoryId,
+        processId: processId,
       }));
     }
   };
@@ -100,12 +180,16 @@ const FactoryInfo = () => {
   return (
     <>
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-        {factories.map((factory) => (
-          <div key={factory.id} className='rounded-xl bg-white p-6 shadow-sm'>
+        {factories.map((factory, index) => {
+          console.log("index : ", index);
+          console.log("factory.name : ", typeof factory.name);
+          return ( 
+            <>
+                   <div key={factory.id} className='rounded-xl bg-white p-6 shadow-sm'>
             <div className='mb-6 flex items-center gap-2'>
               <Factory className='h-5 w-5 text-[#674529]' />
               <h2 className='text-base text-[#674529]'>
-                {factory.id === 1 ? '1공장 (전처리)' : '2공장 (제조)'}
+                {factory.name}
               </h2>
             </div>
 
@@ -118,34 +202,42 @@ const FactoryInfo = () => {
                 </label>
                 <input
                   type='text'
-                  value={factory.address}
+                  value={factory.address || factory.Address?.address || ''}
                   readOnly
                   className='w-full rounded-xl bg-gray-100 px-4 py-2.5 text-gray-900'
                 />
               </div>
 
               {/* 담당 공정 */}
-              <div>
+              {
+                factory.name.includes("공장") && (   <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
                   담당 공정
                 </label>
                 <div className='flex flex-wrap items-center gap-2'>
-                  {factory.processes.map((process, index) => (
-                    <span
-                      key={index}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${
-                        factory.id === 1
-                          ? 'bg-[#a3c478] text-[#fff]'
-                          : 'bg-[#f9b679] text-[#fff]'
-                      }`}
-                    >
-                      {process}
-                      <X
-                        className='h-3 w-3 cursor-pointer hover:opacity-80'
-                        onClick={() => handleRemoveProcess(factory.id, index)}
-                      />
-                    </span>
-                  ))}
+                  {(Array.isArray(factory.processes) ? factory.processes : factory.Processes || []).map((process, index) => {
+                    // process가 객체인 경우 name 또는 processName 추출
+                    const processId = typeof process === 'object' ? process.id : null;
+                    const processName = typeof process === 'string'
+                      ? process
+                      : process?.name || process?.processName || process?.Name || '';
+
+                    return (
+                      <span
+                        key={processId || index}
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ${factory.id === 1
+                            ? 'bg-[#a3c478] text-[#fff]'
+                            : 'bg-[#f9b679] text-[#fff]'
+                          }`}
+                      >
+                        {processName}
+                        <X
+                          className='h-3 w-3 cursor-pointer hover:opacity-80'
+                          onClick={() => handleRemoveProcess(factory.id, processId || index, processName)}
+                        />
+                      </span>
+                    );
+                  })}
                   <button
                     onClick={() => handleOpenModal(factory.id)}
                     className='inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300'
@@ -154,10 +246,15 @@ const FactoryInfo = () => {
                     <Plus className='h-4 w-4 text-gray-600' />
                   </button>
                 </div>
-              </div>
+              </div>)
+              }
+           
             </div>
           </div>
-        ))}
+            </>
+          )
+   
+})}
       </div>
 
       {/* 공정 추가 모달 */}
@@ -187,40 +284,46 @@ const FactoryInfo = () => {
             <div className='space-y-4'>
               <div>
                 <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  공정명
+                  공정 이름 (쉼표로 구분)
                 </label>
                 <input
                   type='text'
-                  value={newProcess}
+                  value={processNamesInput}
                   onChange={(e) => {
-                    setNewProcess(e.target.value);
-                    if (error) setError('');
+                    setProcessNamesInput(e.target.value);
+                    setError('');
                   }}
-                  placeholder='공정명을 입력하세요'
-                  className={`w-full rounded-xl border ${
-                    error ? 'border-red-300' : 'border-gray-100'
-                  } bg-gray-100 px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#674529]/20`}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter') handleAddProcess();
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddProcess();
+                    }
                   }}
+                  placeholder='예: 전처리'
+                  className={`w-full rounded-xl border ${
+                    error ? 'border-red-300' : 'border-gray-300'
+                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529]`}
                 />
+                <p className='mt-1 text-xs text-gray-500'>
+                  공정 이름을 쉼표로 구분하여 입력하세요. 중복된 공정은 자동으로 제외됩니다.
+                </p>
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
+            </div>
 
-              <div className='flex gap-3'>
-                <button
-                  onClick={handleCloseModal}
-                  className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleAddProcess}
-                  className='flex-1 rounded-xl bg-[#674529] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
-                >
-                  추가
-                </button>
-              </div>
+            <div className='flex gap-3 mt-2'>
+              <button
+                onClick={handleCloseModal}
+                className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
+              >
+                취소
+              </button>
+              <button
+                onClick={handleAddProcess}
+                className='flex-1 rounded-xl bg-[#674529] px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#553821] hover:shadow-md active:scale-95'
+              >
+                추가
+              </button>
             </div>
           </div>
         </div>

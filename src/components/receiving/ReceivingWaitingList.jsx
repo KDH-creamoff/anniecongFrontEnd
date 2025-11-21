@@ -1,7 +1,7 @@
 import { Package, Calendar, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete }) => {
+const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete, isLoading = false }) => {
   const [receivingInputs, setReceivingInputs] = useState({});
 
   const handleInputChange = (id, field, value) => {
@@ -61,13 +61,13 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
       <div className='overflow-x-auto'>
         <table className='w-full table-fixed'>
           <colgroup>
-            <col className='w-[12%]' />
-            <col className='w-[28%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[12%]' />
-            <col className='w-[14%]' />
             <col className='w-[10%]' />
+            <col className='w-[25%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[13%]' />
+            <col className='w-[19%]' />
           </colgroup>
           <thead>
             <tr>
@@ -89,13 +89,23 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 입고예정일
               </th>
-              <th className='px-4 py-3 text-center text-xs font-semibold text-gray-600' colSpan='2'>
-                작업
-              </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>
-            {waitingData.map((item) => (
+            {isLoading ? (
+              <tr>
+                <td colSpan={7} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  로딩 중...
+                </td>
+              </tr>
+            ) : waitingData.length === 0 ? (
+              <tr>
+                <td colSpan={7} className='px-4 py-8 text-center text-sm text-gray-500'>
+                  입고 대기 목록이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              waitingData.map((item) => (
               <tr key={item.id}>
                 <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                   {item.itemCode}
@@ -104,7 +114,7 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                   {item.itemName}
                 </td>
                 <td className='px-4 py-4 text-sm text-gray-700'>
-                  {item.expectedQuantity}
+                  {item.expectedQuantity || item.quantity} {item.unit || ''}
                 </td>
                 <td className='px-4 py-4'>
                   <input
@@ -131,10 +141,10 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                 <td className='px-4 py-4'>
                   <div className='flex items-center space-x-1 text-sm text-gray-700'>
                     <Calendar className='h-4 w-4 text-gray-500' />
-                    <span>{item.expectedDate}</span>
+                    <span>{item.expectedDate || item.scheduledDate || item.scheduled_date}</span>
                   </div>
                 </td>
-                <td className='flex gap-1 justify-center items-center px-4 py-4'>
+                <td className='flex gap-1 justify-start items-center px-4 py-4'>
                   <button
                     onClick={() => handleReceive(item)}
                     className='rounded-xl bg-[#674529] hover:bg-[#553821] px-4 py-2 text-sm font-medium text-white transition-colors'
@@ -150,7 +160,8 @@ const ReceivingWaitingList = ({ waitingData, onAddReceiving, onReceive, onDelete
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -52,19 +52,46 @@ export default function issuingReducer(state = initialState, action) {
         issuingListError: null,
       };
     case FETCH_ISSUING_LIST.SUCCESS: {
-      const newData = action.payload;
+      const newData = action.payload || [];
+      const newDataArray = Array.isArray(newData) ? newData : [];
+      
       // 데이터의 status를 확인하여 적절한 배열에 저장
-      const isPending = newData.every(item => item.status === '대기');
-      const isCompleted = newData.every(item => item.status === '완료');
+      // status가 '대기', 'PENDING', 'pending'인 경우
+      const isPending = newDataArray.length > 0 && newDataArray.every(item => 
+        item.status === '대기' || item.status === 'PENDING' || item.status === 'pending'
+      );
+      // status가 '완료', 'COMPLETED', 'completed'인 경우
+      const isCompleted = newDataArray.length > 0 && newDataArray.every(item => 
+        item.status === '완료' || item.status === 'COMPLETED' || item.status === 'completed'
+      );
+
+      // 기존 데이터와 병합 (중복 제거)
+      const mergedList = [...state.issuingList];
+      newDataArray.forEach((newItem) => {
+        const existingIndex = mergedList.findIndex((item) => item.id === newItem.id);
+        if (existingIndex >= 0) {
+          mergedList[existingIndex] = newItem;
+        } else {
+          mergedList.push(newItem);
+        }
+      });
 
       return {
         ...state,
         issuingListLoading: false,
-        issuingList: newData,
+        issuingList: mergedList,
         // status가 '대기'인 데이터만 들어왔다면 pendingIssuings 업데이트
-        pendingIssuings: isPending ? newData : state.pendingIssuings,
+        pendingIssuings: isPending 
+          ? newDataArray 
+          : isCompleted 
+          ? state.pendingIssuings 
+          : mergedList.filter(item => item.status === '대기' || item.status === 'PENDING' || item.status === 'pending'),
         // status가 '완료'인 데이터만 들어왔다면 completedIssuings 업데이트
-        completedIssuings: isCompleted ? newData : state.completedIssuings,
+        completedIssuings: isCompleted 
+          ? newDataArray 
+          : isPending 
+          ? state.completedIssuings 
+          : mergedList.filter(item => item.status === '완료' || item.status === 'COMPLETED' || item.status === 'completed'),
         issuingListError: null,
       };
     }

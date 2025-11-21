@@ -17,25 +17,10 @@ const Login = () => {
     remember: false
   });
 
-  // 임시 자동 로그인 (로컬 Mock 사용)
-  useEffect(() => {
-    if (!user && !loading) {
-      // 로컬 스토리지에서 직접 사용자 정보 가져와서 Redux에 저장
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const mockUser = users.find(u => u.email === 'admin@kitae.com');
-      
-      if (mockUser) {
-        const { password, ...userWithoutPassword } = mockUser;
-        localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
-        dispatch(login.success({ user: userWithoutPassword }));
-      }
-    }
-  }, [dispatch, user, loading]);
-
-  // 로그인 성공 시 대시보드로 이동
+  // 로그인 성공 또는 이미 로그인된 상태일 때 대시보드로 이동
   useEffect(() => {
     if (user) {
-      navigate('/dash');
+      navigate('/dash', { replace: true });
     }
   }, [user, navigate]);
 
@@ -64,9 +49,10 @@ const Login = () => {
     }
 
     // Redux Saga를 통한 로그인 처리
-    // API는 email을 받지만, 프론트에서는 userId로 표시
+    // 백엔드 API는 username을 받음
     dispatch(login.request({
-      email: formData.userId, // userId를 email 필드로 전송
+      userId: formData.userId, // username으로 변환됨
+      username: formData.userId, // 백엔드 API 형식
       password: formData.password,
       remember: formData.remember
     }));
