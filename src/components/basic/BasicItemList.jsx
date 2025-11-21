@@ -32,6 +32,7 @@ const BasicItemList = () => {
 
   const [editingItemId, setEditingItemId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [lastOperationType, setLastOperationType] = useState(null); // 마지막 작업 타입 추적
 
   // 컴포넌트 마운트 시 품목 목록, 공장 목록, 보관 조건 목록 조회
   useEffect(() => {
@@ -40,14 +41,22 @@ const BasicItemList = () => {
     dispatch(fetchStorageConditions.request());
   }, [dispatch]);
 
-  // 품목 수정/삭제 성공 시 목록 다시 조회
+  // 품목 수정/삭제 성공 시 목록 다시 조회 및 성공 메시지 표시
   useEffect(() => {
-    if (itemOperation && !itemOperationLoading) {
+    if (itemOperation && !itemOperationLoading && !itemOperation.error) {
+      // 성공 메시지 표시
+      if (lastOperationType === 'update') {
+        alert('품목이 수정되었습니다.');
+      } else if (lastOperationType === 'delete') {
+        alert('품목이 삭제되었습니다.');
+      }
+      
       dispatch(fetchItems.request());
       setEditingItemId(null);
       setEditForm({});
+      setLastOperationType(null); // 메시지 표시 후 초기화
     }
-  }, [itemOperation, itemOperationLoading, dispatch]);
+  }, [itemOperation, itemOperationLoading, lastOperationType, dispatch]);
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const pageData = useMemo(() => {
@@ -57,6 +66,7 @@ const BasicItemList = () => {
 
   const handleDelete = (itemId) => {
     if (!window.confirm('정말로 이 품목을 삭제하시겠습니까?')) return;
+    setLastOperationType('delete'); // 삭제 작업 타입 저장
     dispatch(deleteItem.request(itemId));
 
     // 현재 페이지의 마지막 항목 삭제 시 페이지 조정
@@ -108,6 +118,7 @@ const BasicItemList = () => {
       unit: editForm.unit,
     };
 
+    setLastOperationType('update'); // 수정 작업 타입 저장
     dispatch(updateItem.request({ id: item.id, data: payload }));
   };
 

@@ -125,6 +125,10 @@ const basicReducer = (state = initialState, action) => {
 
     // BOM 상세 조회
     case FETCH_BOM_BY_ID.REQUEST:
+      // null이면 bomDetail 초기화
+      if (action.payload === null) {
+        return { ...state, bomDetail: { data: null, loading: false, error: null } };
+      }
       return { ...state, bomDetail: { ...state.bomDetail, loading: true, error: null } };
     case FETCH_BOM_BY_ID.SUCCESS:
       return { ...state, bomDetail: { data: action.payload, loading: false, error: null } };
