@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Plus } from 'lucide-react';
-import { createItem, fetchStorageConditions } from '../../store/modules/basic/actions';
+import { createItem, fetchStorageConditions, fetchItems } from '../../store/modules/basic/actions';
 import {
   selectItemOperation,
   selectItemOperationLoading,
@@ -55,6 +55,13 @@ const BasicNewItem = () => {
       alert(itemOperationError || '등록 중 오류가 발생했습니다.');
     }
   }, [itemOperationError]);
+
+  // 품목 등록 성공 시 리스트 업데이트
+  useEffect(() => {
+    if (itemOperation && !itemOperationLoading && !itemOperationError) {
+      dispatch(fetchItems.request());
+    }
+  }, [itemOperation, itemOperationLoading, itemOperationError, dispatch]);
 
   const handleInputChange = (field, value) => {
     // 보관 조건 선택 시 id와 name을 모두 저장

@@ -406,6 +406,12 @@ function* fetchBomsSaga(action) {
 }
 
 function* fetchBomByIdSaga(action) {
+  // null이면 초기화만 하고 API 호출 안 함
+  if (action.payload === null) {
+    yield put(fetchBomById.success(null));
+    return;
+  }
+  
   try {
     const response = yield call(bomsAPI.getBom, action.payload);
     

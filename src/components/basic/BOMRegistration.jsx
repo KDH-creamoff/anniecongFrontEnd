@@ -12,14 +12,14 @@ const BOMRegistration = ({ onSave }) => {
   // 카테고리 영어 값을 한글로 변환
   const getCategoryName = (category) => {
     const categoryMap = {
-      'RawMaterial': '원재료',
-      'SemiFinished': '반제품',
-      'Finished': '완제품',
-      'Supply': '소모품',
-      '원재료': '원재료',
-      '반제품': '반제품',
-      '완제품': '완제품',
-      '소모품': '소모품',
+      RawMaterial: '원재료',
+      SemiFinished: '반제품',
+      Finished: '완제품',
+      Supply: '소모품',
+      원재료: '원재료',
+      반제품: '반제품',
+      완제품: '완제품',
+      소모품: '소모품',
     };
     return categoryMap[category] || category || '-';
   };
@@ -88,12 +88,12 @@ const BOMRegistration = ({ onSave }) => {
       const numAmount = parseFloat(amount);
       setNewMaterial({
         ...newMaterial,
-        amount: isNaN(numAmount) ? '' : numAmount,
+        amount: Number.isNaN(numAmount) ? '' : numAmount,
       });
     }
   };
 
-  // 단위 선택 시
+  // 단위 선택 시 (현재는 readOnly라서 호출 안 되지만, 로직은 유지)
   const handleUnitChange = (unit) => {
     setNewMaterial({
       ...newMaterial,
@@ -113,13 +113,13 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료 확인 (목록에 추가)
   const handleConfirmMaterial = () => {
-    if (newMaterial.code && newMaterial.name && newMaterial.amount && newMaterial.unit) {
+    if (newMaterial?.code && newMaterial?.name && newMaterial?.amount && newMaterial?.unit) {
       setCurrentMaterials([...currentMaterials, newMaterial]);
       setNewMaterial(null);
     }
   };
 
-  // BOM 저장
+  // 🔧 BOM 저장 (여기서 백엔드가 원하는 구조로 변환)
   const handleSaveBOM = () => {
     if (!currentBOMName.trim()) {
       alert('BOM 명을 입력해주세요.');
@@ -130,13 +130,51 @@ const BOMRegistration = ({ onSave }) => {
       return;
     }
 
+    // 코드/수량 정상인 재료만 사용
+    const validMaterials = currentMaterials.filter(
+      (m) =>
+        m.code &&
+        m.code.trim().length > 0 &&
+        !Number.isNaN(Number(m.amount)) &&
+        Number(m.amount) > 0,
+    );
+
+    if (validMaterials.length === 0) {
+      alert('유효한 원재료를 최소 1개 이상 추가해주세요.');
+      return;
+    }
+
+    // ✅ 백엔드가 요구하는 BOM code 자동 생성 (예: BOM-20251120153000)
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    const generatedBomCode = `BOM-${y}${m}${d}${hh}${mm}${ss}`;
+
+    // ✅ 백엔드로 바로 넘겨도 되는 형태로 변환
     const newBOM = {
+      code: currentMaterials.code,           // 🔥 백엔드에서 요구하는 code
+      name: currentBOMName,
       bomName: currentBOMName,
-      updatedDate: new Date().toISOString().split('T')[0],
-      materials: currentMaterials,
+      updatedDate: now.toISOString().split('T')[0],
+
+      // 프론트에서 쓰던 원재료 목록(그대로 유지)
+      materials: validMaterials,
+
+      // 백엔드에서 components[*].code, quantity, unit 등을 바로 쓸 수 있게 구성
+      components: validMaterials.map((mItem, index) => ({
+        code: mItem.code,                // 🔥 여기가 없으면 "code가 필요합니다." 뜰 수 있음
+        itemCode: mItem.code,
+        quantity: Number(mItem.amount),
+        unit: mItem.unit || 'g',
+        sortOrder: index + 1,
+      })),
     };
 
-    // 부모 컴포넌트로 데이터 전달
+    // 부모 컴포넌트로 데이터 전달 (여기서 createBom.request(newBOM) 호출하면 됨)
     if (onSave) {
       onSave(newBOM);
     }
