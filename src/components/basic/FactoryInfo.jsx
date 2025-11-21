@@ -293,6 +293,12 @@ const FactoryInfo = () => {
                     setProcessNamesInput(e.target.value);
                     setError('');
                   }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddProcess();
+                    }
+                  }}
                   placeholder='예: 전처리'
                   className='w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529] mb-5'
                 />
