@@ -13,7 +13,7 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
   const [searchTerm, setSearchTerm]   = useState('');
   const [selectedBOM, setSelectedBOM] = useState(null);
   const [editingBOM, setEditingBOM] = useState(null); // 수정 중인 BOM
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // bomDetail이 변경되면 selectedBOM 업데이트
   useEffect(() => {

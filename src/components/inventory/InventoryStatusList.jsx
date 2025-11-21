@@ -15,7 +15,7 @@ export default function InventoryStatusList({ filters }) {
   const loading = useSelector(selectInventoryStatusLoading);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   useEffect(() => {
     dispatch(fetchInventoryStatus.request());

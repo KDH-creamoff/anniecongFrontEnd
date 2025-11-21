@@ -10,7 +10,7 @@ const WorkOrderList = () => {
   const [filterType, setFilterType] = useState('전체');
   const [statusFilter, setStatusFilter] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [completionData, setCompletionData] = useState({

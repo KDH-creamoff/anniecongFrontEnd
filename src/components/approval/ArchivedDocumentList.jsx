@@ -19,7 +19,7 @@ const ArchivedDocumentList = () => {
         searchTerm: '',
     });
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6;
+    const itemsPerPage = 5;
 
     // 체크박스 선택 상태
     const [selectedDocs, setSelectedDocs] = useState(new Set());

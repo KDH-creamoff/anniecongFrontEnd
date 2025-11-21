@@ -20,7 +20,7 @@ const BasicItemList = () => {
   const itemOperationLoading = useSelector(selectItemOperationLoading);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
   const [editingItemId, setEditingItemId] = useState(null);
   const [editForm, setEditForm] = useState({});

@@ -11,7 +11,7 @@ const WorkOrderListView = () => {
   const [factoryFilter, setFactoryFilter] = useState('전체');
   const [statusFilter, setStatusFilter] = useState('전체');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // Redux에서 작업지시서 목록 가져오기
   const workOrdersFromRedux = useSelector(selectWorkOrders);
