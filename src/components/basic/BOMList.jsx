@@ -15,6 +15,8 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBOM, setSelectedBOM] = useState(null);
   const [editingBOM, setEditingBOM] = useState(null);
+  const [focusedInputId, setFocusedInputId] = useState(null); // 포커스된 입력 필드 추적
+  const [inputValues, setInputValues] = useState({}); // 입력 중인 값 저장 (문자열)
 
   const itemsPerPage = 10;
 
@@ -542,29 +544,88 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                           <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
+                                            type="text"
+                                            inputMode="decimal"
                                             value={
-                                              editingBOM.materials.find(
-                                                (mat) => mat.id === m.id,
-                                              )?.amount ?? 0
+                                              (() => {
+                                                // 포커스 중이면 입력 중인 값 표시
+                                                if (focusedInputId === m.id && inputValues[m.id] !== undefined) {
+                                                  return inputValues[m.id];
+                                                }
+                                                
+                                                const amount = editingBOM.materials.find(
+                                                  (mat) => mat.id === m.id,
+                                                )?.amount;
+                                                
+                                                // 포커스가 없을 때만 0이면 빈 문자열로 표시
+                                                if (amount === 0 || amount === undefined || amount === null) {
+                                                  return '';
+                                                }
+                                                // 숫자면 그대로 표시
+                                                return amount.toString();
+                                              })()
                                             }
+                                            onFocus={() => {
+                                              setFocusedInputId(m.id);
+                                              // 포커스 시 현재 값을 입력 값으로 설정
+                                              const amount = editingBOM.materials.find(
+                                                (mat) => mat.id === m.id,
+                                              )?.amount;
+                                              if (amount !== undefined && amount !== null && amount !== 0) {
+                                                setInputValues(prev => ({
+                                                  ...prev,
+                                                  [m.id]: amount.toString()
+                                                }));
+                                              } else {
+                                                setInputValues(prev => ({
+                                                  ...prev,
+                                                  [m.id]: ''
+                                                }));
+                                              }
+                                            }}
                                             onChange={(e) => {
                                               // 만약 원재료명이 선택되지 않았다면 입력 불가
                                               if (!m.code || m.code === '') {
                                                 return;
                                               }
-                                              const numAmount = Number.isNaN(
-                                                Number(e.target.value),
-                                              )
-                                                ? 0
-                                                : Number(e.target.value);
-                                              // 입력 시 필요량 0이거나 0.01미만이면 알림과 입력 거부
-                                              if (numAmount < 0.01) {
-                                                alert('필요량은 0.01 미만이 될 수 없습니다.');
+                                              
+                                              const inputValue = e.target.value.trim();
+                                              
+                                              // 숫자 형식 검증 (소수점 포함)
+                                              const numberPattern = /^-?\d*\.?\d*$/;
+                                              if (!numberPattern.test(inputValue) && inputValue !== '') {
+                                                return; // 유효하지 않은 입력은 무시
+                                              }
+                                              
+                                              // 입력 중인 값 저장 (문자열로)
+                                              setInputValues(prev => ({
+                                                ...prev,
+                                                [m.id]: inputValue
+                                              }));
+                                              
+                                              // 빈 문자열이면 0으로 설정
+                                              if (inputValue === '' || inputValue === null || inputValue === undefined) {
+                                                const newMaterials = editingBOM.materials.map(
+                                                  (mat) =>
+                                                    mat.id === m.id
+                                                      ? { ...mat, amount: 0 }
+                                                      : mat,
+                                                );
+                                                setEditingBOM({
+                                                  ...editingBOM,
+                                                  materials: newMaterials,
+                                                });
                                                 return;
                                               }
+                                              
+                                              // 숫자로 변환 (빈 문자열이나 "."만 있으면 0)
+                                              const numAmount = inputValue === '.' || inputValue === '' 
+                                                ? 0 
+                                                : Number.isNaN(Number(inputValue))
+                                                  ? 0
+                                                  : Number(inputValue);
+                                              
+                                              // onChange에서는 입력을 허용 (검증은 onBlur에서)
                                               const newMaterials = editingBOM.materials.map(
                                                 (mat) =>
                                                   mat.id === m.id
@@ -575,6 +636,54 @@ const BOMList = ({ bomList = [], onDelete, loading = false, error = '', onSearch
                                                 ...editingBOM,
                                                 materials: newMaterials,
                                               });
+                                            }}
+                                            onBlur={(e) => {
+                                              setFocusedInputId(null); // 포커스 해제
+                                              
+                                              // blur 시 검증 및 처리
+                                              const inputValue = e.target.value.trim();
+                                              
+                                              // 입력 값 초기화
+                                              setInputValues(prev => {
+                                                const newValues = { ...prev };
+                                                delete newValues[m.id];
+                                                return newValues;
+                                              });
+                                              
+                                              // 빈 문자열이면 0으로 설정
+                                              if (inputValue === '' || inputValue === null || inputValue === undefined || inputValue === '.') {
+                                                const newMaterials = editingBOM.materials.map(
+                                                  (mat) =>
+                                                    mat.id === m.id
+                                                      ? { ...mat, amount: 0 }
+                                                      : mat,
+                                                );
+                                                setEditingBOM({
+                                                  ...editingBOM,
+                                                  materials: newMaterials,
+                                                });
+                                                return;
+                                              }
+                                              
+                                              const numAmount = Number.isNaN(Number(inputValue))
+                                                ? 0
+                                                : Number(inputValue);
+                                              
+                                              // blur 시 최종 검증: 0.01 미만이면 알림
+                                              if (numAmount < 0.01 && numAmount !== 0) {
+                                                alert('필요량은 0.01 미만이 될 수 없습니다.');
+                                                // 0.01로 자동 설정
+                                                const newMaterials = editingBOM.materials.map(
+                                                  (mat) =>
+                                                    mat.id === m.id
+                                                      ? { ...mat, amount: 0.01 }
+                                                      : mat,
+                                                );
+                                                setEditingBOM({
+                                                  ...editingBOM,
+                                                  materials: newMaterials,
+                                                });
+                                              }
                                             }}
                                             className={`w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-[#674529] focus:outline-none ${
                                               !m.code ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
