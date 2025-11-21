@@ -95,9 +95,6 @@ const ShippingWaitingList = ({ waitingData, onAddShipping, onShip, onDelete }) =
               <th className='px-4 py-3 text-left text-xs font-semibold text-gray-600'>
                 출고예정일
               </th>
-              <th className='px-4 py-3 text-center text-xs font-semibold text-gray-600' colSpan='2'>
-                작업
-              </th>
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-200'>

@@ -7,9 +7,9 @@ import { fetchAvailableProducts } from '../../store/modules/manufacturing/action
 const TransferRegistration = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    departureLocation: '1공장',
-    arrivalLocation: '2공장',
-    transportMethod: '트럭',
+    departureLocation: '',
+    arrivalLocation: '',
+    transportMethod: '',
     recipient: '',
     rawMaterials: [{ code: '', name: '', quantity: '' }]
   });
@@ -68,6 +68,7 @@ const TransferRegistration = () => {
                 onChange={(e) => setFormData({ ...formData, departureLocation: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#674529]"
               >
+                <option value="" disabled hidden>출발장소 선택</option>
                 <option value="1공장">1공장</option>
                 <option value="2공장">2공장</option>
                 <option value="1창고">1창고</option>
@@ -81,6 +82,7 @@ const TransferRegistration = () => {
                 onChange={(e) => setFormData({ ...formData, arrivalLocation: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#674529]"
               >
+                <option value="" disabled hidden>도착장소 선택</option>
                 <option value="1공장">1공장</option>
                 <option value="2공장">2공장</option>
                 <option value="1창고">1창고</option>
@@ -94,6 +96,7 @@ const TransferRegistration = () => {
                 onChange={(e) => setFormData({ ...formData, transportMethod: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#674529]"
               >
+                <option value="" disabled hidden>운송방식 선택</option>
                 <option value="트럭">트럭</option>
                 <option value="팔레트">팔레트</option>
                 <option value="박스">박스</option>

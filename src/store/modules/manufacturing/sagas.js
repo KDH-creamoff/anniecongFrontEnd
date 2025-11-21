@@ -877,7 +877,7 @@ function* fetchWorkOrdersSaga(action) {
     yield delay(500);
     yield put(fetchWorkOrders.success(mockWorkOrders));
   } catch (error) {
-    yield put(fetchWorkOrders.failure(error.response?.data?.message || '작업 지시서 목록을 불러오는데 실패했습니다.'));
+    yield put(fetchWorkOrders.failure(error.response?.data?.message || '작업지시서 목록을 불러오는데 실패했습니다.'));
   }
 }
 
@@ -891,10 +891,10 @@ function* fetchWorkOrderByIdSaga(action) {
     if (workOrder) {
       yield put(fetchWorkOrderById.success(workOrder));
     } else {
-      yield put(fetchWorkOrderById.failure('작업 지시서를 찾을 수 없습니다.'));
+      yield put(fetchWorkOrderById.failure('작업지시서를 찾을 수 없습니다.'));
     }
   } catch (error) {
-    yield put(fetchWorkOrderById.failure(error.response?.data?.message || '작업 지시서 상세 정보를 불러오는데 실패했습니다.'));
+    yield put(fetchWorkOrderById.failure(error.response?.data?.message || '작업지시서 상세 정보를 불러오는데 실패했습니다.'));
   }
 }
 
@@ -938,7 +938,7 @@ function* createWorkOrderSaga(action) {
       yield put(createWorkOrder.failure('공장을 선택해주세요.'));
     }
   } catch (error) {
-    yield put(createWorkOrder.failure(error.response?.data?.message || '작업 지시서 등록에 실패했습니다.'));
+    yield put(createWorkOrder.failure(error.response?.data?.message || '작업지시서 등록에 실패했습니다.'));
   }
 }
 
@@ -955,10 +955,10 @@ function* updateWorkOrderSaga(action) {
       mockWorkOrders[index] = { ...mockWorkOrders[index], ...data };
       yield put(updateWorkOrder.success(mockWorkOrders[index]));
     } else {
-      yield put(updateWorkOrder.failure('작업 지시서를 찾을 수 없습니다.'));
+      yield put(updateWorkOrder.failure('작업지시서를 찾을 수 없습니다.'));
     }
   } catch (error) {
-    yield put(updateWorkOrder.failure(error.response?.data?.message || '작업 지시서 수정에 실패했습니다.'));
+    yield put(updateWorkOrder.failure(error.response?.data?.message || '작업지시서 수정에 실패했습니다.'));
   }
 }
 
@@ -971,7 +971,7 @@ function* deleteWorkOrderSaga(action) {
     mockWorkOrders = mockWorkOrders.filter((wo) => wo.id !== action.payload);
     yield put(deleteWorkOrder.success({ id: action.payload }));
   } catch (error) {
-    yield put(deleteWorkOrder.failure(error.response?.data?.message || '작업 지시서 삭제에 실패했습니다.'));
+    yield put(deleteWorkOrder.failure(error.response?.data?.message || '작업지시서 삭제에 실패했습니다.'));
   }
 }
 
@@ -993,10 +993,10 @@ function* updateWorkOrderStatusSaga(action) {
       mockWorkOrders[index] = updatedOrder;
       yield put(updateWorkOrderStatus.success(updatedOrder));
     } else {
-      yield put(updateWorkOrderStatus.failure('작업 지시서를 찾을 수 없습니다.'));
+      yield put(updateWorkOrderStatus.failure('작업지시서를 찾을 수 없습니다.'));
     }
   } catch (error) {
-    yield put(updateWorkOrderStatus.failure(error.response?.data?.message || '작업 지시서 상태 변경에 실패했습니다.'));
+    yield put(updateWorkOrderStatus.failure(error.response?.data?.message || '작업지시서 상태 변경에 실패했습니다.'));
   }
 }
 

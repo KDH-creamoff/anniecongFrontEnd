@@ -27,7 +27,7 @@ export default function InventoryMovementList() {
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   useEffect(() => {
     dispatch(fetchInventoryMovements.request({ page: 1, limit: 50 }));

@@ -122,7 +122,12 @@ const BOMRegistration = ({ onSave }) => {
 
   // 원재료 확인 (목록에 추가)
   const handleConfirmMaterial = () => {
-    // 원재료명(코드) 선택 안 했을 때
+    if (newMaterial.name === '') {
+      alert('원재료를 선택해주세요.');
+      return;
+    } 
+    if (newMaterial.code && newMaterial.name && newMaterial.amount && newMaterial.unit) {
+    }
     if (!newMaterial?.code) {
       alert('원재료명을 선택해주세요.');
       return;
