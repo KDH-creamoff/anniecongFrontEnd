@@ -53,7 +53,6 @@ export default function InventoryMovementList() {
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">시간</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">유형</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">품목</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">바코드번호</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">수량</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">출발지</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">도착지</th>
@@ -72,7 +71,6 @@ export default function InventoryMovementList() {
                 <td className="px-4 py-4">
                   <div className="text-sm text-gray-900">{m.category}</div>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">{m.lotNumber}</td>
                 <td className="px-4 py-4"><span className={`text-sm font-semibold ${qtyColor(m.quantity)}`}>{m.quantity}</span></td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.fromLocation}</td>
                 <td className="px-4 py-4 text-sm text-gray-900">{m.toLocation}</td>

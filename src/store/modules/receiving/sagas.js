@@ -248,7 +248,6 @@ function* printLabelSaga(action) {
 
 // ==================== Root Saga ====================
 export default function* receivingSaga() {
-  console.log('🟣 receivingSaga 등록 완료');
   yield takeLatest(FETCH_RECEIVING_LIST.REQUEST, fetchReceivingListSaga);
   yield takeLatest(CREATE_RECEIVING.REQUEST, createReceivingSaga);
   yield takeLatest(UPDATE_RECEIVING.REQUEST, updateReceivingSaga);

@@ -21,7 +21,7 @@ export default function InventoryStatusSummary() {
 
   const summaryCards = [
     { id: 1, title: "총 품목수", value: data.totalItems, icon: <Package className="h-6 w-6" />, bgColor: "bg-[#724323]", iconTextColor: "text-[#fff]" },
-    { id: 2, title: "부족 재고", value: data.lowStock, icon: <AlertTriangle className="h-6 w-6" />, bgColor: "bg-[#fef9c2]", iconTextColor: "text-[#d08700]" },
+    { id: 2, title: "재고 부족", value: data.lowStock, icon: <AlertTriangle className="h-6 w-6" />, bgColor: "bg-[#fef9c2]", iconTextColor: "text-[#d08700]" },
     { id: 3, title: "유통기한 임박", value: data.expiringSoon, icon: <Clock className="h-6 w-6" />, bgColor: "bg-[#ffedd4]", iconTextColor: "text-[#f65814]" },
     { id: 4, title: "창고 수", value: data.warehouseCount, icon: <MapPin className="h-6 w-6" />, bgColor: "bg-[#A3C478]", iconTextColor: "text-[#fff]" },
   ];

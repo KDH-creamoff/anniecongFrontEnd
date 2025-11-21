@@ -49,23 +49,23 @@ const TemperatureInput = ({ onFilterChange }) => {
 
   const handleRegister = () => {
     // 필수 값 검증
-    if (!filters.temperature || !filters.inspector) {
-      alert('모든 필드를 입력해주세요.');
+    if (!filters.temperature || !filters.storageType) {
+      alert('온도와 보관 유형을 입력해주세요.');
       return;
     }
 
-    const now = new Date();
+    // recordedAt: 선택한 날짜 + 시간 조합 (ISO DateTime)
+    const recordedAt = `${filters.date}T${filters.hour}:${filters.minute}:00`;
 
-    const registeredAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const measurementTime = `${filters.hour}:${filters.minute}`;
-
+    // 백엔드 API 형식에 맞게 데이터 구성
+    // POST /api/temperatures
+    // { factoryId, location?, celsius, recordedAt?, deviceId?, note? }
     const data = {
-      storageType: filters.storageType,
-      temperature: filters.temperature,
-      inspector: filters.inspector,
-      time: measurementTime,
-      date: registeredAt,
+      factoryId: 1, // TODO: 실제 공장 ID로 변경 필요 (로그인 사용자의 공장 또는 선택된 공장)
+      location: filters.storageType, // 냉장고, 냉동고, 상온
+      celsius: parseFloat(filters.temperature),
+      recordedAt: recordedAt,
+      note: filters.inspector ? `검수자: ${filters.inspector}` : undefined,
     };
 
     dispatch(updateTemperature.request(data));

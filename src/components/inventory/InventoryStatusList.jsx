@@ -47,7 +47,7 @@ export default function InventoryStatusList({ filters }) {
         }
       }
 
-      // 4. 검색어 필터 (품목명, 품목코드, 바코드번호)
+      // 4. 검색어 필터 (품목명, 품목코드)
       if (filters.searchTerm && filters.searchTerm.trim()) {
         const search = filters.searchTerm.toLowerCase().trim();
         const itemName = (item?.item || '').toLowerCase();
@@ -97,7 +97,6 @@ export default function InventoryStatusList({ filters }) {
               <th className="px-4 py-3 text-left text-sm font-medium">카테고리</th>
               <th className="px-4 py-3 text-left text-sm font-medium">재고량</th>
               <th className="px-4 py-3 text-left text-sm font-medium">창고/위치</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">바코드번호</th>
               <th className="px-4 py-3 text-left text-sm font-medium">유통기한</th>
               <th className="px-4 py-3 text-left text-sm font-medium">상태</th>
             </tr>

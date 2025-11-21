@@ -394,7 +394,7 @@ const BOMRegistration = ({ onSave }) => {
         </div>
       )}
     </div>
-  );
+  )};
 };
 
 export default BOMRegistration;

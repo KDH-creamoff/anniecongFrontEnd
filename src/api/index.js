@@ -285,6 +285,29 @@ export const inventoryAPI = {
 };
 
 // ============================================
+// 5-1. Temperature API (온도 관리)
+// ============================================
+export const temperatureAPI = {
+  // 온도 기록 생성
+  createTemperature: async (data) => {
+    const response = await apiClient.post('/temperatures', data);
+    return response;
+  },
+  
+  // 온도 이력 조회
+  getTemperatures: async (params = {}) => {
+    const response = await apiClient.get('/temperatures', { params });
+    return response;
+  },
+  
+  // 온도 기록 삭제
+  deleteTemperature: async (id) => {
+    const response = await apiClient.delete(`/temperatures/${id}`);
+    return response;
+  },
+};
+
+// ============================================
 // 6. Inventory Transactions API (재고 트랜잭션)
 // ============================================
 export const inventoryTransactionsAPI = {
