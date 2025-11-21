@@ -219,6 +219,8 @@ function* createItemSaga(action) {
       category: payload.category,
       unit: payload.unit,
       factory_id: payload.factoryId,
+      storage_temp: payload.storageTemp, // 보관 조건 name
+      storage_condition_id: payload.storageConditionId, // 보관 조건 ID
       shortage: payload.shortage,
       expiration_date: payload.shelfLife,
       wholesale_price: payload.wholesalePrice,
@@ -248,10 +250,11 @@ function* updateItemSaga(action) {
       name: data.name,
       category: data.category,
       unit: data.unit,
-      factoryId: data.factoryId,
+      factory_id: data.factoryId,
+      storage_condition_id: data.storageConditionId,
       shortage: data.shortage,
       expiration_date: data.shelfLife,
-      wholesalePrice: data.wholesalePrice,
+      wholesale_price: data.wholesalePrice,
     };
     
     const response = yield call(itemsAPI.updateItem, id, updateData);
@@ -403,6 +406,12 @@ function* fetchBomsSaga(action) {
 }
 
 function* fetchBomByIdSaga(action) {
+  // null이면 초기화만 하고 API 호출 안 함
+  if (action.payload === null) {
+    yield put(fetchBomById.success(null));
+    return;
+  }
+  
   try {
     const response = yield call(bomsAPI.getBom, action.payload);
     

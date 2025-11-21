@@ -83,11 +83,21 @@ const FactoryInfo = () => {
         return;
       }
 
-      // 쉼표로 구분된 공정 이름들을 배열로 변환
-      const processNames = processNamesInput
+      // 쉼표로 구분된 공정 이름들을 배열로 변환하고 중복 제거 (띄어쓰기 무시)
+      const trimmedNames = processNamesInput
         .split(',')
         .map(name => name.trim())
         .filter(name => name.length > 0);
+      
+      const seen = new Set();
+      const processNames = [];
+      for (const name of trimmedNames) {
+        const key = name.replace(/\s+/g, ''); // 공백 제거한 버전
+        if (!seen.has(key)) {
+          seen.add(key);
+          processNames.push(name); // 원본 형태 유지
+        }
+      }
 
       if (processNames.length === 0) {
         setError('공정 이름을 입력해주세요');
@@ -139,13 +149,17 @@ const FactoryInfo = () => {
     handleCloseModal();
   };
 
-  const handleRemoveProcess = (factoryId, processId) => {
+  const handleRemoveProcess = (factoryId, processId, processName) => {
     if (!processId) {
       console.warn('공정 ID가 없습니다.');
       return;
     }
 
-    if (window.confirm('공정을 제거하시겠습니까?')) {
+    const confirmMessage = processName 
+      ? `"${processName}" 공정을 제거하시겠습니까?`
+      : '공정을 제거하시겠습니까?';
+
+    if (window.confirm(confirmMessage)) {
       // Redux Saga 액션 dispatch
       dispatch(removeFactoryProcess.request({
         factoryId: factoryId,
@@ -219,7 +233,7 @@ const FactoryInfo = () => {
                         {processName}
                         <X
                           className='h-3 w-3 cursor-pointer hover:opacity-80'
-                          onClick={() => handleRemoveProcess(factory.id, processId || index)}
+                          onClick={() => handleRemoveProcess(factory.id, processId || index, processName)}
                         />
                       </span>
                     );
@@ -279,15 +293,25 @@ const FactoryInfo = () => {
                     setProcessNamesInput(e.target.value);
                     setError('');
                   }}
-                  placeholder='예: 전처리, 혼합, 포장'
-                  className='w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529] mb-5'
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddProcess();
+                    }
+                  }}
+                  placeholder='예: 전처리'
+                  className={`w-full rounded-xl border ${
+                    error ? 'border-red-300' : 'border-gray-300'
+                  } bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-[#674529] focus:outline-none focus:ring-2 focus:ring-[#674529]`}
                 />
+                <p className='mt-1 text-xs text-gray-500'>
+                  공정 이름을 쉼표로 구분하여 입력하세요. 중복된 공정은 자동으로 제외됩니다.
+                </p>
                 {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
               </div>
-              {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
             </div>
 
-            <div className='flex gap-3'>
+            <div className='flex gap-3 mt-2'>
               <button
                 onClick={handleCloseModal}
                 className='flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
